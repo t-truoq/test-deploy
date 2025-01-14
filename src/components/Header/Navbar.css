@@ -1,0 +1,93 @@
+/* Tổng quan thanh điều hướng */
+.navbar {
+    background: linear-gradient(to right, #f8f9fa, #ffffff); /* Hiệu ứng gradient nhạt */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tạo bóng nhẹ */
+    font-family: "Arial", sans-serif; /* Font chữ hiện đại */
+  }
+  
+  .navbar-brand {
+    font-size: 1.5rem; /* Kích thước lớn hơn cho logo */
+    font-weight: bold;
+    color: #b80f56; /* Màu hồng đậm cho logo */
+    text-transform: uppercase; /* Viết hoa toàn bộ */
+  }
+  
+  .navbar-brand img {
+    margin-right: 8px; /* Khoảng cách giữa logo và chữ */
+  }
+  
+  .nav-link {
+    font-size: 1rem; /* Kích thước chữ */
+    font-weight: 500;
+    color: #333; /* Màu chữ chính */
+    margin-right: 20px; /* Khoảng cách giữa các mục */
+    transition: color 0.3s ease; /* Hiệu ứng hover mượt */
+  }
+  
+  .nav-link:hover {
+    color: #b80f56; /* Đổi màu khi hover */
+  }
+  
+  .navbar-toggler {
+    border: none; /* Xóa viền nút toggler */
+  }
+  
+  .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ffffff' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Biểu tượng menu màu trắng */
+  }
+  
+  .navbar-nav .nav-item:last-child .nav-link {
+    color: #666; /* Màu sắc riêng cho mục ngôn ngữ */
+  }
+  
+  .navbar-nav .nav-item:last-child .nav-link:hover {
+    color: #b80f56; /* Màu sắc khi hover */
+  }
+  
+  /* Responsive: Thu nhỏ kích thước menu khi màn hình nhỏ */
+  @media (max-width: 992px) {
+    .nav-link {
+      font-size: 0.9rem;
+      margin-right: 10px;
+    }
+  
+    .navbar-brand {
+      font-size: 1.3rem;
+    }
+  }
+  
+  .bi-search {
+    font-size: 1.2rem; /* Điều chỉnh kích thước icon */
+    color: #333; /* Điều chỉnh màu sắc icon */
+  }
+  
+  @media (max-width: 991.98px) {
+    .navbar-collapse {
+      padding: 1rem 0;
+    }
+    
+    .navbar-nav {
+      gap: 0.5rem;
+    }
+    
+    .nav-link {
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+  }
+  
+  .navbar-collapse {
+    z-index: 1000;
+  }
+  
+  @media (max-width: 991.98px) {
+    .navbar-collapse {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  }
+  
