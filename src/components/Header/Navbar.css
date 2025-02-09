@@ -91,3 +91,25 @@
     }
   }
   
+  .login-btn {
+    background-color: #b80f56;
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  .login-btn:hover {
+    background-color: #8f0c42;
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  @media (max-width: 991.98px) {
+    .login-btn {
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+  

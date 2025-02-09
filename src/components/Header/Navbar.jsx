@@ -1,5 +1,8 @@
+import { Link, NavLink } from 'react-router-dom';
 import './Navbar.css';
+
 const Navbar = () => {
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
@@ -30,29 +33,29 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarNav" style={{ zIndex: 1000 }}>
           <ul className="navbar-nav ms-auto align-items-lg-center">
             <li className="nav-item">
-              <a className="nav-link py-2" href="#makeup">
+              <NavLink className="nav-link py-2" to="/">
                 Home
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#skincare">
+              <NavLink className="nav-link" to="/about">
                 About
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#gifts">
+              <NavLink className="nav-link" to="/blog">
                 Blog
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#branches">
+              <NavLink className="nav-link" to="/products">
                 Products
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#our-brand">
+              <NavLink className="nav-link" to="/services">
                 Services
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item mt-2 mt-lg-0">
               <form className="d-flex">
@@ -70,9 +73,14 @@ const Navbar = () => {
               </form>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#language">
+              <NavLink className="nav-link" to="/language">
                 US (EN)
-              </a>
+              </NavLink>
+            </li>
+            <li className="nav-item ms-lg-2">
+              <Link to="/login" className="btn btn-primary login-btn">
+                Login
+              </Link>
             </li>
           </ul>
         </div>
