@@ -150,7 +150,7 @@ const Body = () => {
                             <h1 className="slider-title">Unlock Your Natural Glow</h1>
                             <button
                                 className="btn btn-outline-light slider-btn"
-                                onClick={() => window.location.href = '/products'}
+                                onClick={() => window.location.href = '/services'}
                             >
                                 Know More
                             </button>
@@ -167,7 +167,7 @@ const Body = () => {
                             <h1 className="slider-title">Discover Your True Beauty</h1>
                             <button
                                 className="btn btn-outline-light slider-btn"
-                                onClick={() => window.location.href = '/products'}
+                                onClick={() => window.location.href = '/services'}
                             >
                                 Learn More
                             </button>
@@ -184,7 +184,7 @@ const Body = () => {
                             <h1 className="slider-title">Experience Premium Beauty</h1>
                             <button
                                 className="btn btn-outline-light slider-btn"
-                                onClick={() => window.location.href = '/products'}
+                                onClick={() => window.location.href = '/services'}
                             >
                                 Shop Now
                             </button>
@@ -245,18 +245,18 @@ const Body = () => {
                 {/* Virtual Skincare Analysis Banner */}
                 <div className="row mt-5">
                     <div className="col-md-12">
-                        <div className="card text-white" style={{ backgroundColor: "#3D021E" }}>
-                            <div className="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
-                                <div className="text-section" style={{ flex: "1" }}>
-                                    <h3 className="card-title">NEW Virtual Skincare Analysis</h3>
-                                    <p className="card-text">
+                        <div className="body-analysis-banner text-white" style={{ backgroundColor: "#3D021E" }}>
+                            <div className="body-analysis-content d-flex flex-column flex-md-row align-items-center justify-content-between">
+                                <div className="body-analysis-text" style={{ flex: "1" }}>
+                                    <h3 className="body-analysis-title">NEW Virtual Skincare Analysis</h3>
+                                    <p className="body-analysis-description">
                                         Looking For A Full Skincare Routine? Our NEW Virtual Skincare Analysis Tool
                                         Evaluates Your Skin And Provides The Most Personalized Recommendations.
                                     </p>
-                                    <p className="card-text fw-bold">Scan With Your Phone To Get Started</p>
+                                    <p className="body-analysis-instruction fw-bold">Scan With Your Phone To Get Started</p>
                                     <button className="btn btn-outline-light mt-3">Answer A Few Questions</button>
                                 </div>
-                                <div className="image-section mt-3 mt-md-0" style={{ flex: "1" }}>
+                                <div className="body-analysis-image mt-3 mt-md-0" style={{ flex: "1" }}>
                                     <img
                                         src="/newVisual/newVisual.jpg"
                                         alt="Virtual Skincare Analysis"

@@ -1,0 +1,54 @@
+import axios from 'axios';
+
+const axiosInstance = axios.create({
+  baseURL: 'https://67ab40ae5853dfff53d6b994.mockapi.io/api/v1',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
+// Request interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // Có thể thêm xử lý trước khi gửi request
+    // Ví dụ: thêm token authentication
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+axiosInstance.interceptors.response.use(
+  (response) => {
+    // Xử lý response data trước khi trả về
+    return response.data;
+  },
+  (error) => {
+    // Xử lý lỗi
+    if (error.response) {
+      // Lỗi response từ server (status code không phải 2xx)
+      console.error('Response error:', error.response.data);
+    } else if (error.request) {
+      // Không nhận được response
+      console.error('Request error:', error.request);
+    } else {
+      // Lỗi khi setup request
+      console.error('Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// API endpoints
+export const servicesAPI = {
+  getAll: () => axiosInstance.get('/services'),
+  getById: (id) => axiosInstance.get(`/services/${id}`),
+  create: (data) => axiosInstance.post('/services', data),
+  update: (id, data) => axiosInstance.put(`/services/${id}`, data),
+  delete: (id) => axiosInstance.delete(`/services/${id}`)
+};
+
+export default axiosInstance; 

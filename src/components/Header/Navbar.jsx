@@ -48,13 +48,13 @@ const Navbar = () => {
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/products">
-                Products
+              <NavLink className="nav-link" to="/services">
+                Services
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/services">
-                Services
+              <NavLink className="nav-link" to="/products">
+                Products
               </NavLink>
             </li>
             <li className="nav-item mt-2 mt-lg-0">

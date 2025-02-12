@@ -1,0 +1,214 @@
+/* Định dạng tổng thể */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Tiêu đề trang */
+  h1 {
+    font-size: 2.5rem;
+    color: #007bff;
+    font-weight: bold;
+  }
+  
+  /* Thẻ dịch vụ */
+  .card {
+    border: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: linear-gradient(to top, #ffffff, #f8f9fa);
+    cursor: pointer;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .card-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+  }
+  
+  /* Nút đặt hàng */
+  .btn-outline-primary {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border-width: 2px;
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
+  /* Hiển thị dịch vụ theo cột */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .col-md-3 {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+  }
+  
+  .card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+  }
+  
+  .form-check-input {
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .booking-bar {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .btn-booking {
+    background-color: #C71585;
+    color: white;
+    padding: 8px 24px;
+    border-radius: 4px;
+    border: none;
+  }
+  
+  .btn-booking:hover {
+    background-color: #B31574;
+    color: white;
+  }
+  
+  .service-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  
+  .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+  }
+  
+  .service-card.selected {
+    border: 2px solid #0d6efd;
+    background-color: rgba(13, 110, 253, 0.02);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+  }
+  
+  .service-card img {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+  
+  .service-card .card-body {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+  
+  .service-card .checkbox-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+  }
+  
+  .service-card .form-check-input {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Popup styles */
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .popup-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    transform: scale(0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .popup-overlay.active .popup-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+  
+  .popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .popup-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+  
+  .popup-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .popup-description {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  

@@ -67,6 +67,7 @@
     margin: 15px 0 10px;
 }
 
+/* Nút chính trong form */
 .login-wrapper .login-container button {
     background-color: #3D021E;
     color: #fff;
@@ -79,17 +80,20 @@
     text-transform: uppercase;
     margin-top: 10px;
     cursor: pointer;
-}
-
-.login-wrapper .login-container button.hidden {
-    background-color: transparent;
-    border-color: #fff;
-}
-
-/* Thêm hiệu ứng hover */
-.login-wrapper .login-container button:hover {
-    background-color: #2a0115;
     transition: background-color 0.3s ease;
+}
+
+/* Nút trong toggle panel */
+.login-wrapper .login-container button.hidden {
+    background-color: #3D021E;  /* Thay đổi từ transparent */
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+/* Hiệu ứng hover cho cả hai loại nút */
+.login-wrapper .login-container button:hover,
+.login-wrapper .login-container button.hidden:hover {
+    background-color: #2a0115;
 }
 
 .login-wrapper .login-container form {
