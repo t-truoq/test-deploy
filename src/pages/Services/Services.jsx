@@ -1,195 +1,253 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./Services.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './Services.css';
 
 const services = [
-  { 
-    id: 1, 
-    name: "Massage Thư Giãn", 
-    description: "Trải nghiệm massage thư giãn giúp giảm căng thẳng và đau nhức.",
-    image: "/services/massageThuGian.webp"
-  },
-  { 
-    id: 2, 
-    name: "Chăm Sóc Da Mặt", 
-    description: "Dịch vụ chăm sóc da chuyên sâu giúp bạn có làn da khỏe mạnh và rạng rỡ.",
-    image: "/services/chamSocDaMat.jpg"
-  },
-  { 
-    id: 3, 
-    name: "Tẩy Tế Bào Chết", 
-    description: "Loại bỏ tế bào chết mang lại làn da mịn màng và tươi mới.",
-    image: "/services/tayTeBaoChet.jpg"
-  },
-  { 
-    id: 4, 
-    name: "Xông Hơi Thảo Dược", 
-    description: "Xông hơi thư giãn giúp cải thiện tuần hoàn và thải độc tố.",
-    image: "/services/xongHoiThaoDuoc.jpg"
-  },
-  { 
-    id: 5, 
-    name: "Liệu Trình Trẻ Hóa", 
-    description: "Trẻ hóa làn da bằng công nghệ và liệu pháp tiên tiến.",
-    image: "/services/treHoa.jpg"
-  },
-  { 
-    id: 6, 
-    name: "Trị Mụn Chuyên Sâu", 
-    description: "Điều trị mụn hiệu quả và an toàn cho làn da nhạy cảm.",
-    image: "/services/triMunChuyenSau.jpg"
-  },
-  { 
-    id: 7, 
-    name: "Chăm Sóc Body", 
-    description: "Liệu trình chăm sóc cơ thể toàn diện giúp bạn thư giãn hoàn toàn.",
-    image: "/services/chamSocBody.jpg"
-  },
-  { 
-    id: 8, 
-    name: "Gội Đầu Thảo Dược", 
-    description: "Gội đầu bằng thảo dược tự nhiên giúp giảm stress và làm sạch tóc.",
-    image: "/services/goiDauThaoDuoc.jpg"
-  },
-];
-
-const ServiceCard = ({ service, onSelect, isSelected }) => {
-  const [showPopup, setShowPopup] = useState(false);
-
-  return (
-    <>
-      <div className="col-md-3 mb-4">
-        <div 
-          className={`card h-100 shadow-sm position-relative ${isSelected ? 'border-primary' : ''}`}
-          onClick={(e) => {
-            if (!e.target.classList.contains('form-check-input')) {
-              setShowPopup(true);
-            }
-          }}
-        >
-          <div className="position-absolute top-0 end-0 m-2" style={{ zIndex: 2 }}>
-            <input
-              type="checkbox"
-              className="form-check-input"
-              checked={isSelected}
-              onChange={(e) => {
-                e.stopPropagation();
-                onSelect(service);
-              }}
-              style={{ width: '20px', height: '20px' }}
-            />
-          </div>
-          <div id={`carousel-${service.id}`} className="carousel slide" data-bs-ride="carousel">
-            <div className="carousel-inner">
-              <div className="carousel-item active">
-                <img 
-                  src={service.image} 
-                  className="d-block w-100" 
-                  alt={service.name}
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="card-body text-center">
-            <h5 className="card-title font-weight-bold">{service.name}</h5>
-            <p className="card-text text-muted">{service.description}</p>
+{
+      id: 1,
+      name: "Hydrating Facial",
+      description: "A deeply hydrating treatment that restores moisture to dry skin.",
+      image: "/services/HydratingFacial.webp",
+      time: "60 minutes",
+      skin_therapist: "Dr. Tam Dep Trai",
+      price: 50.0,
+      note: "Best for dry and dehydrated skin."
+    },
+    {
+      id: 2,
+      name: "Acne Treatment",
+      description: "A specialized treatment to reduce acne and breakouts.",
+      image: "/services/AcneTreatment.jpg",
+      time: "75 minutes",
+      skin_therapist: "Dr. Nam Suoi Vang",
+      price: 70.0,
+      note: "Recommended for oily and acne-prone skin."
+    },
+    {
+      id: 3,
+      name: "Anti-Aging Facial",
+      description: "A rejuvenating facial to reduce fine lines and wrinkles.",
+      image: "/services/AntiAgingFacial.jpg",
+      time: "90 minutes",
+      skin_therapist: "Dr. Truong Mot Lan",
+      price: 90.0,
+      note: "Best for mature skin."
+    },
+    {
+      id: 4,
+      name: "Brightening Facial",
+      description: "A facial treatment to enhance skin radiance and even tone.",
+      image: "/services/BrighteningFacial.avif",
+      time: "75 minutes",
+      skin_therapist: "Dr. SNam Gay",
+      price: 80.0,
+      note: "Ideal for dull and uneven skin tone."
+    },
+    {
+      id: 5,
+      name: "Deep Cleansing Facial",
+      description: "A deep pore cleansing facial to remove impurities.",
+      image: "/services/DeepCleansingFacial.jpg",
+      time: "60 minutes",
+      skin_therapist: "Dr. SNam Gay",
+      price: 60.0,
+      note: "Best for congested and oily skin."
+    },
+    {
+      id: 6,
+      name: "Collagen Boosting Facial",
+      description: "A treatment to boost collagen production for firm skin.",
+      image: "/services/CollageBoostingFacial.jpeg",
+      time: "90 minutes",
+      skin_therapist: "Dr. Truong Mot Lan",
+      price: 100.0,
+      note: "Great for reducing fine lines."
+    },
+    {
+      id: 7,
+      name: "Oxygen Facial",
+      description: "A skin-revitalizing treatment using pure oxygen infusion.",
+      image: "/services/OxygenFacial.jpg",
+      time: "75 minutes",
+      skin_therapist: "Dr. Truong Mot Lan",
+      price: 85.0,
+      note: "Perfect for tired and stressed skin."
+    },
+    {
+      id: 8,
+      name: "Vitamin C Infusion Facial",
+      description: "A brightening treatment infused with Vitamin C.",
+      image: "/services/VitaminCInfusionFacial.jpg",
+      time: "60 minutes",
+      skin_therapist: "Dr. Tam Dep Trai",
+      price: 75.0,
+      note: "Enhances skin glow and evens skin tone."
+    },
+    {
+      id: 9,
+      name: "Microdermabrasion Treatment",
+      description: "An exfoliating treatment for smoother, fresher skin.",
+      image: "/services/MicrodermabrasionTreatment.jpg",
+      time: "60 minutes",
+      skin_therapist: "Dr. Nam Suoi Vang",
+      price: 95.0,
+      note: "Helps with uneven skin texture."
+    },
+    {
+      id: 10,
+      name: "Detox Facial",
+      description: "A purifying treatment that removes toxins and impurities.",
+      image: "/services/DetoxFacial.jpg",
+      time: "75 minutes",
+      skin_therapist: "Dr. Nam Suoi Vang",
+      price: 85.0,
+      note: "Ideal for city dwellers exposed to pollution."
+    },
+    {
+      id: 11,
+      name: "Sensitive Skin Facial",
+      description: "A gentle treatment designed for sensitive skin types.",
+      image: "/services/SensitiveSkinFacial.webp",
+      time: "60 minutes",
+      skin_therapist: "Dr. Tam Dep Trai",
+      price: 70.0,
+      note: "Calms redness and irritation."
+    },
+    {
+      id: 12,
+      name: "Gold Facial",
+      description: "A luxurious 24K gold facial for ultimate skin rejuvenation.",
+      image: "/services/GoldFacial.webp",
+      time: "90 minutes",
+      skin_therapist: "Dr. SNam Gay",
+      price: 120.0,
+      note: "Provides deep hydration and anti-aging benefits."
+    }
+  ]
+  const ServiceCard = ({ service, onSelect, isSelected }) => (
+    <div className="col-lg-6 mb-4">
+      <div className={`card h-100 ${isSelected ? 'selected' : ''}`} 
+        style={{ 
+          borderRadius: '12px',
+          backgroundColor: isSelected ? '#FCEEF3' : '#fff',
+          border: '1px solid #dee2e6',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+        }}>
+        <img 
+          src={service.image} 
+          className="card-img-top" 
+          alt={service.name} 
+          style={{ 
+            height: "250px", 
+            objectFit: "cover", 
+            borderRadius: "12px 12px 0 0",
+            padding: "10px"
+          }} 
+        />
+        <div className="card-body d-flex flex-column">
+          <h5 className="card-title mb-3" style={{ color: "#A10550", fontFamily: 'Playfair Display', fontWeight: 'bold' }}>
+            {service.name}
+          </h5>
+          <p className="card-text fw-bold mb-2">
+            ${service.price}.00 - {service.time}
+          </p>
+          <p className="card-text mb-4">
+            {service.description}
+          </p>
+          <div className="mt-auto d-flex gap-2">
+            <button 
+              className="btn flex-grow-1" 
+              style={{ 
+                backgroundColor: "#A10550", 
+                color: "#fff",
+                fontWeight: 'bold'
+              }} 
+              onClick={() => onSelect(service)}>
+              {isSelected ? 'Booked' : 'Book Now'}
+            </button>
+            <button 
+              className="btn btn-outline-dark flex-grow-1" 
+              style={{ fontWeight: 'bold' }}>
+              Details
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Popup */}
-      <div className={`popup-overlay ${showPopup ? 'active' : ''}`} onClick={() => setShowPopup(false)}>
-        <div className="popup-content" onClick={e => e.stopPropagation()}>
-          <span className="popup-close" onClick={() => setShowPopup(false)}>&times;</span>
-          <img src={service.image} alt={service.name} className="popup-image" />
-          <h3 className="popup-title">{service.name}</h3>
-          <p className="popup-description">{service.description}</p>
-          <button 
-            className="btn btn-booking w-100"
-            onClick={() => {
-              onSelect(service);
-              setShowPopup(false);
-            }}
-          >
-            {isSelected ? 'Hủy Chọn' : 'Chọn Dịch Vụ'}
-          </button>
-        </div>
-      </div>
-    </>
-  );
-};
-
-ServiceCard.propTypes = {
-  service: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-  }).isRequired,
-  onSelect: PropTypes.func.isRequired,
-  isSelected: PropTypes.bool.isRequired,
-};
-
-const Services = () => {
-  const [selectedServices, setSelectedServices] = useState([]);
-
-  const handleServiceSelect = (service) => {
-    setSelectedServices(prev => {
-      const isAlreadySelected = prev.find(s => s.id === service.id);
-      if (isAlreadySelected) {
-        return prev.filter(s => s.id !== service.id);
-      } else {
-        return [...prev, service];
-      }
-    });
-  };
-
-  return (
-    <div className="container mt-5">
-      <div className="d-flex align-items-center mb-4">
-        <span>Home</span>
-        <span className="mx-2">&gt;</span>
-        <span>Services</span>
-      </div>
-      
-      <h2 className="mb-4">Services</h2>
-      
-      <div className="row">
-        {services.map((service) => (
-          <ServiceCard 
-            key={service.id} 
-            service={service} 
-            onSelect={handleServiceSelect}
-            isSelected={selectedServices.some(s => s.id === service.id)}
-          />
-        ))}
-      </div>
-
-      {/* Thanh đặt dịch vụ */}
-      <div className="booking-bar bg-white p-3 mt-4">
-        <div className="d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center">
-            <span className="me-2">Number Of Services:</span>
-            <strong>{selectedServices.length}</strong>
-          </div>
-          <button 
-            className="btn btn-booking"
-            onClick={() => {
-              if (selectedServices.length === 0) {
-                alert('Vui lòng chọn ít nhất một dịch vụ');
-                return;
-              }
-              // Xử lý logic đặt hàng
-            }}
-          >
-            Booking Services
-          </button>
-        </div>
-      </div>
+      <hr className="service-divider" />
     </div>
   );
-};
+  
+  const SelectedServices = ({ selectedServices, clearServices }) => (
+    <div className="selected-services">
+      <h4>Number of services: {selectedServices.length}</h4>
+      <ul>
+        {selectedServices.map(service => <li key={service.id}>{service.name}</li>)}
+      </ul>
+      <button className="btn primary">Booking</button>
+      <button className="btn secondary" onClick={clearServices}>Clear Services</button>
+    </div>
+  );
+  
+  const Services = () => {
+    const [selectedServices, setSelectedServices] = useState([]);
+  
+    const handleSelect = (service) => {
+      setSelectedServices((prev) =>
+        prev.includes(service) ? prev.filter(s => s !== service) : [...prev, service]
+      );
+    };
+  
+    const clearServices = () => {
+      setSelectedServices([]);
+    };
+  
+    return (
+      <div className="services-page">
+        {/* Breadcrumb */}
+        <div className="container">
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mt-3">
+              <li className="breadcrumb-item"><a href="/" style={{ color: '#000', textDecoration: 'none' }}>Home</a></li>
+              <li className="breadcrumb-item active" aria-current="page" style={{ color: '#A10550' }}>Services</li>
+            </ol>
+          </nav>
+          <h2 className="mb-4" style={{ color: '#000' }}>Services</h2>
+        </div>
 
-export default Services;
+        {/* Services Grid */}
+        <div className="container" style={{ marginTop: '30px', marginBottom: '30px' }}>
+          <div className="row">
+            {services.map(service => 
+              <ServiceCard 
+                key={service.id} 
+                service={service} 
+                onSelect={handleSelect} 
+                isSelected={selectedServices.includes(service)} 
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Selected Services Box */}
+        <div className="services-summary">
+          <h4 className="services-summary-title">
+            Number of services: {selectedServices.length}
+          </h4>
+          <ul className="services-list">
+            {selectedServices.map(service => (
+              <li key={service.id} className="services-list-item">
+                {service.name}
+              </li>
+            ))}
+          </ul>
+          <button className="services-book-btn">Booking</button>
+          <button className="services-clear-btn" onClick={clearServices}>
+            Clear Services
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+  export default Services;
