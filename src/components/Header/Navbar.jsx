@@ -1,88 +1,59 @@
-import { Link, NavLink } from 'react-router-dom';
-import './Navbar.css';
+import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
-
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container">
+    <nav className="bg-gradient-to-r from-gray-100 to-white shadow-md py-3">
+      <div className="container mx-auto flex justify-between items-center px-4">
         {/* Logo */}
-        <a className="navbar-brand" href="#">
-          <img
-            src="/logo/logo.webp" // Thay thế bằng đường dẫn logo của bạn
-            alt="Beauty Logo"
-            style={{ height: "40px" }}
-          />
+        <Link to="/" className="flex items-center text-pink-700 font-bold text-xl uppercase">
+          <img src="/logo/logo.webp" alt="Beauty Logo" className="h-10 mr-2" />
           BEAUTYA
-        </a>
+        </Link>
 
-        {/* Toggle button cho mobile */}
-        <button
-          className="navbar-toggler border-0"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <i className="bi bi-list fs-3"></i>
+        {/* Mobile Menu Button */}
+        <button className="lg:hidden text-gray-700 text-2xl focus:outline-none">
+          <i className="bi bi-list"></i>
         </button>
 
         {/* Menu items */}
-        <div className="collapse navbar-collapse" id="navbarNav" style={{ zIndex: 1000 }}>
-          <ul className="navbar-nav ms-auto align-items-lg-center">
-            <li className="nav-item">
-              <NavLink className="nav-link py-2" to="/">
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/about">
-                About
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/blog">
-                Blog
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/services">
-                Services
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/products">
-                Products
-              </NavLink>
-            </li>
-            <li className="nav-item mt-2 mt-lg-0">
-              <form className="d-flex">
-                <div className="input-group">
-                  <input
-                    type="search"
-                    className="form-control form-control-sm"
-                    placeholder="Tìm kiếm..."
-                    aria-label="Search"
-                  />
-                  <button className="btn btn-outline btn-sm" type="submit">
-                    <i className="bi bi-search"></i>
-                  </button>
-                </div>
-              </form>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/language">
-                US (EN)
-              </NavLink>
-            </li>
-            <li className="nav-item ms-lg-2">
-              <Link to="/login" className="btn btn-primary login-btn">
-                Login
-              </Link>
-            </li>
-          </ul>
+        <div className="hidden lg:flex space-x-6 items-center">
+          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/">
+            Home
+          </NavLink>
+          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/about">
+            About
+          </NavLink>
+          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/blog">
+            Blog
+          </NavLink>
+          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/services">
+            Services
+          </NavLink>
+          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/products">
+            Products
+          </NavLink>
+
+          {/* Search Bar */}
+          <form className="relative">
+            <input
+              type="search"
+              className="border rounded-lg px-4 py-1 text-sm outline-none focus:ring-2 focus:ring-pink-400"
+              placeholder="Tìm kiếm..."
+            />
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <i className="bi bi-search"></i>
+            </button>
+          </form>
+
+          {/* Language */}
+          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/language">
+            US (EN)
+          </NavLink>
+
+          {/* Login Button */}
+          <Link to="/login" className="bg-pink-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-800 transition">
+            Login
+          </Link>
         </div>
       </div>
     </nav>

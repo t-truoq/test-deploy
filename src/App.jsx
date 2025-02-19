@@ -1,5 +1,5 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation } from 'react-router-dom';
+
 
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Header/Navbar'
@@ -16,7 +16,8 @@ function App() {
   const location = useLocation();
   const hiddenNavbarAndFooter = ['/login'];
   return (
-    <div className="app-container">
+    <>
+     <div className="app-container">
       {!hiddenNavbarAndFooter.includes(location.pathname) && <Navbar/>}
       <main>
         
@@ -30,7 +31,16 @@ function App() {
         </Routes>
       </main>
       {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer/>}
+      
     </div>
+{/* <div className="bg-green-500 text-white p-4 text-center">
+  Nếu phần này có nền màu xanh lá, Tailwind đã hoạt động!
+</div> */}
+
+    </>
+   
+
+    
   )
 }
 
