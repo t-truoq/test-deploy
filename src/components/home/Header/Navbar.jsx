@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+import CartButton from "./cart/CartButton";
 
 const Navbar = () => {
   return (
@@ -32,6 +33,7 @@ const Navbar = () => {
           <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/products">
             Products
           </NavLink>
+          
 
           {/* Search Bar */}
           <form className="relative">
@@ -54,6 +56,9 @@ const Navbar = () => {
           <Link to="/login" className="bg-pink-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-pink-800 transition">
             Login
           </Link>
+
+          {/* Shop Cart Icon */}
+          <CartButton/>
         </div>
       </div>
     </nav>

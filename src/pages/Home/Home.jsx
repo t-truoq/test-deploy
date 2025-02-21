@@ -1,4 +1,4 @@
-import Body from '../../components/Body/Body'
+import Body from '../../components/home/Body/Body'
 
 const Home = () => {
   return (
