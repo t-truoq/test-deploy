@@ -1,18 +1,47 @@
 "use client"
+import { useState } from "react"
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Clock, User, DollarSign, Bookmark } from "lucide-react"
-import { services } from '../../../data/services';
-
-// This would typically come from an API or database
+import { ArrowLeft, Clock, User, DollarSign, Bookmark, CheckCircle, Calendar } from "lucide-react"
+// import DatePicker from "react-datepicker"
+// import "react-datepicker/dist/react-datepicker.css"
+import { services } from "../../../data/service/services"
 
 export default function ServiceDetail() {
-    const { id } = useParams();
-    console.log(id)
-    const service = services.find((s) => s.id === Number(id));
-  
-    if (!service) {
-      return <div>Service not found</div>;
-    }
+  const { id } = useParams()
+  const service = services.find((s) => s.id === id)
+
+  const [selectedDuration, setSelectedDuration] = useState("30")
+  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedTime, setSelectedTime] = useState(null)
+
+  if (!service) {
+    return <div>Service not found</div>
+  }
+
+  const durationPrices = {
+    30: service.price,
+    45: service.price * 1.5,
+    60: service.price * 2,
+  }
+
+  const handleDurationChange = (duration) => {
+    setSelectedDuration(duration)
+  }
+
+  // Giả lập các khung giờ có sẵn
+  const availableTimes = [
+    new Date().setHours(9, 0, 0),
+    new Date().setHours(10, 0, 0),
+    new Date().setHours(11, 0, 0),
+    new Date().setHours(14, 0, 0),
+    new Date().setHours(15, 0, 0),
+    new Date().setHours(16, 0, 0),
+  ]
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date)
+    setSelectedTime(null) // Reset selected time when date changes
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -23,48 +52,129 @@ export default function ServiceDetail() {
         </Link>
       </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div>
           <img
             src={service.image || "/placeholder.svg"}
             alt={service.name}
-            className="w-full h-[500px] object-cover rounded-xl shadow-lg"
+            className="w-full h-[500px] object-cover rounded-xl shadow-lg mb-8"
           />
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Benefits</h2>
+            <ul className="space-y-2">
+              {service.benefits.map((benefit, index) => (
+                <li key={index} className="flex items-start">
+                  <CheckCircle className="text-[#A10550] mr-2 mt-1 flex-shrink-0" size={20} />
+                  <span className="text-gray-600">{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <div>
-          <h1 className="text-4xl font-playfair font-bold text-[#A10550] mb-4">{service.name}</h1>
-          <p className="text-xl text-gray-600 mb-6">{service.description}</p>
+          <h1 className="text-4xl font-playfair font-bold text-[#A10550] mb-6">{service.name}</h1>
+          <p className="text-xl text-gray-600 mb-8">{service.description}</p>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="flex items-center">
-              <Clock className="text-[#A10550] mr-2" size={24} />
-              <span className="font-semibold">{service.time}</span>
-            </div>
-            <div className="flex items-center">
-              <User className="text-[#A10550] mr-2" size={24} />
-              <span className="font-semibold">{service.skin_therapist}</span>
-            </div>
-            <div className="flex items-center">
-              <DollarSign className="text-[#A10550] mr-2" size={24} />
-              <span className="font-semibold">${service.price}.00</span>
-            </div>
-            <div className="flex items-center">
-              <Bookmark className="text-[#A10550] mr-2" size={24} />
-              <span className="font-semibold">{service.note}</span>
+          <div className="bg-gray-100 rounded-xl p-6 mb-8">
+            <h2 className="text-2xl font-bold mb-4">Service Details</h2>
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <Clock className="text-[#A10550] mr-4" size={24} />
+                <div>
+                  <p className="font-semibold">Duration</p>
+                  <p className="text-gray-600">{selectedDuration} minutes</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <User className="text-[#A10550] mr-4" size={24} />
+                <div>
+                  <p className="font-semibold">Skin Therapist</p>
+                  <p className="text-gray-600">{service.skin_therapist}</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <DollarSign className="text-[#A10550] mr-4" size={24} />
+                <div>
+                  <p className="font-semibold">Price</p>
+                  <p className="text-gray-600">${durationPrices[selectedDuration].toFixed(2)}</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <Bookmark className="text-[#A10550] mr-4" size={24} />
+                <div>
+                  <p className="font-semibold">Note</p>
+                  <p className="text-gray-600">{service.note}</p>
+                </div>
+              </div>
+              {selectedDate && selectedTime && (
+                <div className="flex items-center">
+                  <Calendar className="text-[#A10550] mr-4" size={24} />
+                  <div>
+                    <p className="font-semibold">Appointment</p>
+                    <p className="text-gray-600">
+                      {selectedDate.toDateString()} at{" "}
+                      {selectedTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold mb-4">Benefits</h2>
-          <ul className="list-disc pl-5 mb-8">
-            {service.benefits.map((benefit, index) => (
-              <li key={index} className="text-gray-600 mb-2">
-                {benefit}
-              </li>
-            ))}
-          </ul>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Choose Duration</h2>
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              {["30", "45", "60"].map((duration) => (
+                <button
+                  key={duration}
+                  onClick={() => handleDurationChange(duration)}
+                  className={`flex-1 py-4 px-6 rounded-lg font-bold text-lg transition-colors ${
+                    selectedDuration === duration
+                      ? "bg-[#A10550] text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {duration} min
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <button className="w-full bg-[#A10550] text-white py-3 px-6 rounded-lg font-bold text-lg hover:bg-[#8a0443] transition-colors">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Schedule Your Appointment</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={handleDateChange}
+                  minDate={new Date()}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholderText="Choose a date"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Time</label>
+                <DatePicker
+                  selected={selectedTime}
+                  onChange={(time) => setSelectedTime(time)}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={30}
+                  timeCaption="Time"
+                  dateFormat="h:mm aa"
+                  includeTimes={availableTimes}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholderText="Choose a time"
+                  disabled={!selectedDate}
+                />
+              </div>
+            </div>
+          </div>
+
+          <button className="w-full bg-[#A10550] text-white py-4 px-6 rounded-lg font-bold text-lg hover:bg-[#8a0443] transition-colors">
             Book Now
           </button>
         </div>
