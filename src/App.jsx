@@ -12,6 +12,7 @@ import Products from './pages/Products/Products';
 import Services from './pages/Services/Services';
 import Login from './pages/Login/Login';
 import ServiceDetail from './components/service/serviceDetail/SeviceDetail';
+import BlogInfo from "./components/blog/blogDetail/BlogInfor";
 
 function App() {
   const location = useLocation();
@@ -26,11 +27,11 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogInfo />} />
           <Route path="/products" element={<Products />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/:id" element={<ServiceDetail />} />
           <Route path="/login" element={<Login />} />
-
         </Routes>
       </main>
       {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer/>}

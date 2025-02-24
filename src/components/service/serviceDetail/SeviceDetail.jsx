@@ -2,8 +2,8 @@
 import { useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { ArrowLeft, Clock, User, DollarSign, Bookmark, CheckCircle, Calendar } from "lucide-react"
-// import DatePicker from "react-datepicker"
-// import "react-datepicker/dist/react-datepicker.css"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import { services } from "../../../data/service/services"
 
 export default function ServiceDetail() {
