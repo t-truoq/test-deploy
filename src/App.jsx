@@ -10,13 +10,14 @@ import About from './pages/About/About';
 import Blog from './pages/Blog/Blog';
 import Products from './pages/Products/Products';
 import Services from './pages/Services/Services';
-import Login from './pages/Login/Login';
 import ServiceDetail from './components/service/serviceDetail/SeviceDetail';
 import BlogInfo from "./components/blog/blogDetail/BlogInfor";
-
+import SignUp from './components/login/signUp/SignUp';
+import LoginPage from './components/login/LoginPage';
+import ForgetPassword from './components/login/forgetPass/forgetPass';
 function App() {
   const location = useLocation();
-  const hiddenNavbarAndFooter = ['/login'];
+  const hiddenNavbarAndFooter = [ '/signup','/login','/forgetpass'];
   return (
     <>
      <div className="app-container">
@@ -31,7 +32,9 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/:id" element={<ServiceDetail />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgetpass" element={<ForgetPassword />} />
         </Routes>
       </main>
       {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer/>}

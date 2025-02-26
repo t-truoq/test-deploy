@@ -4,7 +4,7 @@ const AboutBeautya = () => {
       {/* Hero Section */}
       <div className="relative w-full h-[600px]">
         <img 
-          src="./about/beautya/headerbeautya.png" 
+          src="public/about/AboutHeader.png" 
           alt="Beautya Spa Interior" 
           className="object-cover brightness-95 w-full h-full"
         />
@@ -36,7 +36,7 @@ const AboutBeautya = () => {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="relative h-[400px]">
                 <img 
-                  src="./about/beautya/mision.jpg" 
+                  src="./about/AboutBody.jpg" 
                   alt="Beautya Mission" 
                   className="object-cover rounded-lg w-full h-full"
                 />

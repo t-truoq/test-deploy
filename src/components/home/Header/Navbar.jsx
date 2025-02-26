@@ -7,7 +7,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center text-pink-700 font-bold text-xl uppercase">
-          <img src="/logo/logo.webp" alt="Beauty Logo" className="h-10 mr-2" />
+          <img src="./home/logo/logo.webp" alt="Beauty Logo" className="h-10 mr-2" />
           BEAUTYA
         </Link>
 
