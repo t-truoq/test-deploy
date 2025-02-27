@@ -1,5 +1,5 @@
 import Header from "../../../components/Admin/HeaderAdmin/Header";
-import OrderLists from "../../../components/Admin/OrderlistAdmin/OrderLists";
+import OrderlistAdmin from "../../../components/Admin/OrderlistAdmin/OrderlistAdmin";
 import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
 
 const OrderListAdmin = () => {
@@ -23,7 +23,7 @@ const OrderListAdmin = () => {
               OrderLists
             </h1>
           </div>
-          <OrderLists />
+          <OrderlistAdmin />
         </main>
       </div>
     </div>

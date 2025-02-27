@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function OrderLists() {
+export default function OrderlistAdmin() {
   const [orders] = useState([
     {
       id: "00001",
