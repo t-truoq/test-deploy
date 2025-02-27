@@ -12,7 +12,7 @@ import {
   MessageCircleWarning,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import "./Sidebar.css";
+import "./sidebar.css";
 
 export default function Sidebar() {
   const location = useLocation();
