@@ -30,9 +30,9 @@ const Navbar = () => {
           <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/services">
             Services
           </NavLink>
-          <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/products">
+          {/* <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/products">
             Products
-          </NavLink>
+          </NavLink> */}
           
 
           {/* Search Bar */}
@@ -40,7 +40,7 @@ const Navbar = () => {
             <input
               type="search"
               className="border rounded-lg px-4 py-1 text-sm outline-none focus:ring-2 focus:ring-pink-400"
-              placeholder="Tìm kiếm..."
+              placeholder="Search..."
             />
             <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">
               <i className="bi bi-search"></i>

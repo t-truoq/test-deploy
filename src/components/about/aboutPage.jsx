@@ -18,14 +18,14 @@ const AboutPage = () => {
       <AboutDoctor />
       <AboutFeedback />
 
-      {/* CTA Section */}
+      {/* CTA Section
       <div className="py-16 text-center">
         <AboutButton
           text="Book Services Now"
           onClick={() => console.log("Booking appointment")}
           className="mx-auto"
         />
-      </div>
+      </div> */}
     </div>
   )
 }
