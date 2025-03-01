@@ -15,14 +15,27 @@ import SignUp from "./components/login/signUp/SignUp";
 import LoginPage from "./components/login/LoginPage";
 import ForgetPassword from "./components/login/forgetPass/forgetPass";
 import HomeAdmin from "./pages/Admin/Home/HomeAdmin";
-import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
 import OrderListAdmin from "./pages/Admin/Orderlists/OrderlistAdmin";
 import CalendarAdmin from "./pages/Admin/Calendar/CalendarAdmin";
 import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
 import InvoiceAdmin from "./pages/Admin/Invoice/InvocieAdmin";
+import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
+import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
 function App() {
   const location = useLocation();
-  const hiddenNavbarAndFooter = ["/signup", "/login", "/forgetpass"];
+  const hiddenNavbarAndFooter = [
+    "/signup",
+    "/login",
+    "/forgetpass",
+    "/admin/home",
+    "/admin/services",
+    "/admin/orderlists",
+    "/admin/calendar",
+    "/admin/contact",
+    "/admin/invoice",
+    "/admin/feedback",
+  ];
+
   return (
     <>
       <div className="app-container">
@@ -46,6 +59,7 @@ function App() {
             <Route path="/admin/calendar" element={<CalendarAdmin />} />
             <Route path="/admin/contact" element={<ContactAdmin />} />
             <Route path="/admin/invoice" element={<InvoiceAdmin />} />
+            <Route path="/admin/feedback" element={<FeedbackManagement />} />
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}

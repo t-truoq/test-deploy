@@ -5,17 +5,25 @@ import { X } from "lucide-react";
 import PropTypes from "prop-types";
 
 const EditServiceModal = ({ service, onEditService, onClose }) => {
-  const [title, setTitle] = useState(service.title);
-  const [price, setPrice] = useState(service.price);
-  const [image, setImage] = useState(service.image);
+  const [formData, setFormData] = useState({
+    name: service.name,
+    price: service.price,
+    duration: service.duration,
+    imageUrl: service.imageUrl,
+    status: service.status,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onEditService(service.id, {
-      title,
-      price,
-      image,
-    });
+    onEditService(service.id, formData);
     onClose();
   };
 
@@ -35,17 +43,18 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
-              htmlFor="title"
+              htmlFor="name"
               className="mb-1 block text-sm font-medium text-gray-700"
             >
               Service Name
             </label>
             <input
               type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
               required
             />
           </div>
@@ -60,27 +69,74 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
             <input
               type="text"
               id="price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
               required
             />
           </div>
 
           <div className="mb-4">
             <label
-              htmlFor="image"
+              htmlFor="duration"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Duration
+            </label>
+            <div className="flex space-x-4">
+              {["30", "45", "60"].map((duration) => (
+                <label key={duration} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="duration"
+                    value={duration}
+                    checked={formData.duration === duration}
+                    onChange={handleChange}
+                    className="mr-2 focus:ring-[#4A0404]"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {duration === "60" ? "1 hour" : `${duration} min`}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="imageUrl"
               className="mb-1 block text-sm font-medium text-gray-700"
             >
               Image URL
             </label>
             <input
               type="text"
-              id="image"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              id="imageUrl"
+              name="imageUrl"
+              value={formData.imageUrl}
+              onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
             />
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="status"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
 
           <div className="flex justify-end gap-2">
@@ -93,7 +149,7 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#4A0404] hover:bg-[#3A0303] text-white rounded-md transition-colors"
+              className="rounded-md bg-[#4A0404] px-4 py-2 text-sm font-medium text-white hover:bg-[#3A0303]"
             >
               Save Changes
             </button>
@@ -106,10 +162,12 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
 
 EditServiceModal.propTypes = {
   service: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
     price: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
+    duration: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
   }).isRequired,
   onEditService: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
