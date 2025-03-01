@@ -1,48 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import Header from "../../../components/Admin/HeaderAdmin/Header";
-import ServiceCard from "../../../components/Admin/ServiceAdmin/Service";
+import ServiceRow from "../../../components/Admin/ServiceAdmin/ServiceRow";
 import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
 import AddServiceModal from "../../../components/Admin/ServiceAdmin/AddService";
 
 const ServicesAdmin = () => {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [services, setServices] = useState([
     {
-      id: 1,
-      title: "clear start prevent & glow",
+      id: "00001",
+      name: "clear start prevent & glow",
       price: "120.00",
-      image: "https://example.com/facial-treatment-1.jpg",
+      duration: "60",
+      imageUrl: "https://example.com/facial-treatment-1.jpg",
+      status: "Active",
     },
     {
-      id: 2,
-      title: "pro clear skin treatment",
+      id: "00002",
+      name: "pro clear skin treatment",
       price: "100.00",
-      image: "https://example.com/facial-treatment-2.jpg",
+      duration: "45",
+      imageUrl: "https://example.com/facial-treatment-2.jpg",
+      status: "Active",
     },
     {
-      id: 3,
-      title: "clear start back treatment",
+      id: "00003",
+      name: "clear start back treatment",
       price: "80.00",
-      image: "https://example.com/facial-treatment-3.jpg",
-    },
-    {
-      id: 4,
-      title: "clear start back treatment",
-      price: "80.00",
-      image: "https://example.com/facial-treatment-3.jpg",
-    },
-    {
-      id: 5,
-      title: "clear start back treatment",
-      price: "80.00",
-      image: "https://example.com/facial-treatment-3.jpg",
-    },
-    {
-      id: 6,
-      title: "clear start back treatment",
-      price: "80.00",
-      image: "https://example.com/facial-treatment-3.jpg",
+      duration: "30",
+      imageUrl: "https://example.com/facial-treatment-3.jpg",
+      status: "Inactive",
     },
   ]);
 
@@ -50,12 +40,15 @@ const ServicesAdmin = () => {
     setServices((prevServices) => [
       ...prevServices,
       {
-        id: prevServices.length + 1,
-        title: newService.name, // Convert name to title
+        id: String(prevServices.length + 1).padStart(5, "0"),
+        name: newService.name,
         price: newService.price,
-        image: newService.image,
+        duration: newService.duration,
+        imageUrl: newService.imageUrl,
+        status: "Active",
       },
     ]);
+    setIsAddModalOpen(false);
   };
 
   const handleEditService = (id, updatedService) => {
@@ -63,6 +56,12 @@ const ServicesAdmin = () => {
       prevServices.map((service) =>
         service.id === id ? { ...service, ...updatedService } : service
       )
+    );
+  };
+
+  const handleDeleteService = (id) => {
+    setServices((prevServices) =>
+      prevServices.filter((service) => service.id !== id)
     );
   };
 
@@ -79,26 +78,92 @@ const ServicesAdmin = () => {
           </div>
         </div>
 
-        <main className="p-7">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-semibold text-gray-900">Services</h1>
-            <AddServiceModal onAddService={handleAddService} />
+        <main className="p-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Service Management
+            </h1>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                id={service.id}
-                image={service.image}
-                title={service.title}
-                price={service.price}
-                onEditService={handleEditService}
-              />
-            ))}
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center rounded-md bg-[#4A0404] px-4 py-2 text-sm font-medium text-white hover:bg-[#3A0303] focus:outline-none focus:ring-2 focus:ring-[#4A0404] focus:ring-offset-2"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              Add New Service
+            </button>
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    ID
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Service Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Image
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Price
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Duration
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {services.map((service) => (
+                  <ServiceRow
+                    key={service.id}
+                    service={service}
+                    onEditService={handleEditService}
+                    onDeleteService={handleDeleteService}
+                  />
+                ))}
+              </tbody>
+            </table>
           </div>
         </main>
       </div>
+
+      {isAddModalOpen && (
+        <AddServiceModal
+          onAddService={handleAddService}
+          onClose={() => setIsAddModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
