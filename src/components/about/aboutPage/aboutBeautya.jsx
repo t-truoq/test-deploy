@@ -49,7 +49,7 @@ const AboutBeautya = () => {
                 <p className="text-gray-600 leading-relaxed">
                   At Beautya, we understand that every skin has its own story, and we want to help you write the most
                   beautiful one. Our expert team is constantly researching to provide personalized treatments tailored
-                  to each customer's needs.
+                  to each customer`&apos;`s needs.
                 </p>
                 <p className="text-gray-600 leading-relaxed">
                   Our goal is to become the leading skincare booking system, allowing customers to easily find suitable
