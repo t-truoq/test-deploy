@@ -1,20 +1,17 @@
 import React from "react";
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
 import LeftLogin from "../componentsLogin/LeftLogin";
 
 export default function SignUp() {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ email, password, name });
+    console.log({ email, password });
   };
 
   return (
