@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { ArrowLeft, Send } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LeftLogin from '../componentsLogin/LeftLogin'
 
 export default function ForgetPassword() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
 

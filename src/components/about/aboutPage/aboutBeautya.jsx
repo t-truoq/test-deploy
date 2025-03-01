@@ -4,7 +4,7 @@ const AboutBeautya = () => {
       {/* Hero Section */}
       <div className="relative w-full h-[600px]">
         <img 
-          src="public/about/AboutHeader.png" 
+          src="./about/AboutHeader.png" 
           alt="Beautya Spa Interior" 
           className="object-cover brightness-95 w-full h-full"
         />

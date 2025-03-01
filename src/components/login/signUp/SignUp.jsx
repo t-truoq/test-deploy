@@ -1,19 +1,20 @@
-"use client"
-
 import React from 'react'
 import { useState } from 'react'
 import { EyeIcon, EyeOffIcon } from "lucide-react"
+import { Link, useNavigate } from 'react-router-dom'
 import LeftLogin from "../componentsLogin/LeftLogin"
 
 export default function SignUp() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
   const [agreeTerms, setAgreeTerms] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log({ email, password })
+    console.log({ email, password, name })
   }
 
   return (
@@ -74,9 +75,9 @@ export default function SignUp() {
               />
               <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-900">
                 I agree to the{" "}
-                <a href="#" className="text-[#FF6B2B] hover:text-[#FF8F5B]">
+                <Link to="/terms" className="text-[#FF6B2B] hover:text-[#FF8F5B]">
                   Terms and Conditions
-                </a>
+                </Link>
               </label>
             </div>
 
@@ -118,9 +119,9 @@ export default function SignUp() {
 
           <p className="text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <a href="/login" className="text-orange-500 hover:text-orange-600">
+            <Link to="/login" className="text-orange-500 hover:text-orange-600">
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import React from 'react'
 import { useState } from 'react'
 import { EyeIcon, EyeOffIcon } from "lucide-react"
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function SignIn() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -58,9 +60,9 @@ export default function SignIn() {
               />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
-            <a href="/forgetpass" className="text-sm text-orange-500 hover:text-orange-600">
+            <Link to="/forgetpass" className="text-sm text-orange-500 hover:text-orange-600">
               Forgot your password?
-            </a>
+            </Link>
           </div>
 
           <button
@@ -100,10 +102,10 @@ export default function SignIn() {
         </div>
 
         <p className="text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <a href="/signup" className="text-orange-500 hover:text-orange-600">
+          Don&apos;t have an account?{" "}
+          <Link to="/signup" className="text-orange-500 hover:text-orange-600">
             Sign up now
-          </a>
+          </Link>
         </p>
       </div>
     </div>
