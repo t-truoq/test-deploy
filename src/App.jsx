@@ -14,6 +14,9 @@ import BlogInfo from "./components/blog/blogDetail/BlogInfor";
 import SignUp from "./components/login/signUp/SignUp";
 import LoginPage from "./components/login/LoginPage";
 import ForgetPassword from "./components/login/forgetPass/forgetPass";
+import SidebarProfile from "./components/Profile/SidebarProfile";
+import Wishlist from "./components/Profile/ProfileComponents/Wishlist";
+
 import HomeAdmin from "./pages/Admin/Home/HomeAdmin";
 import OrderListAdmin from "./pages/Admin/Orderlists/OrderlistAdmin";
 import CalendarAdmin from "./pages/Admin/Calendar/CalendarAdmin";
@@ -53,6 +56,8 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgetpass" element={<ForgetPassword />} />
+            <Route path="/profile" element={<SidebarProfile />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             {/* Admin router*/}
             <Route path="/admin/home" element={<HomeAdmin />} />
             <Route path="/admin/services" element={<ServicesAdmin />} />
