@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   ListChecks,
@@ -16,6 +16,16 @@ import "./sidebar.css";
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Xóa token và thông tin user từ localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Chuyển hướng về trang home
+    navigate('/');
+  };
 
   const mainNav = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/admin/home" },
@@ -28,7 +38,12 @@ export default function Sidebar() {
     { name: "Calendar", icon: Calendar, path: "/admin/calendar" },
     { name: "Contact", icon: Contact, path: "/admin/contact" },
     { name: "Invoice", icon: FileText, path: "/admin/invoice" },
-    { name: "Logout", icon: LogOut, path: "/logout" },
+    { 
+      name: "Logout", 
+      icon: LogOut, 
+      path: "/",
+      onClick: handleLogout 
+    },
   ];
 
   return (
@@ -71,7 +86,18 @@ export default function Sidebar() {
         <nav>
           {pages.map((item) => {
             const Icon = item.icon;
-            return (
+            return item.name === "Logout" ? (
+              <button
+                key={item.name}
+                onClick={item.onClick}
+                className={`sidebar-link w-full text-left ${
+                  location.pathname === item.path ? "active" : ""
+                }`}
+              >
+                <Icon className="sidebar-icon" />
+                {item.name}
+              </button>
+            ) : (
               <Link
                 to={item.path}
                 key={item.name}
