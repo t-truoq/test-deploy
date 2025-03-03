@@ -232,7 +232,7 @@ export default function SignIn() {
   // Xử lý callback từ Google OAuth2
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const code = params.get('code'); // Lấy code từ query param
+    const code = params.get('code');
 
     if (code) {
       handleGoogleCallback(code);
@@ -242,7 +242,6 @@ export default function SignIn() {
   const handleGoogleCallback = async (code) => {
     setIsLoading(true);
     try {
-      // Gọi API để đổi code lấy token
       const response = await axios.get(
         `https://a8d7-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
         { headers: { 'Content-Type': 'application/json' } }
@@ -362,7 +361,6 @@ export default function SignIn() {
   };
 
   const handleGoogleLogin = () => {
-    // Chuyển hướng đến endpoint OAuth2 của Google
     window.location.href = 'https://a8d7-118-69-182-149.ngrok-free.app/oauth2/authorization/google';
   };
 
@@ -479,10 +477,7 @@ export default function SignIn() {
           </button>
           <button
             type="button"
-            disabled={isLoading}
-            className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg transition-colors ${
-              isLoading ? 'bg-gray-200 cursor-not-allowed' : 'hover:bg-gray-50'
-            }`}
+            className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z" />
@@ -492,7 +487,7 @@ export default function SignIn() {
         </div>
 
         <p className="text-center text-sm text-gray-600">
-          Chưa có tài khoản?{' '}
+          Chưa có tài khoản?{" "}
           <Link to="/signup" className="text-orange-500 hover:text-orange-600">
             Đăng ký ngay
           </Link>
