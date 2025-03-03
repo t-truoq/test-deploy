@@ -25,7 +25,7 @@
 //       }
 
 //       // Gọi API login với email và password
-//       const response = await axios.post('https://a8d7-118-69-182-149.ngrok-free.app/api/auth/login', {
+//       const response = await axios.post('https://fd7d-1-52-185-27.ngrok-free.app/api/auth/login', {
 //         email,
 //         password
 //       })
@@ -243,7 +243,7 @@ export default function SignIn() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `https://a8d7-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+        `https://fd7d-1-52-185-27.ngrok-free.app/login/oauth2/code/google?code=${code}`,
         { headers: { 'Content-Type': 'application/json' } }
       );
 
@@ -303,7 +303,7 @@ export default function SignIn() {
 
       console.log('Request data:', { email, password });
       const response = await axios.post(
-        'https://a8d7-118-69-182-149.ngrok-free.app/auth/token',
+        'https://fd7d-1-52-185-27.ngrok-free.app/auth/token',
         { email, password },
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -361,7 +361,7 @@ export default function SignIn() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://a8d7-118-69-182-149.ngrok-free.app/oauth2/authorization/google';
+    window.location.href = 'https://fd7d-1-52-185-27.ngrok-free.app/oauth2/authorization/google';
   };
 
   return (

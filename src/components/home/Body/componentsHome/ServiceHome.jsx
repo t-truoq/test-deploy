@@ -67,7 +67,7 @@ export default function ServiceHome() {
 
       try {
         const response = await axios.get(
-          'https://a8d7-118-69-182-149.ngrok-free.app/api/services',
+          'https://fd7d-1-52-185-27.ngrok-free.app/api/services',
           {
             headers: {
               'Authorization': `Bearer ${token}`,

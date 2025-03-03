@@ -211,7 +211,7 @@ export default function ServiceDetail() {
 
       try {
         const response = await axios.get(
-          `https://a8d7-118-69-182-149.ngrok-free.app/api/services/${id}`,
+          `https://fd7d-1-52-185-27.ngrok-free.app/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
