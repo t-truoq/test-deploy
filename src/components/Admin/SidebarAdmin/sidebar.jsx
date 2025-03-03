@@ -39,7 +39,7 @@ export default function Sidebar() {
         className="flex items-center text-pink-700 font-bold text-xl uppercase"
       >
         <img
-          src="/public/home/logo/logo.webp"
+          src="/home/logo/logo.webp"
           alt="Beauty Logo"
           className="h-10 mr-2"
         />

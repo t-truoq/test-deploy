@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://67ab40ae5853dfff53d6b994.mockapi.io/api/v1',
+  baseURL: 'https://a8d7-118-69-182-149.ngrok-free.app/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -42,7 +42,16 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// API endpoints
+// Thêm API endpoints cho users
+export const usersAPI = {
+  getAll: () => axiosInstance.get('/users'),
+  getById: (id) => axiosInstance.get(`/users/${id}`),
+  create: (data) => axiosInstance.post('/users', data),
+  update: (id, data) => axiosInstance.put(`/users/${id}`, data),
+  delete: (id) => axiosInstance.delete(`/users/${id}`)
+};
+
+// Giữ nguyên servicesAPI
 export const servicesAPI = {
   getAll: () => axiosInstance.get('/services'),
   getById: (id) => axiosInstance.get(`/services/${id}`),
