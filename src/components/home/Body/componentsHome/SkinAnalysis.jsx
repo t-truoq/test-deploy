@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function SkinAnalysis() {
+  const navigate = useNavigate()
+
   return (
      <section className="bg-[#3D021E] rounded-2xl overflow-hidden mx-4 lg:mx-auto max-w-6xl h-[280px]">
               <div className="flex h-full">
@@ -15,7 +18,10 @@ export default function SkinAnalysis() {
                   <div className="space-y-2">
                     <p className="text-white/90 text-sm">Scan With Your Phone To Get Started</p>
                     <p className="text-white/90 text-sm">Or</p>
-                    <button className="border border-white/20 text-white px-6 py-1.5 rounded text-sm hover:bg-white/10 transition-colors">
+                    <button 
+                      onClick={() => navigate('/quiz')}
+                      className="border border-white/20 text-white px-6 py-1.5 rounded text-sm hover:bg-white/10 transition-colors"
+                    >
                       Answer A Few Questions
                     </button>
                   </div>

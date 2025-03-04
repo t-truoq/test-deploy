@@ -24,6 +24,9 @@ import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
 import InvoiceAdmin from "./pages/Admin/Invoice/InvocieAdmin";
 import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
 import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
+import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
+import Quiz from "./components/Quiz/Quiz";
+import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
 
 function App() {
   const location = useLocation();
@@ -58,6 +61,9 @@ function App() {
             <Route path="/forgetpass" element={<ForgetPassword />} />
             <Route path="/profile" element={<SidebarProfile />} />
             <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/mybooking" element={<MyBooking />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/myskintype" element={<MySkinType />} />
             {/* Admin router*/}
             <Route path="/admin/home" element={<HomeAdmin />} />
             <Route path="/admin/services" element={<ServicesAdmin />} />

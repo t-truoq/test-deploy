@@ -3,14 +3,13 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
-import ServiceCard from "../../service/serviceList/components/ServiceCard/ServiceCard"; // Ensure this path is correct
+import ServiceCard from "../../service/serviceList/components/ServiceCard/ServiceCard";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedServices, setSelectedServices] = useState([]); // Để quản lý trạng thái "Booked" của ServiceCard
+  const [selectedServices, setSelectedServices] = useState([]);
 
-  // Hàm chọn/xóa dịch vụ khỏi danh sách "Booked"
   const handleSelect = (service) => {
     setSelectedServices((prev) =>
       prev.some((s) => s.serviceId === service.serviceId)
@@ -19,26 +18,21 @@ const Wishlist = () => {
     );
   };
 
-  // Hàm thêm/xóa dịch vụ vào wishlist (lưu vào cookie)
   const handleAddToWishlist = (service) => {
     let updatedWishlist = [...wishlist];
     const isInWishlist = updatedWishlist.some((item) => item.serviceId === service.serviceId);
 
     if (isInWishlist) {
-      // Nếu đã có trong wishlist, xóa khỏi wishlist
       updatedWishlist = updatedWishlist.filter((item) => item.serviceId !== service.serviceId);
     } else {
-      // Nếu chưa có, thêm vào wishlist
       updatedWishlist.push(service);
     }
 
-    // Lưu wishlist vào cookie
-    Cookies.set("wishlist", JSON.stringify(updatedWishlist), { expires: 7 }); // Cookie hết hạn sau 7 ngày
+    Cookies.set("wishlist", JSON.stringify(updatedWishlist), { expires: 7 });
     setWishlist(updatedWishlist);
   };
 
   useEffect(() => {
-    // Lấy wishlist từ cookie khi component mount
     const savedWishlist = Cookies.get("wishlist");
     if (savedWishlist) {
       try {
@@ -61,8 +55,7 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Breadcrumb */}
+    <div className="max-w-7xl mx-auto px-4">
       <nav className="py-4">
         <ol className="flex items-center space-x-2">
           <li>
@@ -75,10 +68,8 @@ const Wishlist = () => {
         </ol>
       </nav>
 
-      {/* Title */}
       <h2 className="text-3xl font-bold mb-8 text-gray-800">Your Wishlist</h2>
 
-      {/* Wishlist Content */}
       {wishlist.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-600 text-lg">Your wishlist is empty.</p>
@@ -90,7 +81,7 @@ const Wishlist = () => {
           </Link>
         </div>
       ) : (
-        <div className="flex flex-wrap mb-8 justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {wishlist.map((service) => (
             <ServiceCard
               key={service.serviceId}
