@@ -211,7 +211,7 @@ export default function ServiceDetail() {
 
       try {
         const response = await axios.get(
-          `https://fd7d-1-52-185-27.ngrok-free.app/api/services/${id}`,
+          `https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -248,7 +248,7 @@ export default function ServiceDetail() {
     return (
       <div className="text-center py-8 text-red-600">
         {error}{" "}
-        <Link to="/signin" className="text-[#A10550] underline">
+        <Link to="/login" className="text-[#A10550] underline">
           Đăng nhập ngay
         </Link>
       </div>

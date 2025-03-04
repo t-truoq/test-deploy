@@ -124,11 +124,10 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
   }
 
   return (
-    <div className="w-full lg:w-1/3 p-4 group">
-      <div
-        className={`bg-white rounded-xl shadow-lg border ${
-          isSelected ? "border-[#A10550]" : "border-gray-200 hover:border-[#A10550]"
-        } p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]`}
+    <div className="w-full">
+      <div className={`bg-white rounded-xl shadow-lg border ${
+        isSelected ? "border-[#A10550]" : "border-gray-200 hover:border-[#A10550]"
+      } p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

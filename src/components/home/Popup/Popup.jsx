@@ -6,7 +6,7 @@ export const PopupModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate()
 
   const handleTakeTest = () => {
-    navigate("/skin-test")
+    navigate("/quiz")
     onClose()
   }
 

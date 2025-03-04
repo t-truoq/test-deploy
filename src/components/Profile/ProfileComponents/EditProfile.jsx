@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react";
 import { Check, AlertCircle, Eye, EyeOff, Save } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
+    userId: null,
+    email: "",
     name: "",
     phone: "",
     address: "",
+    role: "",
+    createdAt: "",
+    updatedAt: "",
   });
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -18,7 +25,7 @@ const EditProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: "", message: "" });
   const [changePassword, setChangePassword] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -28,31 +35,23 @@ const EditProfile = () => {
           throw new Error("No token found. Please login again.");
         }
 
-        // Decode token để lấy userId
+        // Kiểm tra token có hợp lệ không
         let decodedToken;
         try {
           decodedToken = JSON.parse(atob(token.split('.')[1]));
-        } catch (error) {
-          console.error("Error decoding token:", error);
+          console.log("Decoded token:", decodedToken);
+        } catch (err) {
+          console.error("Invalid token format:", err);
           throw new Error("Invalid token format. Please login again.");
         }
 
-        const fetchedUserId = decodedToken.sub;
-        if (!fetchedUserId) {
-          throw new Error("Invalid token: userId (sub) not found");
-        }
-
-        // Log userId và token để debug
-        console.log("Fetching user data with userId:", fetchedUserId);
-        console.log("Token:", token);
-        setUserId(fetchedUserId);
-
         const response = await axios.get(
-          `https://fd7d-1-52-185-27.ngrok-free.app/api/users/${fetchedUserId}`,
+          `https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
               'ngrok-skip-browser-warning': 'true',
+              'Content-Type': 'application/json',
             },
           }
         );
@@ -60,9 +59,14 @@ const EditProfile = () => {
         console.log("Fetch user data response:", response.data);
 
         setUser({
+          userId: response.data.userId || null,
+          email: response.data.email || "",
           name: response.data.name || "",
           phone: response.data.phone || "",
           address: response.data.address || "",
+          role: response.data.role || "",
+          createdAt: response.data.createdAt || "",
+          updatedAt: response.data.updatedAt || "",
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -70,26 +74,28 @@ const EditProfile = () => {
           console.log("Error response:", error.response.data);
           console.log("Status:", error.response.status);
           if (error.response.status === 400) {
-            showNotification("error", `Bad request: ${error.response.data.message || "Invalid user ID format"}`);
+            setError(error.response.data.message || "Bad request: Invalid request");
           } else if (error.response.status === 401) {
-            showNotification("error", "Unauthorized: Please login again.");
-            window.location.href = "/login";
+            setError("Unauthorized: Please login again.");
+            setTimeout(() => {
+              navigate("/login");
+            }, 2000);
           } else if (error.response.status === 404) {
-            showNotification("error", "User not found.");
+            setError("Profile not found.");
           } else {
-            showNotification("error", error.response.data.message || "Failed to load profile data. Please try again.");
+            setError(error.response.data.message || "Failed to load profile data. Please try again.");
           }
         } else if (error.request) {
           console.log("No response received:", error.request);
-          showNotification("error", "Unable to connect to server. Please try again.");
+          setError("Unable to connect to server. Please try again.");
         } else {
-          showNotification("error", error.message || "Failed to load profile data. Please try again.");
+          setError(error.message || "Failed to load profile data. Please try again.");
         }
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,6 +115,8 @@ const EditProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+    setNotification({ show: false, type: "", message: "" });
 
     try {
       if (changePassword) {
@@ -119,6 +127,10 @@ const EditProfile = () => {
         if (newPassword.length < 6) {
           throw new Error("Password must be at least 6 characters");
         }
+
+        if (!currentPassword) {
+          throw new Error("Please enter your current password");
+        }
       }
 
       const updateData = {
@@ -127,9 +139,10 @@ const EditProfile = () => {
         address: user.address,
       };
 
-      if (changePassword && newPassword) {
+      if (changePassword) {
         updateData.currentPassword = currentPassword;
         updateData.password = newPassword;
+        updateData.confirmPassword = confirmPassword;
       }
 
       const token = localStorage.getItem("token");
@@ -137,36 +150,41 @@ const EditProfile = () => {
         throw new Error("No token found. Please login again.");
       }
 
-      if (!userId) {
-        throw new Error("User ID not found. Please try again.");
-      }
+      console.log("Sending update data:", updateData);
 
-      // Gửi yêu cầu PUT để cập nhật profile
       const response = await axios.put(
-        `https://fd7d-1-52-185-27.ngrok-free.app/api/users/${userId}`,
+        `https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/users/profile`,
         updateData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
             'ngrok-skip-browser-warning': 'true',
+            'Content-Type': 'application/json',
           },
         }
       );
 
       console.log("Update profile response:", response.data);
 
-      localStorage.setItem("user", JSON.stringify({
-        ...JSON.parse(localStorage.getItem("user")),
-        name: response.data.name,
-      }));
+      if (response.status === 200 || (response.data && response.data.message === "Profile updated successfully")) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...JSON.parse(localStorage.getItem("user") || "{}"),
+            name: response.data.name || user.name,
+          })
+        );
 
-      showNotification("success", "Profile updated successfully!");
+        showNotification("success", "Profile updated successfully!");
 
-      if (changePassword) {
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-        setChangePassword(false);
+        if (changePassword) {
+          setCurrentPassword("");
+          setNewPassword("");
+          setConfirmPassword("");
+          setChangePassword(false);
+        }
+      } else {
+        throw new Error("Profile update failed: Unexpected response from server");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -175,11 +193,15 @@ const EditProfile = () => {
         console.log("Status:", error.response.status);
         if (error.response.status === 401) {
           showNotification("error", "Unauthorized: Please login again.");
-          window.location.href = "/login";
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
         } else if (error.response.status === 403) {
           showNotification("error", "You do not have permission to update this profile.");
         } else if (error.response.status === 404) {
-          showNotification("error", "User not found.");
+          showNotification("error", "Profile not found.");
+        } else if (error.response.status === 400) {
+          showNotification("error", error.response.data.message || "Bad request: Invalid data provided.");
         } else {
           showNotification("error", error.response.data.message || "Failed to update profile. Please try again.");
         }
@@ -194,6 +216,23 @@ const EditProfile = () => {
     }
   };
 
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-3xl text-center">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Error</h1>
+          <p className="text-red-600">{error}</p>
+          <button
+            onClick={() => navigate("/login")}
+            className="mt-4 px-6 py-2 bg-pink-700 text-white rounded-md hover:bg-pink-800 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -203,9 +242,11 @@ const EditProfile = () => {
         </div>
 
         {notification.show && (
-          <div className={`px-6 py-3 mb-4 flex items-center ${
-            notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-          }`}>
+          <div
+            className={`px-6 py-3 mb-4 flex items-center ${
+              notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+            }`}
+          >
             {notification.type === "success" ? (
               <Check className="h-5 w-5 mr-2" />
             ) : (
@@ -251,6 +292,21 @@ const EditProfile = () => {
               </div>
 
               <div className="mt-6">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={user.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500 bg-gray-100"
+                  disabled
+                />
+              </div>
+
+              <div className="mt-6">
                 <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                   Address
                 </label>
@@ -261,6 +317,51 @@ const EditProfile = () => {
                   onChange={handleChange}
                   rows="3"
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+
+              <div className="mt-6">
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
+                </label>
+                <input
+                  type="text"
+                  id="role"
+                  name="role"
+                  value={user.role}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500 bg-gray-100"
+                  disabled
+                />
+              </div>
+
+              <div className="mt-6">
+                <label htmlFor="createdAt" className="block text-sm font-medium text-gray-700 mb-1">
+                  Created At
+                </label>
+                <input
+                  type="text"
+                  id="createdAt"
+                  name="createdAt"
+                  value={user.createdAt ? new Date(user.createdAt).toLocaleString() : ""}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500 bg-gray-100"
+                  disabled
+                />
+              </div>
+
+              <div className="mt-6">
+                <label htmlFor="updatedAt" className="block text-sm font-medium text-gray-700 mb-1">
+                  Updated At
+                </label>
+                <input
+                  type="text"
+                  id="updatedAt"
+                  name="updatedAt"
+                  value={user.updatedAt ? new Date(user.updatedAt).toLocaleString() : ""}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500 bg-gray-100"
+                  disabled
                 />
               </div>
             </div>
@@ -361,9 +462,25 @@ const EditProfile = () => {
               >
                 {isLoading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Updating...
                   </>
