@@ -24,9 +24,13 @@ import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
 import InvoiceAdmin from "./pages/Admin/Invoice/InvocieAdmin";
 import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
 import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
+<<<<<<< HEAD
+import HomeStaff from "./pages/Staff/HomeStaff";
+=======
 import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
 import Quiz from "./components/Quiz/Quiz";
 import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
+>>>>>>> a683d0ebb9d49b994cca7e2606bdcf30f58a48eb
 
 function App() {
   const location = useLocation();
@@ -41,6 +45,11 @@ function App() {
     "/admin/contact",
     "/admin/invoice",
     "/admin/feedback",
+    "/staff/home",
+    "/staff/appointments",
+    "/staff/schedule",
+    "/staff/clients",
+    "/staff/staff-list",
   ];
 
   return (
@@ -72,7 +81,16 @@ function App() {
             <Route path="/admin/contact" element={<ContactAdmin />} />
             <Route path="/admin/invoice" element={<InvoiceAdmin />} />
             <Route path="/admin/feedback" element={<FeedbackManagement />} />
+<<<<<<< HEAD
+            {/* Staff router*/}
+            <Route path="/staff/home" element={<HomeStaff />} />
+            <Route path="/staff/appointments" element={<HomeStaff />} />
+            <Route path="/staff/clients" element={<HomeStaff />} />
+            <Route path="/staff/staff-list" element={<HomeStaff />} />
+            <Route path="/staff/schedule" element={<HomeStaff />} />
+=======
             <Route path="/" element={<Home />} />
+>>>>>>> a683d0ebb9d49b994cca7e2606bdcf30f58a48eb
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}
