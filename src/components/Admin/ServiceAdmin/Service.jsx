@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import EditServiceModal from "./EditService";
 import PropTypes from "prop-types";

@@ -21,6 +21,8 @@ import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
 import InvoiceAdmin from "./pages/Admin/Invoice/InvocieAdmin";
 import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
 import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
+import HomeStaff from "./pages/Staff/HomeStaff";
+
 function App() {
   const location = useLocation();
   const hiddenNavbarAndFooter = [
@@ -34,6 +36,11 @@ function App() {
     "/admin/contact",
     "/admin/invoice",
     "/admin/feedback",
+    "/staff/home",
+    "/staff/appointments",
+    "/staff/schedule",
+    "/staff/clients",
+    "/staff/staff-list",
   ];
 
   return (
@@ -60,6 +67,12 @@ function App() {
             <Route path="/admin/contact" element={<ContactAdmin />} />
             <Route path="/admin/invoice" element={<InvoiceAdmin />} />
             <Route path="/admin/feedback" element={<FeedbackManagement />} />
+            {/* Staff router*/}
+            <Route path="/staff/home" element={<HomeStaff />} />
+            <Route path="/staff/appointments" element={<HomeStaff />} />
+            <Route path="/staff/clients" element={<HomeStaff />} />
+            <Route path="/staff/staff-list" element={<HomeStaff />} />
+            <Route path="/staff/schedule" element={<HomeStaff />} />
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}

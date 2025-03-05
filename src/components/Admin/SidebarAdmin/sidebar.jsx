@@ -1,5 +1,3 @@
-"use client";
-
 import { useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -12,7 +10,6 @@ import {
   MessageCircleWarning,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import "./sidebar.css";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -32,14 +29,14 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="sidebar">
+    <div className="w-64 min-h-screen bg-white border-r border-gray-200 p-4 flex flex-col">
       {/* Logo - Updated to link to dashboard */}
       <Link
         to="/admin/home"
         className="flex items-center text-pink-700 font-bold text-xl uppercase"
       >
         <img
-          src="/public/home/logo/logo.webp"
+          src="/home/logo/logo.webp"
           alt="Beauty Logo"
           className="h-10 mr-2"
         />
@@ -47,18 +44,20 @@ export default function Sidebar() {
       </Link>
 
       {/* Main Navigation */}
-      <nav className="sidebar-nav">
+      <nav className="flex flex-col gap-1 mt-8">
         {mainNav.map((item) => {
           const Icon = item.icon;
           return (
             <Link
               to={item.path}
               key={item.name}
-              className={`sidebar-link ${
-                location.pathname === item.path ? "active" : ""
+              className={`flex items-center w-full p-2 text-sm rounded-lg transition-all duration-300 ease-in-out hover:bg-pink-100 hover:text-pink-700 hover:scale-105 ${
+                location.pathname === item.path
+                  ? "bg-pink-50 text-pink-700 font-semibold scale-[1.08] shadow-md shadow-pink-700/15"
+                  : "text-gray-600"
               }`}
             >
-              <Icon className="sidebar-icon" />
+              <Icon className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out hover:rotate-10" />
               {item.name}
             </Link>
           );
@@ -66,20 +65,24 @@ export default function Sidebar() {
       </nav>
 
       {/* Pages Section */}
-      <div className="sidebar-pages">
-        <h2>PAGES</h2>
-        <nav>
+      <div className="mt-8">
+        <h2 className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          PAGES
+        </h2>
+        <nav className="flex flex-col gap-1">
           {pages.map((item) => {
             const Icon = item.icon;
             return (
               <Link
                 to={item.path}
                 key={item.name}
-                className={`sidebar-link ${
-                  location.pathname === item.path ? "active" : ""
+                className={`flex items-center w-full p-2 text-sm rounded-lg transition-all duration-300 ease-in-out hover:bg-pink-100 hover:text-pink-700 hover:scale-105 ${
+                  location.pathname === item.path
+                    ? "bg-pink-50 text-pink-700 font-semibold scale-[1.08] shadow-md shadow-pink-700/15"
+                    : "text-gray-600"
                 }`}
               >
-                <Icon className="sidebar-icon" />
+                <Icon className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out group-hover:rotate-10" />
                 {item.name}
               </Link>
             );

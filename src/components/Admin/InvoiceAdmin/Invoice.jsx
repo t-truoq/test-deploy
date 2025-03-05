@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Printer, Send, Filter, ChevronDown } from "lucide-react";
 
