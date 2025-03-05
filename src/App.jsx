@@ -14,6 +14,9 @@ import BlogInfo from "./components/blog/blogDetail/BlogInfor";
 import SignUp from "./components/login/signUp/SignUp";
 import LoginPage from "./components/login/LoginPage";
 import ForgetPassword from "./components/login/forgetPass/forgetPass";
+import SidebarProfile from "./components/Profile/SidebarProfile";
+import Wishlist from "./components/Profile/ProfileComponents/Wishlist";
+
 import HomeAdmin from "./pages/Admin/Home/HomeAdmin";
 import OrderListAdmin from "./pages/Admin/Orderlists/OrderlistAdmin";
 import CalendarAdmin from "./pages/Admin/Calendar/CalendarAdmin";
@@ -21,7 +24,13 @@ import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
 import InvoiceAdmin from "./pages/Admin/Invoice/InvocieAdmin";
 import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
 import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
+<<<<<<< HEAD
 import HomeStaff from "./pages/Staff/HomeStaff";
+=======
+import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
+import Quiz from "./components/Quiz/Quiz";
+import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
+>>>>>>> a683d0ebb9d49b994cca7e2606bdcf30f58a48eb
 
 function App() {
   const location = useLocation();
@@ -59,6 +68,11 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgetpass" element={<ForgetPassword />} />
+            <Route path="/profile" element={<SidebarProfile />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/mybooking" element={<MyBooking />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/myskintype" element={<MySkinType />} />
             {/* Admin router*/}
             <Route path="/admin/home" element={<HomeAdmin />} />
             <Route path="/admin/services" element={<ServicesAdmin />} />
@@ -67,12 +81,16 @@ function App() {
             <Route path="/admin/contact" element={<ContactAdmin />} />
             <Route path="/admin/invoice" element={<InvoiceAdmin />} />
             <Route path="/admin/feedback" element={<FeedbackManagement />} />
+<<<<<<< HEAD
             {/* Staff router*/}
             <Route path="/staff/home" element={<HomeStaff />} />
             <Route path="/staff/appointments" element={<HomeStaff />} />
             <Route path="/staff/clients" element={<HomeStaff />} />
             <Route path="/staff/staff-list" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
+=======
+            <Route path="/" element={<Home />} />
+>>>>>>> a683d0ebb9d49b994cca7e2606bdcf30f58a48eb
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}
