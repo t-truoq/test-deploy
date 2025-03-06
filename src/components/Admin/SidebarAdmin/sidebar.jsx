@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-import { useLocation } from "react-router-dom";
-=======
-"use client";
-
 import { useLocation, useNavigate } from "react-router-dom";
->>>>>>> a683d0ebb9d49b994cca7e2606bdcf30f58a48eb
 import {
   LayoutDashboard,
   ListChecks,
@@ -23,11 +17,11 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     // Xóa token và thông tin user từ localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     // Chuyển hướng về trang home
-    navigate('/');
+    navigate("/");
   };
 
   const mainNav = [
@@ -41,11 +35,11 @@ export default function Sidebar() {
     { name: "Calendar", icon: Calendar, path: "/admin/calendar" },
     { name: "Contact", icon: Contact, path: "/admin/contact" },
     { name: "Invoice", icon: FileText, path: "/admin/invoice" },
-    { 
-      name: "Logout", 
-      icon: LogOut, 
+    {
+      name: "Logout",
+      icon: LogOut,
       path: "/",
-      onClick: handleLogout 
+      onClick: handleLogout,
     },
   ];
 

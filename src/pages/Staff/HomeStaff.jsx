@@ -39,7 +39,7 @@ export default function HomeStaff() {
         );
       case "/staff/clients":
         return <StaffClients />;
-      case "/staff/staff-list":
+      case "/staff/skintherapist":
         return <StaffList />;
       case "/staff/schedule":
         return <StaffSchedule />;
