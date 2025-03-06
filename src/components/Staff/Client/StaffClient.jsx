@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Search, MoreHorizontal, Plus } from "lucide-react";
 import { AddClientModal } from "./AddClientModal";
+import { EditClientModal } from "./EditClientModal";
 
-const clients = [
+const initialClients = [
   {
     id: "1",
     name: "Emma Thompson",
@@ -78,9 +79,12 @@ const clients = [
 ];
 
 export function StaffClients() {
+  const [clients, setClients] = useState(initialClients);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
+  const [clientToDelete, setClientToDelete] = useState(null);
 
   const filteredClients = clients.filter(
     (client) =>
@@ -92,7 +96,7 @@ export function StaffClients() {
   const getStatusColor = (status) => {
     switch (status) {
       case "active":
-        return "bg-teal-100 text-teal-800";
+        return "bg-green-100 text-green-800";
       case "inactive":
         return "bg-gray-100 text-gray-800";
       default:
@@ -100,8 +104,43 @@ export function StaffClients() {
     }
   };
 
+  const handleEditClient = (client) => {
+    setEditingClient(client);
+  };
+
+  const handleSaveEditedClient = (updatedClient) => {
+    setClients(
+      clients.map((client) =>
+        client.id === updatedClient.id ? updatedClient : client
+      )
+    );
+    setEditingClient(null);
+  };
+
+  const handleDeleteClient = (clientId) => {
+    setClientToDelete(clientId);
+  };
+
+  const confirmDeleteClient = () => {
+    if (clientToDelete) {
+      setClients(clients.filter((client) => client.id !== clientToDelete));
+      setClientToDelete(null);
+    }
+  };
+
+  const handleAddClient = (newClient) => {
+    const client = {
+      ...newClient,
+      id: (clients.length + 1).toString(),
+      visits: 0,
+      lastVisit: "N/A",
+    };
+    setClients([...clients, client]);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
@@ -120,13 +159,14 @@ export function StaffClients() {
         </div>
       </div>
 
+      {/* Search and Table */}
       <div className="p-6">
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search clients..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -164,7 +204,7 @@ export function StaffClients() {
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-800 text-sm font-medium">
+                      <div className="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-800 text-sm font-medium">
                         {client.name
                           .split(" ")
                           .map((n) => n[0])
@@ -214,34 +254,20 @@ export function StaffClients() {
                       {dropdownOpen === client.id && (
                         <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                           <div className="py-1" role="menu">
-                            <a
-                              href="#"
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              role="menuitem"
-                            >
-                              View Profile
-                            </a>
-                            <a
-                              href="#"
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              role="menuitem"
-                            >
-                              Book Appointment
-                            </a>
-                            <a
-                              href="#"
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            <button
+                              onClick={() => handleEditClient(client)}
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               role="menuitem"
                             >
                               Edit Client
-                            </a>
-                            <a
-                              href="#"
-                              className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClient(client.id)}
+                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                               role="menuitem"
                             >
                               Delete Client
-                            </a>
+                            </button>
                           </div>
                         </div>
                       )}
@@ -253,10 +279,42 @@ export function StaffClients() {
           </table>
         </div>
       </div>
+
+      <EditClientModal
+        isOpen={!!editingClient}
+        onClose={() => setEditingClient(null)}
+        client={editingClient}
+        onSave={handleSaveEditedClient}
+      />
+
       <AddClientModal
         isOpen={isAddClientModalOpen}
         onClose={() => setIsAddClientModalOpen(false)}
+        onAdd={handleAddClient}
       />
+
+      {clientToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <h3 className="text-lg font-bold mb-4">Confirm Deletion</h3>
+            <p>Are you sure you want to delete this client?</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setClientToDelete(null)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteClient}
+                className="px-4 py-2 bg-red-500 text-white rounded-md text-sm font-medium hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

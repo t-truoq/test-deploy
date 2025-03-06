@@ -1,9 +1,9 @@
 import { useState } from "react";
 import AppSidebar from "../../components/Staff/Sidebar";
-import { Header } from "../../components/Staff/Header";
 import FeedbackStats from "../../components/Staff/Feedback/FeedbackStar";
 import FeedbackFilter from "../../components/Staff/Feedback/FeedbackFilter";
 import FeedbackList from "../../components/Staff/Feedback/FeedbackList";
+import { Header } from "../../components/Staff/Header/Header";
 
 export default function FeedbackStaff() {
   const [filter, setFilter] = useState(0); // 0 means all ratings

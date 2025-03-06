@@ -6,9 +6,9 @@ import { AppointmentDetails } from "../../components/Staff/Appointment/Appointme
 import { StaffClients } from "../../components/Staff/Client/StaffClient";
 import { StaffList } from "../../components/Staff/Employee/StaffList";
 import { StaffSchedule } from "../../components/Staff/StaffSchedule";
-import { Header } from "../../components/Staff/Header";
 import { AppointmentCalendar } from "../../components/Staff/Appointment/AppointmentCalendar";
 import AppSidebar from "../../components/Staff/Sidebar";
+import { Header } from "../../components/Staff/Header/Header";
 
 export default function HomeStaff() {
   const [selectedAppointment, setSelectedAppointment] = React.useState(null);

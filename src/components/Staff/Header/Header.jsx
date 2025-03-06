@@ -25,6 +25,10 @@ export function Header() {
     }
   };
 
+  const handleNavigation = (path) => {
+    window.location.href = path;
+  };
+
   return (
     <header
       className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2"
@@ -131,11 +135,17 @@ export function Header() {
 
           {isDropdownOpen && (
             <div className="absolute right-0 top-full z-10 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <button
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                onClick={() => handleNavigation("/manage-account")}
+              >
                 <User className="h-4 w-4 text-blue-500" />
                 Manage Account
               </button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <button
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                onClick={() => handleNavigation("/change-password")}
+              >
                 <KeyRound className="h-4 w-4 text-blue-500" />
                 Change Password
               </button>
