@@ -76,7 +76,7 @@ export default function Home() {
       <SkinAnalysis />
 
       {/* Treatment Section */}
-      <Treatment />
+      {/* <Treatment /> */}
 
       {/* Blog View */}
       <BlogHome />
