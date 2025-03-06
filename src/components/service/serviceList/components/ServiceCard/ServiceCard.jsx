@@ -110,7 +110,7 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
           id: service.serviceId,
           name: service.name,
           price: service.price,
-          time: `${Math.round(service.duration / 60000)} min`,
+          time: service.duration,
           image: service.image || "https://via.placeholder.com/350",
         }),
       )
@@ -159,7 +159,7 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
             {service.name}
           </h5>
           <p className="font-bold text-xl mb-4 text-gray-800">
-            ${service.price}.00 - {Math.round(service.duration / 60000)} min
+            ${service.price}.00 - {service.duration} minutes
           </p>
           <p className="text-gray-600 text-lg mb-8 line-clamp-3">{service.description}</p>
           <div className="flex gap-4">

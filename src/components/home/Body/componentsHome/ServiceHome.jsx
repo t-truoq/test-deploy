@@ -20,7 +20,7 @@
 
 //       try {
 //         const response = await axios.get(
-//           'https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/services',
+//           'https://fa9f-118-69-182-149.ngrok-free.app/api/services',
 //           {
 //             headers: {
 //               'Authorization': `Bearer ${token}`,
@@ -122,7 +122,7 @@ export default function ServiceHome() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          'https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/services',
+          'https://fa9f-118-69-182-149.ngrok-free.app/api/services',
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -188,7 +188,7 @@ export default function ServiceHome() {
             <div className="p-6">
               <h3 className="text-xl font-bold text-[#A10550] mb-2">{service.name}</h3>
               <p className="text-gray-700 mb-4">
-                ${service.price.toFixed(2)} - {Math.round(service.duration / 60000)} min
+                ${service.price.toFixed(2)} - {service.duration} min
               </p>
               <p className="text-sm text-gray-600 mb-4">{service.description}</p>
               <button

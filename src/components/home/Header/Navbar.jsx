@@ -594,7 +594,7 @@ const Navbar = () => {
         }
 
         const response = await axios.get(
-          "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/users/profile",
+          "https://fa9f-118-69-182-149.ngrok-free.app/api/users/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,

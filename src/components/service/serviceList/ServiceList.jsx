@@ -6,6 +6,7 @@
 // import Cookies from "js-cookie";
 // import ServiceCard from "./components/ServiceCard/ServiceCard";
 // import ServiceSearch from "./components/ServiceSearch";
+// import BookingSummaryPanel from "./components/ServiceCard/BookingSummaryPanel";
 
 // // Login Required Modal Component (inline)
 // const LoginRequiredModal = ({ isOpen, onClose, onLogin, action }) => {
@@ -81,35 +82,18 @@
 //   const [bookingError, setBookingError] = useState("");
 //   const [bookingSuccess, setBookingSuccess] = useState("");
 //   const [showLoginModal, setShowLoginModal] = useState(false);
-//   const [redirectAction, setRedirectAction] = useState(""); // "booking" or "detail"
+//   const [redirectAction, setRedirectAction] = useState("");
 //   const [serviceForDetail, setServiceForDetail] = useState(null);
 //   const [skinTypeResult, setSkinTypeResult] = useState(null);
+//   const [hasFetched, setHasFetched] = useState(false);
 
 //   // Check if user is logged in
 //   const isLoggedIn = useCallback(() => {
 //     return !!localStorage.getItem("token");
 //   }, []);
 
-//   // Lấy kết quả từ localStorage khi component mount
-//   useEffect(() => {
-//     const result = localStorage.getItem("skinTypeResult");
-//     if (result) {
-//       setSkinTypeResult(JSON.parse(result));
-//     }
-//   }, []);
-
-//   // Handle login required action
-//   const handleLoginRequired = (action, service = null) => {
-//     setRedirectAction(action);
-//     if (service) {
-//       setServiceForDetail(service);
-//     }
-//     setShowLoginModal(true);
-//   };
-
 //   // Redirect to login page
 //   const redirectToLogin = () => {
-//     // Store the redirect information in localStorage
 //     if (redirectAction === "detail" && serviceForDetail) {
 //       localStorage.setItem(
 //         "redirectAfterLogin",
@@ -131,6 +115,23 @@
 //     navigate("/login");
 //   };
 
+//   // Handle login required action
+//   const handleLoginRequired = (action, service = null) => {
+//     setRedirectAction(action);
+//     if (service) {
+//       setServiceForDetail(service);
+//     }
+//     setShowLoginModal(true);
+//   };
+
+//   // Lấy kết quả từ localStorage khi component mount
+//   useEffect(() => {
+//     const result = localStorage.getItem("skinTypeResult");
+//     if (result) {
+//       setSkinTypeResult(JSON.parse(result));
+//     }
+//   }, []);
+
 //   // Hàm chọn/xóa dịch vụ khỏi danh sách "Booked"
 //   const handleSelect = (service) => {
 //     if (!isLoggedIn()) {
@@ -138,11 +139,38 @@
 //       return;
 //     }
 
-//     setSelectedServices((prev) =>
-//       prev.some((s) => s.serviceId === service.serviceId)
+//     const serviceWithDuration = {
+//       ...service,
+//       duration: service.duration,
+//     };
+
+//     setSelectedServices((prev) => {
+//       const updatedServices = prev.some((s) => s.serviceId === service.serviceId)
 //         ? prev.filter((s) => s.serviceId !== service.serviceId)
-//         : [...prev, service],
-//     );
+//         : [...prev, serviceWithDuration];
+
+//       localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices));
+//       return updatedServices;
+//     });
+//   };
+
+//   // Handle removing a service from the selected list
+//   const handleRemoveService = (serviceId) => {
+//     setSelectedServices((prev) => {
+//       const updatedServices = prev.filter((s) => s.serviceId !== serviceId);
+//       if (updatedServices.length === 0) {
+//         localStorage.removeItem("selectedServicesForBooking");
+//       } else {
+//         localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices));
+//       }
+//       return updatedServices;
+//     });
+//   };
+
+//   // Handle clear all services
+//   const handleClearAllServices = () => {
+//     setSelectedServices([]);
+//     localStorage.removeItem("selectedServicesForBooking");
 //   };
 
 //   // Handle view service details
@@ -152,7 +180,6 @@
 //       return;
 //     }
 
-//     // Navigate to service detail page
 //     navigate(`/services/${service.serviceId}`);
 //   };
 
@@ -213,59 +240,26 @@
 //     }
 
 //     try {
-//       const token = localStorage.getItem("token");
-//       if (!token) {
-//         throw new Error("No token found. Please login again.");
-//       }
-
-//       const bookingData = {
-//         specialistId: 9007199254740991, // Giá trị mẫu, cần thay đổi dựa trên logic chọn chuyên gia
-//         bookingDate: new Date().toISOString().split("T")[0], // Ngày hiện tại
-//         timeSlot: "10:00-11:00", // Giá trị mẫu, có thể thêm logic để người dùng chọn khung giờ
-//         serviceIds: selectedServices.map((service) => service.serviceId),
-//       };
-
-//       const response = await axios.post(
-//         "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/bookings",
-//         bookingData,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//             "ngrok-skip-browser-warning": "true",
-//             "Content-Type": "application/json",
-//           },
-//         },
-//       );
-
-//       console.log("Booking response:", response.data);
-
-//       setBookingSuccess("Booking successful! Redirecting to your bookings...");
+//       localStorage.setItem("selectedServicesForBooking", JSON.stringify(selectedServices));
+//       setBookingSuccess("Proceeding to booking page...");
 //       setBookingError("");
-//       setSelectedServices([]); // Xóa danh sách dịch vụ đã chọn
 
-//       // Chuyển hướng đến trang MyBooking sau 2 giây
+//       navigate("/mybooking");
+
 //       setTimeout(() => {
-//         navigate("/mybooking");
-//       }, 2000);
+//         setSelectedServices([]);
+//         localStorage.removeItem("selectedServicesForBooking");
+//       }, 1000);
 //     } catch (error) {
-//       console.error("Error creating booking:", error);
-//       if (error.response) {
-//         if (error.response.status === 401) {
-//           setBookingError("Unauthorized: Please login again.");
-//           setTimeout(() => {
-//             handleLoginRequired("booking");
-//           }, 1000);
-//         } else {
-//           setBookingError(error.response.data.message || "Failed to create booking. Please try again.");
-//         }
-//       } else {
-//         setBookingError("Failed to create booking. Please try again.");
-//       }
+//       console.error("Error preparing booking:", error);
+//       setBookingError("Failed to prepare booking. Please try again.");
 //     }
 //   };
 
 //   // Lấy danh sách dịch vụ từ API
 //   useEffect(() => {
+//     if (hasFetched) return;
+
 //     const savedWishlist = Cookies.get("wishlist");
 //     if (savedWishlist) {
 //       try {
@@ -281,7 +275,6 @@
 //       }
 //     }
 
-//     // Lấy danh sách dịch vụ được đề xuất
 //     const fetchRecommendedServices = async () => {
 //       try {
 //         const token = localStorage.getItem("token");
@@ -290,7 +283,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/quiz/recommended-services",
+//           "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -310,8 +303,6 @@
 //       } catch (error) {
 //         console.error("Error fetching recommended services:", error);
 //         if (error.response) {
-//           console.log("Error response:", error.response.data);
-//           console.log("Status:", error.response.status);
 //           if (error.response.status === 401) {
 //             setError("Unauthorized: Please login again.");
 //             setTimeout(() => {
@@ -323,7 +314,6 @@
 //             setError(error.response.data.message || "Failed to load recommended services. Please try again.");
 //           }
 //         } else if (error.request) {
-//           console.log("No response received:", error.request);
 //           setError("Unable to connect to server. Please try again.");
 //         } else {
 //           setError(error.message || "Failed to load recommended services. Please try again.");
@@ -331,17 +321,13 @@
 //       }
 //     };
 
-//     // Lấy toàn bộ danh sách dịch vụ
 //     const fetchAllServices = async () => {
 //       try {
-//         const response = await axios.get(
-//           "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/services",
-//           {
-//             headers: {
-//               "ngrok-skip-browser-warning": "true",
-//             },
+//         const response = await axios.get("https://fa9f-118-69-182-149.ngrok-free.app/api/services", {
+//           headers: {
+//             "ngrok-skip-browser-warning": "true",
 //           },
-//         );
+//         });
 
 //         console.log("All services data:", response.data);
 //         if (Array.isArray(response.data)) {
@@ -353,15 +339,12 @@
 //       } catch (error) {
 //         console.error("Error fetching all services:", error);
 //         if (error.response) {
-//           console.log("Error response:", error.response.data);
-//           console.log("Status:", error.response.status);
 //           if (error.response.status === 404) {
 //             setError("No services found.");
 //           } else {
 //             setError(error.response.data.message || "Failed to load services. Please try again.");
 //           }
 //         } else if (error.request) {
-//           console.log("No response received:", error.request);
 //           setError("Unable to connect to server. Please try again.");
 //         } else {
 //           setError(error.message || "Failed to load services. Please try again.");
@@ -369,40 +352,109 @@
 //       }
 //     };
 
-//     // Gọi cả hai API
 //     Promise.all([fetchRecommendedServices(), fetchAllServices()]).finally(() => {
 //       setLoading(false);
+//       setHasFetched(true);
 //     });
+//   }, [navigate, hasFetched, isLoggedIn]);
 
-//     // Check for redirect after login
-//     const checkRedirectAfterLogin = () => {
-//       const redirectInfo = localStorage.getItem("redirectAfterLogin");
-//       if (redirectInfo && isLoggedIn()) {
-//         try {
-//           const { action, serviceId, selectedServices: savedServices } = JSON.parse(redirectInfo);
+//   // Gọi lại API nếu skinTypeResult thay đổi (người dùng làm lại quiz)
+//   useEffect(() => {
+//     if (!skinTypeResult || hasFetched) return;
 
-//           if (action === "detail" && serviceId) {
-//             navigate(`/services/${serviceId}`);
-//           } else if (action === "booking" && savedServices && savedServices.length > 0) {
-//             // Find the services in the current list
-//             const servicesToSelect = allServices.filter((s) => savedServices.includes(s.serviceId));
-//             if (servicesToSelect.length > 0) {
-//               setSelectedServices(servicesToSelect);
-//             }
+//     const fetchRecommendedServices = async () => {
+//       try {
+//         const token = localStorage.getItem("token");
+//         if (!token) {
+//           throw new Error("No token found. Please login again.");
+//         }
+
+//         const response = await axios.get(
+//           "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+//           {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               "ngrok-skip-browser-warning": "true",
+//               "Content-Type": "application/json",
+//             },
+//           },
+//         );
+
+//         console.log("Recommended services data:", response.data);
+//         if (Array.isArray(response.data)) {
+//           setRecommendedServices(response.data);
+//           setFilteredRecommendedServices(response.data);
+//         } else {
+//           throw new Error("Recommended services data is not an array");
+//         }
+//       } catch (error) {
+//         console.error("Error fetching recommended services:", error);
+//         if (error.response) {
+//           if (error.response.status === 401) {
+//             setError("Unauthorized: Please login again.");
+//             setTimeout(() => {
+//               navigate("/login");
+//             }, 2000);
+//           } else if (error.response.status === 400 || error.response.status === 404) {
+//             setError("No recommended services found. Please complete the skin type quiz to see recommended services.");
+//           } else {
+//             setError(error.response.data.message || "Failed to load recommended services. Please try again.");
 //           }
-
-//           // Clear the redirect info
-//           localStorage.removeItem("redirectAfterLogin");
-//         } catch (error) {
-//           console.error("Error processing redirect after login:", error);
+//         } else if (error.request) {
+//           setError("Unable to connect to server. Please try again.");
+//         } else {
+//           setError(error.message || "Failed to load recommended services. Please try again.");
 //         }
 //       }
 //     };
 
-//     if (allServices.length > 0) {
-//       checkRedirectAfterLogin();
+//     fetchRecommendedServices();
+//   }, [skinTypeResult, navigate, hasFetched]);
+
+//   // Load selected services from localStorage when component mounts
+//   useEffect(() => {
+//     const storedServices = localStorage.getItem("selectedServicesForBooking");
+//     if (storedServices) {
+//       try {
+//         const parsedServices = JSON.parse(storedServices);
+//         if (Array.isArray(parsedServices) && parsedServices.length > 0) {
+//           setSelectedServices(parsedServices);
+//           setTimeout(() => {
+//             const bookingPanel = document.getElementById("booking-summary-panel");
+//             if (bookingPanel) {
+//               bookingPanel.scrollIntoView({ behavior: "smooth" });
+//             }
+//           }, 500);
+//         }
+//       } catch (error) {
+//         console.error("Error parsing stored services:", error);
+//       }
 //     }
-//   }, [navigate, allServices, isLoggedIn]);
+//   }, []);
+
+//   // Check for redirect after login
+//   useEffect(() => {
+//     const redirectInfo = localStorage.getItem("redirectAfterLogin");
+//     if (redirectInfo && isLoggedIn()) {
+//       try {
+//         const { action, serviceId, selectedServices: savedServices } = JSON.parse(redirectInfo);
+
+//         if (action === "detail" && serviceId) {
+//           navigate(`/services/${serviceId}`);
+//         } else if (action === "booking" && savedServices && savedServices.length > 0) {
+//           const servicesToSelect = allServices.filter((s) => savedServices.includes(s.serviceId));
+//           if (servicesToSelect.length > 0) {
+//             setSelectedServices(servicesToSelect);
+//             localStorage.setItem("selectedServicesForBooking", JSON.stringify(servicesToSelect));
+//           }
+//         }
+
+//         localStorage.removeItem("redirectAfterLogin");
+//       } catch (error) {
+//         console.error("Error processing redirect after login:", error);
+//       }
+//     }
+//   }, [allServices, isLoggedIn, navigate]);
 
 //   if (loading) {
 //     return <div className="text-center py-8 text-gray-600">Loading services...</div>;
@@ -413,12 +465,7 @@
 //       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white flex items-center justify-center p-4">
 //         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
 //           <div className="w-16 h-16 mx-auto mb-4 text-gray-500">
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               fill="none"
-//               viewBox="0 0 24 24"
-//               stroke="currentColor"
-//             >
+//             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 //               <path
 //                 strokeLinecap="round"
 //                 strokeLinejoin="round"
@@ -462,83 +509,89 @@
 //       {bookingError && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">{bookingError}</div>}
 //       {bookingSuccess && <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">{bookingSuccess}</div>}
 
-//       {/* Phần Recommended Services */}
-//       <div className="mb-12">
-//         <h2 className="text-3xl font-bold mb-8 text-gray-800">
-//           Recommended Services for Your Skin Type
-//         </h2>
-//         {error ? (
-//           <div className="text-center py-8 text-gray-600">
-//             {error}
-//             <Link
-//               to="/quiz"
-//               className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
-//             >
-//               Take the Skin Type Quiz
-//             </Link>
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+//         {/* Main content - Services */}
+//         <div className="lg:col-span-2">
+//           {/* Phần Recommended Services */}
+//           <div className="mb-12">
+//             <h2 className="text-3xl font-bold mb-8 text-gray-800">Recommended Services for Your Skin Type</h2>
+//             {error ? (
+//               <div className="text-center py-8 text-gray-600">
+//                 {error}
+//                 <Link
+//                   to="/quiz"
+//                   className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
+//                 >
+//                   Take the Skin Type Quiz
+//                 </Link>
+//               </div>
+//             ) : recommendedServices.length === 0 ? (
+//               <div className="text-center py-8 text-gray-600">
+//                 No recommended services available. Please complete the skin type quiz to see recommendations.
+//                 <Link
+//                   to="/quiz"
+//                   className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
+//                 >
+//                   Take the Quiz
+//                 </Link>
+//               </div>
+//             ) : (
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                 {filteredRecommendedServices.map((service) => (
+//                   <ServiceCard
+//                     key={`recommended-${service.serviceId}`}
+//                     service={service}
+//                     onSelect={handleSelect}
+//                     onViewDetails={() => handleViewDetails(service)}
+//                     isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+//                     onAddToWishlist={handleAddToWishlist}
+//                     isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+//                     variant="recommended"
+//                     className="h-72"
+//                   />
+//                 ))}
+//               </div>
+//             )}
 //           </div>
-//         ) : recommendedServices.length === 0 ? (
-//           <div className="text-center py-8 text-gray-600">
-//             No recommended services available. Please complete the skin type quiz to see recommendations.
-//             <Link
-//               to="/quiz"
-//               className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
-//             >
-//               Take the Quiz
-//             </Link>
-//           </div>
-//         ) : (
-//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//             {filteredRecommendedServices.map((service) => (
-//               <ServiceCard
-//                 key={`recommended-${service.serviceId}`}
-//                 service={service}
-//                 onSelect={handleSelect}
-//                 onViewDetails={() => handleViewDetails(service)}
-//                 isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
-//                 onAddToWishlist={handleAddToWishlist}
-//                 isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
-//                 className="h-64" // Đảm bảo chiều cao đồng bộ
-//               />
-//             ))}
-//           </div>
-//         )}
-//       </div>
 
-//       {/* Phần All Services */}
-//       <div className="mb-12">
-//         <h2 className="text-3xl font-bold mb-8 text-gray-800">All Services</h2>
-//         {allServices.length === 0 ? (
-//           <div className="text-center py-8 text-gray-600">No services available at the moment.</div>
-//         ) : (
-//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//             {filteredAllServices.map((service) => (
-//               <ServiceCard
-//                 key={`all-${service.serviceId}`}
-//                 service={service}
-//                 onSelect={handleSelect}
-//                 onViewDetails={() => handleViewDetails(service)}
-//                 isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
-//                 onAddToWishlist={handleAddToWishlist}
-//                 isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
-//                 className="h-64" // Đảm bảo chiều cao đồng bộ
-//               />
-//             ))}
+//           {/* Phần All Services */}
+//           <div className="mb-12">
+//             <h2 className="text-3xl font-bold mb-8 text-gray-800">All Services</h2>
+//             {filteredAllServices.length === 0 ? (
+//               <div className="text-center py-8 text-gray-600">No services available at the moment.</div>
+//             ) : (
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                 {filteredAllServices.map((service) => (
+//                   <ServiceCard
+//                     key={`all-${service.serviceId}`}
+//                     service={service}
+//                     onSelect={handleSelect}
+//                     onViewDetails={() => handleViewDetails(service)}
+//                     isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+//                     onAddToWishlist={handleAddToWishlist}
+//                     isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+//                     variant="all"
+//                     className="h-64"
+//                   />
+//                 ))}
+//               </div>
+//             )}
 //           </div>
-//         )}
-//       </div>
-
-//       {/* Nút Book */}
-//       {selectedServices.length > 0 && (
-//         <div className="mt-8 flex justify-center">
-//           <button
-//             onClick={handleBookServices}
-//             className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-800 transition-colors"
-//           >
-//             Book Selected Services ({selectedServices.length})
-//           </button>
 //         </div>
-//       )}
+
+//         {/* Sidebar - Booking Summary */}
+//         <div className="lg:col-span-1">
+//           <div className="sticky top-4">
+//             <BookingSummaryPanel
+//               id="booking-summary-panel"
+//               selectedServices={selectedServices}
+//               onRemoveService={handleRemoveService}
+//               onBookServices={handleBookServices}
+//               onClearAllServices={handleClearAllServices}
+//             />
+//           </div>
+//         </div>
+//       </div>
 
 //       {/* Login Required Modal */}
 //       <LoginRequiredModal
@@ -552,8 +605,6 @@
 // };
 
 // export default ServiceList;
-
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -562,8 +613,9 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import ServiceCard from "./components/ServiceCard/ServiceCard";
 import ServiceSearch from "./components/ServiceSearch";
+import BookingSummaryPanel from "./components/ServiceCard/BookingSummaryPanel";
 
-// Login Required Modal Component (inline)
+// Login Required Modal Component (giữ nguyên)
 const LoginRequiredModal = ({ isOpen, onClose, onLogin, action }) => {
   if (!isOpen) return null;
 
@@ -637,10 +689,10 @@ const ServiceList = () => {
   const [bookingError, setBookingError] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [redirectAction, setRedirectAction] = useState(""); // "booking" or "detail"
+  const [redirectAction, setRedirectAction] = useState("");
   const [serviceForDetail, setServiceForDetail] = useState(null);
   const [skinTypeResult, setSkinTypeResult] = useState(null);
-  const [hasFetched, setHasFetched] = useState(false); // Đảm bảo chỉ gọi API một lần
+  const [hasFetched, setHasFetched] = useState(false);
 
   // Check if user is logged in
   const isLoggedIn = useCallback(() => {
@@ -649,14 +701,13 @@ const ServiceList = () => {
 
   // Redirect to login page
   const redirectToLogin = () => {
-    // Store the redirect information in localStorage
     if (redirectAction === "detail" && serviceForDetail) {
       localStorage.setItem(
         "redirectAfterLogin",
         JSON.stringify({
           action: "detail",
           serviceId: serviceForDetail.serviceId,
-        }),
+        })
       );
     } else if (redirectAction === "booking") {
       localStorage.setItem(
@@ -664,7 +715,7 @@ const ServiceList = () => {
         JSON.stringify({
           action: "booking",
           selectedServices: selectedServices.map((s) => s.serviceId),
-        }),
+        })
       );
     }
 
@@ -695,11 +746,38 @@ const ServiceList = () => {
       return;
     }
 
-    setSelectedServices((prev) =>
-      prev.some((s) => s.serviceId === service.serviceId)
+    const serviceWithDuration = {
+      ...service,
+      duration: service.duration,
+    };
+
+    setSelectedServices((prev) => {
+      const updatedServices = prev.some((s) => s.serviceId === service.serviceId)
         ? prev.filter((s) => s.serviceId !== service.serviceId)
-        : [...prev, service],
-    );
+        : [...prev, serviceWithDuration];
+
+      localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices));
+      return updatedServices;
+    });
+  };
+
+  // Handle removing a service from the selected list
+  const handleRemoveService = (serviceId) => {
+    setSelectedServices((prev) => {
+      const updatedServices = prev.filter((s) => s.serviceId !== serviceId);
+      if (updatedServices.length === 0) {
+        localStorage.removeItem("selectedServicesForBooking");
+      } else {
+        localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices));
+      }
+      return updatedServices;
+    });
+  };
+
+  // Handle clear all services
+  const handleClearAllServices = () => {
+    setSelectedServices([]);
+    localStorage.removeItem("selectedServicesForBooking");
   };
 
   // Handle view service details
@@ -709,7 +787,6 @@ const ServiceList = () => {
       return;
     }
 
-    // Navigate to service detail page
     navigate(`/services/${service.serviceId}`);
   };
 
@@ -744,21 +821,21 @@ const ServiceList = () => {
     const filteredRecommended = recommendedServices.filter(
       (service) =>
         service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+        service.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const filteredAll = allServices.filter(
       (service) =>
         service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+        service.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     setFilteredRecommendedServices(filteredRecommended);
     setFilteredAllServices(filteredAll);
   };
 
-  // Hàm gọi API để tạo booking
-  const handleBookServices = async () => {
+  // Hàm gọi để lưu vào localStorage và chuyển hướng đến MyBooking
+  const handleBookServices = () => {
     if (!isLoggedIn()) {
       handleLoginRequired("booking");
       return;
@@ -770,59 +847,29 @@ const ServiceList = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found. Please login again.");
-      }
-
-      const bookingData = {
-        specialistId: 9007199254740991,
-        bookingDate: new Date().toISOString().split("T")[0],
-        timeSlot: "10:00-11:00",
-        serviceIds: selectedServices.map((service) => service.serviceId),
-      };
-
-      const response = await axios.post(
-        "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/bookings",
-        bookingData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      console.log("Booking response:", response.data);
-
-      setBookingSuccess("Booking successful! Redirecting to your bookings...");
+      // Lưu danh sách serviceId vào localStorage
+      const selectedServiceIds = selectedServices.map((service) => service.serviceId);
+      console.log("Saving selectedServiceIds to localStorage:", selectedServiceIds); // Thêm log để kiểm tra
+      localStorage.setItem("selectedServiceIdsForBooking", JSON.stringify(selectedServiceIds));
+      setBookingSuccess("Proceeding to booking confirmation...");
       setBookingError("");
-      setSelectedServices([]);
 
+      // Chuyển hướng sang MyBooking
+      navigate("/mybooking");
+
+      // Sau khi chuyển hướng, xóa selectedServices để tránh lặp lại
       setTimeout(() => {
-        navigate("/mybooking");
-      }, 2000);
+        setSelectedServices([]);
+        localStorage.removeItem("selectedServicesForBooking"); // Xóa tạm nếu có
+      }, 1000);
     } catch (error) {
-      console.error("Error creating booking:", error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          setBookingError("Unauthorized: Please login again.");
-          setTimeout(() => {
-            handleLoginRequired("booking");
-          }, 1000);
-        } else {
-          setBookingError(error.response.data.message || "Failed to create booking. Please try again.");
-        }
-      } else {
-        setBookingError("Failed to create booking. Please try again.");
-      }
+      console.error("Error preparing booking:", error);
+      setBookingError("Failed to prepare booking. Please try again.");
     }
   };
 
   // Lấy danh sách dịch vụ từ API
   useEffect(() => {
-    // Chỉ gọi API nếu chưa fetch dữ liệu
     if (hasFetched) return;
 
     const savedWishlist = Cookies.get("wishlist");
@@ -840,7 +887,6 @@ const ServiceList = () => {
       }
     }
 
-    // Lấy danh sách dịch vụ được đề xuất
     const fetchRecommendedServices = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -849,14 +895,14 @@ const ServiceList = () => {
         }
 
         const response = await axios.get(
-          "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/quiz/recommended-services",
+          "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
               "Content-Type": "application/json",
             },
-          },
+          }
         );
 
         console.log("Recommended services data:", response.data);
@@ -869,8 +915,6 @@ const ServiceList = () => {
       } catch (error) {
         console.error("Error fetching recommended services:", error);
         if (error.response) {
-          console.log("Error response:", error.response.data);
-          console.log("Status:", error.response.status);
           if (error.response.status === 401) {
             setError("Unauthorized: Please login again.");
             setTimeout(() => {
@@ -882,7 +926,6 @@ const ServiceList = () => {
             setError(error.response.data.message || "Failed to load recommended services. Please try again.");
           }
         } else if (error.request) {
-          console.log("No response received:", error.request);
           setError("Unable to connect to server. Please try again.");
         } else {
           setError(error.message || "Failed to load recommended services. Please try again.");
@@ -890,17 +933,13 @@ const ServiceList = () => {
       }
     };
 
-    // Lấy toàn bộ danh sách dịch vụ
     const fetchAllServices = async () => {
       try {
-        const response = await axios.get(
-          "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/services",
-          {
-            headers: {
-              "ngrok-skip-browser-warning": "true",
-            },
+        const response = await axios.get("https://fa9f-118-69-182-149.ngrok-free.app/api/services", {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
           },
-        );
+        });
 
         console.log("All services data:", response.data);
         if (Array.isArray(response.data)) {
@@ -912,15 +951,12 @@ const ServiceList = () => {
       } catch (error) {
         console.error("Error fetching all services:", error);
         if (error.response) {
-          console.log("Error response:", error.response.data);
-          console.log("Status:", error.response.status);
           if (error.response.status === 404) {
             setError("No services found.");
           } else {
             setError(error.response.data.message || "Failed to load services. Please try again.");
           }
         } else if (error.request) {
-          console.log("No response received:", error.request);
           setError("Unable to connect to server. Please try again.");
         } else {
           setError(error.message || "Failed to load services. Please try again.");
@@ -928,12 +964,11 @@ const ServiceList = () => {
       }
     };
 
-    // Gọi cả hai API
     Promise.all([fetchRecommendedServices(), fetchAllServices()]).finally(() => {
       setLoading(false);
-      setHasFetched(true); // Đánh dấu đã fetch dữ liệu
+      setHasFetched(true);
     });
-  }, []);
+  }, [navigate, hasFetched, isLoggedIn]);
 
   // Gọi lại API nếu skinTypeResult thay đổi (người dùng làm lại quiz)
   useEffect(() => {
@@ -947,14 +982,14 @@ const ServiceList = () => {
         }
 
         const response = await axios.get(
-          "https://1e2e-2405-4802-8132-b860-7837-749b-a544-2447.ngrok-free.app/api/quiz/recommended-services",
+          "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
               "Content-Type": "application/json",
             },
-          },
+          }
         );
 
         console.log("Recommended services data:", response.data);
@@ -967,8 +1002,6 @@ const ServiceList = () => {
       } catch (error) {
         console.error("Error fetching recommended services:", error);
         if (error.response) {
-          console.log("Error response:", error.response.data);
-          console.log("Status:", error.response.status);
           if (error.response.status === 401) {
             setError("Unauthorized: Please login again.");
             setTimeout(() => {
@@ -980,7 +1013,6 @@ const ServiceList = () => {
             setError(error.response.data.message || "Failed to load recommended services. Please try again.");
           }
         } else if (error.request) {
-          console.log("No response received:", error.request);
           setError("Unable to connect to server. Please try again.");
         } else {
           setError(error.message || "Failed to load recommended services. Please try again.");
@@ -989,7 +1021,28 @@ const ServiceList = () => {
     };
 
     fetchRecommendedServices();
-  }, [skinTypeResult, navigate]);
+  }, [skinTypeResult, navigate, hasFetched]);
+
+  // Load selected services from localStorage when component mounts
+  useEffect(() => {
+    const storedServices = localStorage.getItem("selectedServicesForBooking");
+    if (storedServices) {
+      try {
+        const parsedServices = JSON.parse(storedServices);
+        if (Array.isArray(parsedServices) && parsedServices.length > 0) {
+          setSelectedServices(parsedServices);
+          setTimeout(() => {
+            const bookingPanel = document.getElementById("booking-summary-panel");
+            if (bookingPanel) {
+              bookingPanel.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 500);
+        }
+      } catch (error) {
+        console.error("Error parsing stored services:", error);
+      }
+    }
+  }, []);
 
   // Check for redirect after login
   useEffect(() => {
@@ -1004,6 +1057,7 @@ const ServiceList = () => {
           const servicesToSelect = allServices.filter((s) => savedServices.includes(s.serviceId));
           if (servicesToSelect.length > 0) {
             setSelectedServices(servicesToSelect);
+            localStorage.setItem("selectedServicesForBooking", JSON.stringify(servicesToSelect));
           }
         }
 
@@ -1023,12 +1077,7 @@ const ServiceList = () => {
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
           <div className="w-16 h-16 mx-auto mb-4 text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -1072,85 +1121,89 @@ const ServiceList = () => {
       {bookingError && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">{bookingError}</div>}
       {bookingSuccess && <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">{bookingSuccess}</div>}
 
-      {/* Phần Recommended Services */}
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800">
-          Recommended Services for Your Skin Type
-        </h2>
-        {error ? (
-          <div className="text-center py-8 text-gray-600">
-            {error}
-            <Link
-              to="/quiz"
-              className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
-            >
-              Take the Skin Type Quiz
-            </Link>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main content - Services */}
+        <div className="lg:col-span-2">
+          {/* Phần Recommended Services */}
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800">Recommended Services for Your Skin Type</h2>
+            {error ? (
+              <div className="text-center py-8 text-gray-600">
+                {error}
+                <Link
+                  to="/quiz"
+                  className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
+                >
+                  Take the Skin Type Quiz
+                </Link>
+              </div>
+            ) : recommendedServices.length === 0 ? (
+              <div className="text-center py-8 text-gray-600">
+                No recommended services available. Please complete the skin type quiz to see recommendations.
+                <Link
+                  to="/quiz"
+                  className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
+                >
+                  Take the Quiz
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredRecommendedServices.map((service) => (
+                  <ServiceCard
+                    key={`recommended-${service.serviceId}`}
+                    service={service}
+                    onSelect={handleSelect}
+                    onViewDetails={() => handleViewDetails(service)}
+                    isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+                    onAddToWishlist={handleAddToWishlist}
+                    isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+                    variant="recommended"
+                    className="h-72"
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        ) : recommendedServices.length === 0 ? (
-          <div className="text-center py-8 text-gray-600">
-            No recommended services available. Please complete the skin type quiz to see recommendations.
-            <Link
-              to="/quiz"
-              className="inline-block px-6 py-3 bg-[#A10550] text-white rounded-lg hover:bg-[#8a0443] transition-colors duration-300 font-medium ml-2"
-            >
-              Take the Quiz
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRecommendedServices.map((service) => (
-              <ServiceCard
-                key={`recommended-${service.serviceId}`}
-                service={service}
-                onSelect={handleSelect}
-                onViewDetails={() => handleViewDetails(service)}
-                isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
-                onAddToWishlist={handleAddToWishlist}
-                isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
-                variant="recommended" // Sử dụng variant để hiển thị kiểu Recommended Services
-                className="h-72" // Tăng kích thước card
-              />
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Phần All Services */}
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800">All Services</h2>
-        {filteredAllServices.length === 0 ? (
-          <div className="text-center py-8 text-gray-600">No services available at the moment.</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredAllServices.map((service) => (
-              <ServiceCard
-                key={`all-${service.serviceId}`}
-                service={service}
-                onSelect={handleSelect}
-                onViewDetails={() => handleViewDetails(service)}
-                isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
-                onAddToWishlist={handleAddToWishlist}
-                isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
-                variant="all" // Sử dụng variant để hiển thị kiểu All Services
-                className="h-64" // Kích thước nhỏ hơn cho All Services
-              />
-            ))}
+          {/* Phần All Services */}
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800">All Services</h2>
+            {filteredAllServices.length === 0 ? (
+              <div className="text-center py-8 text-gray-600">No services available at the moment.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredAllServices.map((service) => (
+                  <ServiceCard
+                    key={`all-${service.serviceId}`}
+                    service={service}
+                    onSelect={handleSelect}
+                    onViewDetails={() => handleViewDetails(service)}
+                    isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+                    onAddToWishlist={handleAddToWishlist}
+                    isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+                    variant="all"
+                    className="h-64"
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Nút Book */}
-      {selectedServices.length > 0 && (
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={handleBookServices}
-            className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-800 transition-colors"
-          >
-            Book Selected Services ({selectedServices.length})
-          </button>
         </div>
-      )}
+
+        {/* Sidebar - Booking Summary */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-4">
+            <BookingSummaryPanel
+              id="booking-summary-panel"
+              selectedServices={selectedServices}
+              onRemoveService={handleRemoveService}
+              onBookServices={handleBookServices}
+              onClearAllServices={handleClearAllServices}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Login Required Modal */}
       <LoginRequiredModal
