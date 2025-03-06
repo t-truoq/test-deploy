@@ -28,10 +28,7 @@ import HomeStaff from "./pages/Staff/HomeStaff";
 import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
 import Quiz from "./components/Quiz/Quiz";
 import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
-<<<<<<< HEAD
 import FeedbackStaff from "./pages/Staff/FeedbackStaff";
-=======
->>>>>>> a1577c088e98fcd0dc6fac224fb98322d7eeaaea
 
 function App() {
   const location = useLocation();
@@ -89,12 +86,8 @@ function App() {
             <Route path="/staff/clients" element={<HomeStaff />} />
             <Route path="/staff/skintherapist" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
-<<<<<<< HEAD
             <Route path="/staff/feedback" element={<FeedbackStaff />} />
             <Route path="/" element={<Home />} />
-=======
-            <Route path="/" element={<Home />} />n
->>>>>>> a1577c088e98fcd0dc6fac224fb98322d7eeaaea
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}
