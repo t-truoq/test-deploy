@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-import { useLocation } from "react-router-dom";
-=======
-"use client";
-
 import { useLocation, useNavigate } from "react-router-dom";
->>>>>>> a683d0ebb9d49b994cca7e2606bdcf30f58a48eb
 import {
   LayoutDashboard,
   ListChecks,
