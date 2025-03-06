@@ -1,10 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Plus, MoreHorizontal, Calendar } from "lucide-react";
+import PropTypes from "prop-types";
 import { AddStaffModal } from "./AddStaffModal";
+import { EditStaffModal } from "./EditStaffModal";
+import { ConfirmDialog } from "./ConfirmDialog";
+import { AppointmentsModal } from "./AppointmentsModal";
 
-const staff = [
+// Define the staff member shape that will be used in multiple places
+export const StaffMemberPropType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  email: PropTypes.string.isRequired,
+  role: PropTypes.oneOf(["Massage Therapist", "Esthetician", "Nail Technician"])
+    .isRequired,
+  specialties: PropTypes.arrayOf(PropTypes.string).isRequired,
+  status: PropTypes.oneOf(["available", "busy", "off-duty"]).isRequired,
+  appointments: PropTypes.number.isRequired,
+});
+
+const initialStaff = [
   {
     id: "1",
     name: "Sarah Johnson",
@@ -53,9 +69,14 @@ const staff = [
 ];
 
 export function StaffList() {
+  const [staff, setStaff] = useState(initialStaff);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
+  const [isEditStaffModalOpen, setIsEditStaffModalOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isAppointmentsModalOpen, setIsAppointmentsModalOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   const filteredStaff = staff.filter(
     (member) =>
@@ -69,9 +90,9 @@ export function StaffList() {
   const getStatusColor = (status) => {
     switch (status) {
       case "available":
-        return "bg-teal-100 text-teal-800";
+        return "bg-green-100 text-green-800";
       case "busy":
-        return "bg-amber-100 text-amber-800";
+        return "bg-yellow-100 text-yellow-800";
       case "off-duty":
         return "bg-gray-100 text-gray-800";
       default:
@@ -86,20 +107,62 @@ export function StaffList() {
       .join("");
   };
 
+  const handleAddStaff = (newStaff) => {
+    const staffMember = {
+      ...newStaff,
+      id: (staff.length + 1).toString(),
+      appointments: 0,
+    };
+
+    setStaff((prevStaff) => [...prevStaff, staffMember]);
+  };
+
+  const handleEditStaff = (updatedStaff) => {
+    setStaff((prevStaff) =>
+      prevStaff.map((member) =>
+        member.id === updatedStaff.id ? updatedStaff : member
+      )
+    );
+  };
+
+  const handleRemoveStaff = (id) => {
+    setStaff((prevStaff) => prevStaff.filter((member) => member.id !== id));
+  };
+
+  const openEditStaff = (member) => {
+    setSelectedStaff(member);
+    setIsEditStaffModalOpen(true);
+    setDropdownOpen(null);
+  };
+
+  const openRemoveConfirmation = (member) => {
+    setSelectedStaff(member);
+    setIsConfirmDialogOpen(true);
+    setDropdownOpen(null);
+  };
+
+  const openAppointments = (member) => {
+    setSelectedStaff(member);
+    setIsAppointmentsModalOpen(true);
+    setDropdownOpen(null);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Staff</h2>
-            <p className="mt-1 text-sm text-gray-600">Manage your spa staff</p>
+            <h2 className="text-2xl font-bold text-gray-800">Skin Therapist</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Manage your skin therapist
+            </p>
           </div>
           <button
             className="px-4 py-2 text-white bg-pink-500 rounded-md flex items-center hover:bg-pink-600 transition-colors duration-300"
             onClick={() => setIsAddStaffModalOpen(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Staff
+            Add Skin Therapist
           </button>
         </div>
       </div>
@@ -110,7 +173,7 @@ export function StaffList() {
           <input
             type="text"
             placeholder="Search staff..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -148,7 +211,7 @@ export function StaffList() {
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-800 text-sm font-medium">
+                      <div className="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-800 text-sm font-medium">
                         {getInitials(member.name)}
                       </div>
                       <div className="ml-4">
@@ -186,7 +249,13 @@ export function StaffList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {member.appointments} this month
+                    <button
+                      onClick={() => openAppointments(member)}
+                      className="text-pink-600 hover:text-pink-800 flex items-center"
+                    >
+                      <Calendar className="h-4 w-4 mr-1" />
+                      {member.appointments} this month
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="relative">
@@ -206,20 +275,16 @@ export function StaffList() {
                             <button
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               role="menuitem"
+                              onClick={() => openEditStaff(member)}
                             >
-                              View Profile
-                            </button>
-                            <button
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              role="menuitem"
-                            >
-                              Edit Staff
+                              Edit Skin Therapist
                             </button>
                             <button
                               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                               role="menuitem"
+                              onClick={() => openRemoveConfirmation(member)}
                             >
-                              Remove Staff
+                              Remove Skin Therapist
                             </button>
                           </div>
                         </div>
@@ -232,10 +297,53 @@ export function StaffList() {
           </table>
         </div>
       </div>
+
+      {/* Modals */}
       <AddStaffModal
         isOpen={isAddStaffModalOpen}
         onClose={() => setIsAddStaffModalOpen(false)}
+        onAdd={handleAddStaff}
       />
+
+      {selectedStaff && (
+        <>
+          <EditStaffModal
+            isOpen={isEditStaffModalOpen}
+            onClose={() => {
+              setIsEditStaffModalOpen(false);
+              setSelectedStaff(null);
+            }}
+            staff={selectedStaff}
+            onSave={handleEditStaff}
+          />
+
+          <ConfirmDialog
+            isOpen={isConfirmDialogOpen}
+            onClose={() => {
+              setIsConfirmDialogOpen(false);
+              setSelectedStaff(null);
+            }}
+            onConfirm={() => {
+              if (selectedStaff) {
+                handleRemoveStaff(selectedStaff.id);
+                setIsConfirmDialogOpen(false);
+                setSelectedStaff(null);
+              }
+            }}
+            title="Remove Staff Member"
+            message={`Are you sure you want to remove ${selectedStaff.name}? This action cannot be undone.`}
+          />
+
+          <AppointmentsModal
+            isOpen={isAppointmentsModalOpen}
+            onClose={() => {
+              setIsAppointmentsModalOpen(false);
+              setSelectedStaff(null);
+            }}
+            staff={selectedStaff}
+          />
+        </>
+      )}
     </div>
   );
 }
