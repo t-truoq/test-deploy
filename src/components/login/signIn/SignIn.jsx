@@ -245,7 +245,6 @@ export default function SignIn() {
       const response = await axios.get(
         `https://b64a-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
         { headers: { "Content-Type": "application/json" } }
-        { headers: { 'Content-Type': 'application/json' } }
       );
 
       console.log("Google callback response:", response.data);
@@ -311,7 +310,6 @@ export default function SignIn() {
       console.log("Request data:", { email, password });
       const response = await axios.post(
         "https://b64a-118-69-182-149.ngrok-free.app/auth/token",
-        'https://b64a-118-69-182-149.ngrok-free.app/auth/token',
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -377,7 +375,6 @@ export default function SignIn() {
   const handleGoogleLogin = () => {
     window.location.href =
       "https://b64a-118-69-182-149.ngrok-free.app/oauth2/authorization/google";
-    window.location.href = 'https://b64a-118-69-182-149.ngrok-free.app/oauth2/authorization/google';
   };
 
   return (

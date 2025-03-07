@@ -29,6 +29,7 @@ import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
 import Quiz from "./components/Quiz/Quiz";
 import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
 import FeedbackStaff from "./pages/Staff/FeedbackStaff";
+import TherapistPage from "./components/Therapist/TherapistPage";
 
 function App() {
   const location = useLocation();
@@ -61,7 +62,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:id" element={<BlogInfo />} />
-            <Route path="/products" element={<Products />} />
+            <Route path="/therapist" element={<TherapistPage />} />
             <Route path="/services" element={<Services />} />
             <Route path="/services/:id" element={<ServiceDetail />} />
             <Route path="/signup" element={<SignUp />} />
