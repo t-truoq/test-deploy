@@ -85,8 +85,8 @@ const BlogDetail = () => {
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : undefined, // Gửi token nếu có
-              'ngrok-skip-browser-warning': 'true',
-              'Content-Type': 'application/json',
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
             },
           }
         );
@@ -99,12 +99,15 @@ const BlogDetail = () => {
           title: response.data.title,
           content: response.data.content,
           author: response.data.author.name,
-          date: new Date(response.data.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
+          date: new Date(response.data.createdAt).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
           }),
-          image: response.data.images && response.data.images.length > 0 ? response.data.images[0].url : "/Placeholder.svg", // Lấy hình ảnh từ images[0].url hoặc dùng placeholder
+          image:
+            response.data.images && response.data.images.length > 0
+              ? response.data.images[0].url
+              : "/Placeholder.svg", // Lấy hình ảnh từ images[0].url hoặc dùng placeholder
           category: "Blog", // Giá trị mặc định vì API không có category
         };
 
@@ -122,13 +125,20 @@ const BlogDetail = () => {
           } else if (error.response.status === 404) {
             setError("Blog post not found.");
           } else {
-            setError(error.response.data.message || "Failed to load blog post. Please try again.");
+            setError(
+              error.response.data.message ||
+                "Failed to load blog post. Please try again."
+            );
           }
         } else if (error.request) {
           console.log("No response received:", error.request);
-          setError("Unable to connect to server. CORS issue or server error. Please try again.");
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
-          setError(error.message || "Failed to load blog post. Please try again.");
+          setError(
+            error.message || "Failed to load blog post. Please try again."
+          );
         }
       } finally {
         setLoading(false);
@@ -139,7 +149,9 @@ const BlogDetail = () => {
   }, [id, navigate]);
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-600">Loading blog post...</div>;
+    return (
+      <div className="text-center py-8 text-gray-600">Loading blog post...</div>
+    );
   }
 
   if (error || !blog) {
@@ -158,7 +170,10 @@ const BlogDetail = () => {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            <Link to="/blog" className="flex items-center text-[#A10550] hover:text-[#8a0443] transition-colors">
+            <Link
+              to="/blog"
+              className="flex items-center text-[#A10550] hover:text-[#8a0443] transition-colors"
+            >
               <ArrowLeft className="mr-2" size={20} />
               <span className="font-medium">Back to Blog</span>
             </Link>
@@ -168,7 +183,11 @@ const BlogDetail = () => {
 
       <main className="max-w-4xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
         <article className="bg-white shadow-lg rounded-lg overflow-hidden">
-          <img src={blog.image} alt={blog.title} className="w-full h-64 object-cover" />
+          <img
+            src={blog.image}
+            alt={blog.title}
+            className="w-full h-64 object-cover"
+          />
 
           <div className="p-8">
             <div className="flex items-center text-sm text-gray-500 mb-4">
@@ -180,7 +199,9 @@ const BlogDetail = () => {
               <span>{blog.category}</span>
             </div>
 
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{blog.title}</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              {blog.title}
+            </h1>
 
             <div className="prose max-w-none">
               {blog.content.split("\n\n").map((paragraph, index) => (

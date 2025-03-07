@@ -44,15 +44,15 @@
 //       </section>
 //   )
 // }
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 export default function BlogHome() {
   const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Lấy danh sách blog từ API
   useEffect(() => {
@@ -62,8 +62,8 @@ export default function BlogHome() {
           "https://b64a-118-69-182-149.ngrok-free.app/api/blogs",
           {
             headers: {
-              'ngrok-skip-browser-warning': 'true',
-              'Content-Type': 'application/json',
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
             },
           }
         );
@@ -75,19 +75,27 @@ export default function BlogHome() {
           const formattedBlogs = response.data.map((blog) => ({
             id: blog.blogId,
             title: blog.title,
-            excerpt: blog.content.length > 100 ? blog.content.substring(0, 100) + "..." : blog.content,
+            excerpt:
+              blog.content.length > 100
+                ? blog.content.substring(0, 100) + "..."
+                : blog.content,
             author: blog.author.name,
-            date: new Date(blog.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
+            date: new Date(blog.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             }),
-            image: blog.images && blog.images.length > 0 ? blog.images[0].url : "/placeholder.svg",
+            image:
+              blog.images && blog.images.length > 0
+                ? blog.images[0].url
+                : "/placeholder.svg",
             category: "Blog", // Giá trị mặc định vì API không có category
           }));
           setBlogs(formattedBlogs);
         } else {
-          throw new Error("Invalid response format: Expected an array of blogs");
+          throw new Error(
+            "Invalid response format: Expected an array of blogs"
+          );
         }
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -97,11 +105,16 @@ export default function BlogHome() {
           if (error.response.status === 404) {
             setError("No blogs found.");
           } else {
-            setError(error.response.data.message || "Failed to load blogs. Please try again.");
+            setError(
+              error.response.data.message ||
+                "Failed to load blogs. Please try again."
+            );
           }
         } else if (error.request) {
           console.log("No response received:", error.request);
-          setError("Unable to connect to server. CORS issue or server error. Please try again.");
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
           setError(error.message || "Failed to load blogs. Please try again.");
         }
@@ -122,15 +135,13 @@ export default function BlogHome() {
   };
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-600">Loading blogs...</div>;
+    return (
+      <div className="text-center py-8 text-gray-600">Loading blogs...</div>
+    );
   }
 
   if (error) {
-    return (
-      <div className="text-center py-8 text-red-600">
-        {error}
-      </div>
-    );
+    return <div className="text-center py-8 text-red-600">{error}</div>;
   }
 
   return (
@@ -152,7 +163,9 @@ export default function BlogHome() {
               />
             </div>
             <div className="p-6 bg-pink-50">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{post.title}</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {post.title}
+              </h3>
               <div className="text-sm text-gray-600 mb-3">
                 {post.category} | {post.author} | {post.date}
               </div>

@@ -1,53 +1,89 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function FeedbackList({ filter }) {
+  const navigate = useNavigate();
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [responseText, setResponseText] = useState("");
-  const [feedbackItems, setFeedbackItems] = useState([
-    {
-      id: 1,
-      customer: "Nguyễn Văn A",
-      email: "nguyenvana@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-      service: "Chăm sóc da mặt cơ bản",
-      message: "Dịch vụ rất tốt, nhân viên thân thiện!",
-      rating: 5,
-      date: "2024-02-15",
-      response:
-        "Cảm ơn bạn đã đánh giá tích cực. Chúng tôi rất vui khi bạn hài lòng với dịch vụ.",
-    },
-    {
-      id: 2,
-      customer: "Trần Thị B",
-      email: "tranthib@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-      service: "Massage toàn thân",
-      message: "Dịch vụ ổn, nhưng cần cải thiện thêm về kỹ thuật massage.",
-      rating: 3,
-      date: "2024-02-20",
-      response: "",
-    },
-    {
-      id: 3,
-      customer: "Lê Văn C",
-      email: "levanc@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-      service: "Tẩy da chết toàn thân",
-      message:
-        "Tôi bị dị ứng sau khi sử dụng dịch vụ. Cần kiểm tra lại sản phẩm sử dụng.",
-      rating: 1,
-      date: "2024-02-22",
-      response: "",
-    },
-  ]);
+  const [feedbackItems, setFeedbackItems] = useState([]);
+  const [error, setError] = useState("");
 
-  // Filter feedback items based on the selected rating
-  const filteredItems =
-    filter === 0
-      ? feedbackItems
-      : feedbackItems.filter((item) => item.rating === filter);
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Vui lòng đăng nhập để xem phản hồi");
+        navigate("/signin");
+        return;
+      }
+
+      try {
+        // Cấu hình headers với token và ngrok-skip-browser-warning
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+          "Content-Type": "application/json",
+        };
+
+        // Gọi API feedbacks
+        const feedbackResponse = await axios.get(
+          "https://b64a-118-69-182-149.ngrok-free.app/api/feedbacks",
+          { headers }
+        );
+
+        // Log dữ liệu để kiểm tra
+        console.log("Feedback Response:", feedbackResponse.data);
+
+        // Kiểm tra xem dữ liệu có phải JSON không
+        if (
+          typeof feedbackResponse.data === "string" &&
+          feedbackResponse.data.startsWith("<!DOCTYPE")
+        ) {
+          setError(
+            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
+          );
+          return;
+        }
+
+        // Ánh xạ dữ liệu phản hồi (tạm thời không dùng customers và specialists)
+        const mappedData = feedbackResponse.data.map((item) => ({
+          id: item.feedbackId,
+          customer: `Khách hàng ID: ${item.customerId}`, // Thay vì tên, dùng ID nếu không có API customers
+          email: "Email không khả dụng", // Cần API customers để lấy email
+          avatar: "/placeholder.svg?height=40&width=40",
+          service: `Dịch vụ ID: ${item.specialistId}`, // Thay vì tên dịch vụ, dùng ID nếu không có API specialists
+          message: item.comment,
+          rating: item.rating,
+          date: item.createdAt.split("T")[0],
+          response: item.response || "",
+        }));
+
+        setFeedbackItems(mappedData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        if (err.response?.status === 401) {
+          setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+          localStorage.removeItem("token");
+          navigate("/signin");
+        } else if (
+          err.response?.data &&
+          typeof err.response.data === "string" &&
+          err.response.data.startsWith("<!DOCTYPE")
+        ) {
+          setError(
+            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
+          );
+        } else {
+          setError("Không thể tải dữ liệu phản hồi. Vui lòng thử lại.");
+        }
+      }
+    };
+
+    fetchData();
+  }, [navigate]);
 
   const renderStars = (rating) => {
     return Array(5)
@@ -98,8 +134,18 @@ export default function FeedbackList({ filter }) {
     closeModal();
   };
 
+  const filteredItems =
+    filter === 0
+      ? feedbackItems
+      : feedbackItems.filter((item) => item.rating === filter);
+
   return (
     <>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          {error}
+        </div>
+      )}
       <div className="space-y-4">
         {filteredItems.length === 0 ? (
           <div className="bg-white rounded-lg shadow border border-gray-200">
@@ -136,7 +182,7 @@ export default function FeedbackList({ filter }) {
                   <div className="flex items-center gap-1 mb-2">
                     {renderStars(item.rating)}
                   </div>
-                  <p className="text-sm font-medium">Dịch vụ: {item.service}</p>
+                  <p className="text-sm font-medium"> {item.service}</p>
                   <p className="mt-2 text-sm">{item.message}</p>
 
                   {item.response && (
