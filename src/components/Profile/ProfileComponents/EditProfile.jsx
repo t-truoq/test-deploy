@@ -46,7 +46,7 @@ const EditProfile = () => {
         }
 
         const response = await axios.get(
-          `https://fa9f-118-69-182-149.ngrok-free.app/api/users/profile`,
+          `https://b64a-118-69-182-149.ngrok-free.app/api/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -153,7 +153,7 @@ const EditProfile = () => {
       console.log("Sending update data:", updateData);
 
       const response = await axios.put(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/users/profile`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/users/profile`,
         updateData,
         {
           headers: {

@@ -27,7 +27,7 @@
 
 //       try {
 //         const response = await axios.get(
-//           `https://fa9f-118-69-182-149.ngrok-free.app/api/services/${id}`,
+//           `https://b64a-118-69-182-149.ngrok-free.app/api/services/${id}`,
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -262,7 +262,7 @@ export default function ServiceDetail() {
       }
 
       try {
-        const response = await axios.get(`https://fa9f-118-69-182-149.ngrok-free.app/api/services/${id}`, {
+        const response = await axios.get(`https://b64a-118-69-182-149.ngrok-free.app/api/services/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
