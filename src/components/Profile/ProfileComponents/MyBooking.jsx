@@ -22,7 +22,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/user",
+//           "https://b64a-118-69-182-149.ngrok-free.app/api/bookings/user",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@
 //       }
 
 //       const response = await axios.post(
-//         `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+//         `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
 //         {},
 //         {
 //           headers: {
@@ -131,7 +131,7 @@
 //       }
 
 //       const response = await axios.post(
-//         `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+//         `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
 //         {},
 //         {
 //           headers: {
@@ -178,7 +178,7 @@
 //       }
 
 //       const response = await axios.post(
-//         `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+//         `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
 //         {},
 //         {
 //           headers: {
@@ -380,8 +380,13 @@ const MyBooking = () => {
 
   // Lấy danh sách serviceIds từ localStorage khi component mount
   useEffect(() => {
-    const storedServiceIds = localStorage.getItem("selectedServiceIdsForBooking");
-    console.log("Retrieved selectedServiceIds from localStorage:", storedServiceIds); // Thêm log để kiểm tra
+    const storedServiceIds = localStorage.getItem(
+      "selectedServiceIdsForBooking"
+    );
+    console.log(
+      "Retrieved selectedServiceIds from localStorage:",
+      storedServiceIds
+    ); // Thêm log để kiểm tra
 
     if (storedServiceIds) {
       try {
@@ -407,7 +412,7 @@ const MyBooking = () => {
         }
 
         const response = await axios.get(
-          "https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/user",
+          "https://b64a-118-69-182-149.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -426,7 +431,9 @@ const MyBooking = () => {
           });
           setBookings(sortedBookings);
         } else {
-          throw new Error("Invalid response format: Expected an array of bookings");
+          throw new Error(
+            "Invalid response format: Expected an array of bookings"
+          );
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -443,13 +450,20 @@ const MyBooking = () => {
           } else if (error.response.status === 404) {
             setError("No bookings found.");
           } else {
-            setError(error.response.data.message || "Failed to load bookings. Please try again.");
+            setError(
+              error.response.data.message ||
+                "Failed to load bookings. Please try again."
+            );
           }
         } else if (error.request) {
           console.log("No response received:", error.request);
-          setError("Unable to connect to server. CORS issue or server error. Please try again.");
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
-          setError(error.message || "Failed to load bookings. Please try again.");
+          setError(
+            error.message || "Failed to load bookings. Please try again."
+          );
         }
       } finally {
         setLoading(false);
@@ -467,7 +481,9 @@ const MyBooking = () => {
   // Lọc booking theo ngày tìm kiếm
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-        const bookingDate = new Date(booking.bookingDate).toISOString().split("T")[0]; // Lấy ngày dưới dạng YYYY-MM-DD
+        const bookingDate = new Date(booking.bookingDate)
+          .toISOString()
+          .split("T")[0]; // Lấy ngày dưới dạng YYYY-MM-DD
         return bookingDate === searchDate;
       })
     : bookings;
@@ -491,7 +507,7 @@ const MyBooking = () => {
       const startTime = "10:00"; // Giờ bắt đầu, theo định dạng API
 
       const response = await axios.post(
-        "https://fa9f-118-69-182-149.ngrok-free.app/api/bookings",
+        "https://b64a-118-69-182-149.ngrok-free.app/api/bookings",
         {
           specialistId,
           bookingDate,
@@ -520,10 +536,14 @@ const MyBooking = () => {
       if (error.response) {
         console.log("Error response:", error.response.data);
         setError(
-          error.response.data.message || "Failed to confirm payment and create booking. Please try again."
+          error.response.data.message ||
+            "Failed to confirm payment and create booking. Please try again."
         );
       } else {
-        setError(error.message || "Failed to confirm payment and create booking. Please try again.");
+        setError(
+          error.message ||
+            "Failed to confirm payment and create booking. Please try again."
+        );
       }
     }
   };
@@ -537,7 +557,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -553,7 +573,9 @@ const MyBooking = () => {
       // Cập nhật danh sách booking sau khi hủy
       setBookings((prevBookings) =>
         prevBookings.map((booking) =>
-          booking.bookingId === bookingId ? { ...booking, status: "CANCELLED" } : booking
+          booking.bookingId === bookingId
+            ? { ...booking, status: "CANCELLED" }
+            : booking
         )
       );
     } catch (error) {
@@ -567,7 +589,10 @@ const MyBooking = () => {
         } else if (error.response.status === 403) {
           setError("You do not have permission to cancel this booking.");
         } else {
-          setError(error.response.data.message || "Failed to cancel booking. Please try again.");
+          setError(
+            error.response.data.message ||
+              "Failed to cancel booking. Please try again."
+          );
         }
       } else {
         setError("Failed to cancel booking. Please try again.");
@@ -584,7 +609,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -601,7 +626,11 @@ const MyBooking = () => {
       setBookings((prevBookings) =>
         prevBookings.map((booking) =>
           booking.bookingId === bookingId
-            ? { ...booking, checkInTime: new Date().toISOString(), status: "IN_PROGRESS" }
+            ? {
+                ...booking,
+                checkInTime: new Date().toISOString(),
+                status: "IN_PROGRESS",
+              }
             : booking
         )
       );
@@ -614,7 +643,10 @@ const MyBooking = () => {
             navigate("/login");
           }, 2000);
         } else {
-          setError(error.response.data.message || "Failed to check-in booking. Please try again.");
+          setError(
+            error.response.data.message ||
+              "Failed to check-in booking. Please try again."
+          );
         }
       } else {
         setError("Failed to check-in booking. Please try again.");
@@ -631,7 +663,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -648,7 +680,11 @@ const MyBooking = () => {
       setBookings((prevBookings) =>
         prevBookings.map((booking) =>
           booking.bookingId === bookingId
-            ? { ...booking, checkOutTime: new Date().toISOString(), status: "COMPLETED" }
+            ? {
+                ...booking,
+                checkOutTime: new Date().toISOString(),
+                status: "COMPLETED",
+              }
             : booking
         )
       );
@@ -661,7 +697,10 @@ const MyBooking = () => {
             navigate("/login");
           }, 2000);
         } else {
-          setError(error.response.data.message || "Failed to check-out booking. Please try again.");
+          setError(
+            error.response.data.message ||
+              "Failed to check-out booking. Please try again."
+          );
         }
       } else {
         setError("Failed to check-out booking. Please try again.");
@@ -670,7 +709,9 @@ const MyBooking = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-600">Loading bookings...</div>;
+    return (
+      <div className="text-center py-8 text-gray-600">Loading bookings...</div>
+    );
   }
 
   if (error) {
@@ -704,7 +745,9 @@ const MyBooking = () => {
       {/* Hiển thị danh sách dịch vụ đã chọn để xác nhận */}
       {selectedServiceIds.length > 0 && (
         <div className="mb-6">
-          <h3 className="text-xl font-semibold mb-4">Selected Services for Booking</h3>
+          <h3 className="text-xl font-semibold mb-4">
+            Selected Services for Booking
+          </h3>
           <ul className="space-y-2">
             {selectedServiceIds.map((serviceId) => (
               <li key={serviceId} className="bg-gray-100 p-2 rounded-md">
@@ -723,7 +766,10 @@ const MyBooking = () => {
 
       {/* Thanh tìm kiếm theo ngày */}
       <div className="mb-6">
-        <label htmlFor="searchDate" className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="searchDate"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           Search by Date
         </label>
         <input
@@ -756,13 +802,16 @@ const MyBooking = () => {
                     Booking ID: {booking.bookingId}
                   </h3>
                   <p className="mt-2 text-gray-600">
-                    <span className="font-medium">Date:</span> {booking.bookingDate}
+                    <span className="font-medium">Date:</span>{" "}
+                    {booking.bookingDate}
                   </p>
                   <p className="mt-1 text-gray-600">
-                    <span className="font-medium">Time Slot:</span> {booking.startTime} (Start)
+                    <span className="font-medium">Time Slot:</span>{" "}
+                    {booking.startTime} (Start)
                   </p>
                   <p className="mt-1 text-gray-600">
-                    <span className="font-medium">Total Price:</span> ${booking.totalPrice || "N/A"}
+                    <span className="font-medium">Total Price:</span> $
+                    {booking.totalPrice || "N/A"}
                   </p>
                   <p className="mt-1 text-gray-600">
                     <span className="font-medium">Status:</span>{" "}
@@ -830,14 +879,15 @@ const MyBooking = () => {
                       Check-in
                     </button>
                   )}
-                  {booking.status === "IN_PROGRESS" && !booking.checkOutTime && (
-                    <button
-                      onClick={() => handleCheckOut(booking.bookingId)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Check-out
-                    </button>
-                  )}
+                  {booking.status === "IN_PROGRESS" &&
+                    !booking.checkOutTime && (
+                      <button
+                        onClick={() => handleCheckOut(booking.bookingId)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Check-out
+                      </button>
+                    )}
                 </div>
               </div>
             </div>

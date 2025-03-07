@@ -33,7 +33,6 @@
 // //           {/* <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/products">
 // //             Products
 // //           </NavLink> */}
-          
 
 // //           {/* Search Bar */}
 // //           {/* <form className="relative">
@@ -530,7 +529,17 @@
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { User, ChevronDown, Menu, X, Settings, LogOut, Heart, ShoppingBag, UserCircle } from "lucide-react";
+import {
+  User,
+  ChevronDown,
+  Menu,
+  X,
+  Settings,
+  LogOut,
+  Heart,
+  ShoppingBag,
+  UserCircle,
+} from "lucide-react";
 import axios from "axios";
 
 // Custom hook để lắng nghe sự thay đổi của localStorage
@@ -581,7 +590,10 @@ const Navbar = () => {
   const [showSidebar, setShowSidebar] = useState(false); // Sidebar state
   const [showLogoutPopup, setShowLogoutPopup] = useState(false); // Logout confirmation popup
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Mobile menu state
-  const [user, setUser] = useLocalStorage("user", { name: "User", email: "user@example.com" }); // Hook lắng nghe localStorage
+  const [user, setUser] = useLocalStorage("user", {
+    name: "User",
+    email: "user@example.com",
+  }); // Hook lắng nghe localStorage
 
   // Check login status and fetch user profile when component mounts
   useEffect(() => {
@@ -594,7 +606,7 @@ const Navbar = () => {
         }
 
         const response = await axios.get(
-          "https://fa9f-118-69-182-149.ngrok-free.app/api/users/profile",
+          "https://b64a-118-69-182-149.ngrok-free.app/api/users/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -637,7 +649,8 @@ const Navbar = () => {
   useEffect(() => {
     const addGoogleTranslateScript = () => {
       const script = document.createElement("script");
-      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.src =
+        "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
       script.async = true;
       document.body.appendChild(script);
 
@@ -700,8 +713,15 @@ const Navbar = () => {
       <nav className="bg-gradient-to-r from-gray-100 to-white shadow-md py-3">
         <div className="container mx-auto flex justify-between items-center px-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center text-pink-700 font-bold text-xl uppercase">
-            <img src="home/logo/logo.webp" alt="Beauty Logo" className="h-10 mr-2" />
+          <Link
+            to="/"
+            className="flex items-center text-pink-700 font-bold text-xl uppercase"
+          >
+            <img
+              src="home/logo/logo.webp"
+              alt="Beauty Logo"
+              className="h-10 mr-2"
+            />
             BEAUTYA
           </Link>
 
@@ -716,19 +736,33 @@ const Navbar = () => {
           {/* Menu items */}
           <div
             className={`lg:flex lg:space-x-6 lg:items-center ${
-              showMobileMenu ? "absolute top-16 left-0 right-0 bg-white shadow-md p-4 flex flex-col space-y-4 z-50" : "hidden"
+              showMobileMenu
+                ? "absolute top-16 left-0 right-0 bg-white shadow-md p-4 flex flex-col space-y-4 z-50"
+                : "hidden"
             }`}
           >
-            <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/">
+            <NavLink
+              className="text-gray-700 font-medium hover:text-pink-700"
+              to="/"
+            >
               Home
             </NavLink>
-            <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/about">
+            <NavLink
+              className="text-gray-700 font-medium hover:text-pink-700"
+              to="/about"
+            >
               About
             </NavLink>
-            <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/blog">
+            <NavLink
+              className="text-gray-700 font-medium hover:text-pink-700"
+              to="/blog"
+            >
               Blog
             </NavLink>
-            <NavLink className="text-gray-700 font-medium hover:text-pink-700" to="/services">
+            <NavLink
+              className="text-gray-700 font-medium hover:text-pink-700"
+              to="/services"
+            >
               Services
             </NavLink>
 
@@ -764,7 +798,10 @@ const Navbar = () => {
 
             {/* User Profile / Login Button */}
             {isLoggedIn ? (
-              <button onClick={toggleSidebar} className="flex items-center space-x-1 text-gray-700 hover:text-pink-700">
+              <button
+                onClick={toggleSidebar}
+                className="flex items-center space-x-1 text-gray-700 hover:text-pink-700"
+              >
                 <User size={20} />
                 <span>My Profile</span>
               </button>
@@ -785,9 +822,14 @@ const Navbar = () => {
 
       {/* User Profile Sidebar */}
       {isLoggedIn && (
-        <div className={`fixed inset-0 z-50 ${showSidebar ? "block" : "hidden"}`}>
+        <div
+          className={`fixed inset-0 z-50 ${showSidebar ? "block" : "hidden"}`}
+        >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={toggleSidebar}></div>
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={toggleSidebar}
+          ></div>
 
           {/* Sidebar */}
           <div
@@ -797,8 +839,13 @@ const Navbar = () => {
           >
             {/* Sidebar Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-pink-700">My Profile</h2>
-              <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700">
+              <h2 className="text-xl font-semibold text-pink-700">
+                My Profile
+              </h2>
+              <button
+                onClick={toggleSidebar}
+                className="text-gray-500 hover:text-gray-700"
+              >
                 <X size={24} />
               </button>
             </div>
@@ -811,26 +858,40 @@ const Navbar = () => {
                 </div>
                 <div>
                   <h3 className="font-medium">{user?.name || "User"}</h3>
-                  <p className="text-sm text-gray-500">{user?.email || "user@example.com"}</p>
+                  <p className="text-sm text-gray-500">
+                    {user?.email || "user@example.com"}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Sidebar Menu */}
             <div className="py-4">
-              <Link to="/profile" className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700">
+              <Link
+                to="/profile"
+                className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700"
+              >
                 <User size={20} className="mr-3" />
                 <span>Edit Profile</span>
               </Link>
-              <Link to="/mybooking" className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700">
+              <Link
+                to="/mybooking"
+                className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700"
+              >
                 <ShoppingBag size={20} className="mr-3" />
                 <span>My Booking </span>
               </Link>
-              <Link to="/wishlist" className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700">
+              <Link
+                to="/wishlist"
+                className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700"
+              >
                 <Heart size={20} className="mr-3" />
                 <span>Wishlist</span>
               </Link>
-              <Link to="/myskintype" className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700">
+              <Link
+                to="/myskintype"
+                className="flex items-center px-6 py-3 hover:bg-pink-50 text-gray-700"
+              >
                 <Settings size={20} className="mr-3" />
                 <span>My Type Skin</span>
               </Link>
@@ -850,7 +911,9 @@ const Navbar = () => {
       {showLogoutPopup && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full animate-fade-in">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Do you want to logout?</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              Do you want to logout?
+            </h3>
             <div className="flex justify-center space-x-4">
               <button
                 onClick={confirmLogout}

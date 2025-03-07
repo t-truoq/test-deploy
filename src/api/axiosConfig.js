@@ -1,11 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: 'https://fa9f-118-69-182-149.ngrok-free.app/api',
+  baseURL: "https://b64a-118-69-182-149.ngrok-free.app/api",
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 // Request interceptor
@@ -30,13 +30,13 @@ axiosInstance.interceptors.response.use(
     // Xử lý lỗi
     if (error.response) {
       // Lỗi response từ server (status code không phải 2xx)
-      console.error('Response error:', error.response.data);
+      console.error("Response error:", error.response.data);
     } else if (error.request) {
       // Không nhận được response
-      console.error('Request error:', error.request);
+      console.error("Request error:", error.request);
     } else {
       // Lỗi khi setup request
-      console.error('Error:', error.message);
+      console.error("Error:", error.message);
     }
     return Promise.reject(error);
   }
@@ -44,20 +44,20 @@ axiosInstance.interceptors.response.use(
 
 // Thêm API endpoints cho users
 export const usersAPI = {
-  getAll: () => axiosInstance.get('/users'),
+  getAll: () => axiosInstance.get("/users"),
   getById: (id) => axiosInstance.get(`/users/${id}`),
-  create: (data) => axiosInstance.post('/users', data),
+  create: (data) => axiosInstance.post("/users", data),
   update: (id, data) => axiosInstance.put(`/users/${id}`, data),
-  delete: (id) => axiosInstance.delete(`/users/${id}`)
+  delete: (id) => axiosInstance.delete(`/users/${id}`),
 };
 
 // Giữ nguyên servicesAPI
 export const servicesAPI = {
-  getAll: () => axiosInstance.get('/services'),
+  getAll: () => axiosInstance.get("/services"),
   getById: (id) => axiosInstance.get(`/services/${id}`),
-  create: (data) => axiosInstance.post('/services', data),
+  create: (data) => axiosInstance.post("/services", data),
   update: (id, data) => axiosInstance.put(`/services/${id}`, data),
-  delete: (id) => axiosInstance.delete(`/services/${id}`)
+  delete: (id) => axiosInstance.delete(`/services/${id}`),
 };
 
-export default axiosInstance; 
+export default axiosInstance;

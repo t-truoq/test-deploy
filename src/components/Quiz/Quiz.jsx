@@ -24,7 +24,7 @@
 
 //         // Gọi API để lấy câu hỏi và đáp án
 //         const response = await axios.get(
-//           "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/questions-with-answers",
+//           "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/questions-with-answers",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@
 //       });
 
 //       const response = await axios.post(
-//         "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/submit",
+//         "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/submit",
 //         submissionData,
 //         {
 //           headers: {
@@ -507,7 +507,6 @@
 
 // export default Quiz;
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -534,28 +533,34 @@ const Quiz = () => {
 
         // Gọi API để lấy câu hỏi và đáp án
         const response = await axios.get(
-          "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/questions-with-answers",
+          "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/questions-with-answers",
           {
             headers: {
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
               "Content-Type": "application/json",
             },
-          },
+          }
         );
 
         console.log("Fetch questions-with-answers response:", response.data);
 
         // Xử lý dữ liệu lồng nhau
         let fetchedQuestions = response.data;
-        if (Array.isArray(response.data) && response.data.length > 0 && Array.isArray(response.data[0])) {
+        if (
+          Array.isArray(response.data) &&
+          response.data.length > 0 &&
+          Array.isArray(response.data[0])
+        ) {
           fetchedQuestions = response.data[0]; // Lấy mảng bên trong nếu dữ liệu lồng nhau
         }
 
         if (Array.isArray(fetchedQuestions)) {
           setQuestions(fetchedQuestions);
         } else {
-          throw new Error("Invalid response format from questions-with-answers API: Expected an array");
+          throw new Error(
+            "Invalid response format from questions-with-answers API: Expected an array"
+          );
         }
       } catch (error) {
         console.error("Error fetching quiz data:", error);
@@ -570,13 +575,20 @@ const Quiz = () => {
           } else if (error.response.status === 404) {
             setError("No quiz questions found.");
           } else {
-            setError(error.response.data.message || "Failed to load quiz questions. Please try again.");
+            setError(
+              error.response.data.message ||
+                "Failed to load quiz questions. Please try again."
+            );
           }
         } else if (error.request) {
           console.log("No response received:", error.request);
-          setError("Unable to connect to server. CORS issue or server error. Please try again.");
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
-          setError(error.message || "Failed to load quiz questions. Please try again.");
+          setError(
+            error.message || "Failed to load quiz questions. Please try again."
+          );
         }
       } finally {
         setLoading(false);
@@ -618,7 +630,7 @@ const Quiz = () => {
       });
 
       const response = await axios.post(
-        "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/submit",
+        "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/submit",
         submissionData,
         {
           headers: {
@@ -626,7 +638,7 @@ const Quiz = () => {
             "ngrok-skip-browser-warning": "true",
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       console.log("Quiz submission response:", response.data);
@@ -652,11 +664,16 @@ const Quiz = () => {
             navigate("/login");
           }, 2000);
         } else {
-          setError(error.response.data.message || "Failed to submit quiz. Please try again.");
+          setError(
+            error.response.data.message ||
+              "Failed to submit quiz. Please try again."
+          );
         }
       } else if (error.request) {
         console.log("No response received:", error.request);
-        setError("Unable to connect to server. CORS issue or server error. Please try again.");
+        setError(
+          "Unable to connect to server. CORS issue or server error. Please try again."
+        );
       } else {
         setError(error.message || "Failed to submit quiz. Please try again.");
       }
@@ -736,7 +753,9 @@ const Quiz = () => {
               />
             </svg>
           </div>
-          <p className="text-red-600 mb-6">Error: Quiz questions are not available.</p>
+          <p className="text-red-600 mb-6">
+            Error: Quiz questions are not available.
+          </p>
         </div>
       </div>
     );
@@ -762,12 +781,21 @@ const Quiz = () => {
         <div className="mb-8">
           <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
             <span>Your progress</span>
-            <span>{Math.round((Object.keys(answers).length / questions.length) * 100)}% Complete</span>
+            <span>
+              {Math.round(
+                (Object.keys(answers).length / questions.length) * 100
+              )}
+              % Complete
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
               className="bg-gradient-to-r from-[#A10550] to-pink-500 h-2.5 rounded-full transition-all duration-300 ease-in-out"
-              style={{ width: `${(Object.keys(answers).length / questions.length) * 100}%` }}
+              style={{
+                width: `${
+                  (Object.keys(answers).length / questions.length) * 100
+                }%`,
+              }}
             ></div>
           </div>
         </div>
@@ -828,14 +856,23 @@ const Quiz = () => {
                         type="radio"
                         name={`question-${question.questionId}`}
                         value={answer.answerId}
-                        checked={answers[question.questionId] === answer.answerId}
-                        onChange={() => handleAnswerChange(question.questionId, answer.answerId)}
+                        checked={
+                          answers[question.questionId] === answer.answerId
+                        }
+                        onChange={() =>
+                          handleAnswerChange(
+                            question.questionId,
+                            answer.answerId
+                          )
+                        }
                         className="sr-only"
                       />
                     </label>
                   ))
                 ) : (
-                  <p className="text-red-600 p-4 bg-red-50 rounded-lg">No answers available for this question.</p>
+                  <p className="text-red-600 p-4 bg-red-50 rounded-lg">
+                    No answers available for this question.
+                  </p>
                 )}
               </div>
             </div>
@@ -872,54 +909,82 @@ const Quiz = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
-              <h3 className="text-2xl font-bold text-white">Your Skin Type Result</h3>
+              <h3 className="text-2xl font-bold text-white">
+                Your Skin Type Result
+              </h3>
             </div>
 
             <div className="p-6">
               {/* Main result */}
               <div className="text-center mb-8">
-                <p className="text-lg text-gray-700 mb-2">Based on your answers, your skin type is:</p>
-                <h4 className="text-3xl font-bold text-[#A10550] mb-2">{quizResult.detectedSkinType}</h4>
+                <p className="text-lg text-gray-700 mb-2">
+                  Based on your answers, your skin type is:
+                </p>
+                <h4 className="text-3xl font-bold text-[#A10550] mb-2">
+                  {quizResult.detectedSkinType}
+                </h4>
                 <div className="w-24 h-1 bg-[#A10550] mx-auto"></div>
               </div>
 
               {/* Skin type scores */}
-              {quizResult.skinTypeScores && typeof quizResult.skinTypeScores === "object" && (
-                <div className="mb-8 bg-pink-50 p-4 rounded-xl">
-                  <h4 className="text-xl font-semibold text-gray-900 mb-4">Skin Type Scores</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {Object.entries(quizResult.skinTypeScores).map(([type, score]) => {
-                      // Calculate the total score
-                      const totalScore = Object.values(quizResult.skinTypeScores).reduce((a, b) => a + b, 0);
-                      // Calculate percentage
-                      const percentage = totalScore > 0 ? (score / totalScore) * 100 : 0;
+              {quizResult.skinTypeScores &&
+                typeof quizResult.skinTypeScores === "object" && (
+                  <div className="mb-8 bg-pink-50 p-4 rounded-xl">
+                    <h4 className="text-xl font-semibold text-gray-900 mb-4">
+                      Skin Type Scores
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {Object.entries(quizResult.skinTypeScores).map(
+                        ([type, score]) => {
+                          // Calculate the total score
+                          const totalScore = Object.values(
+                            quizResult.skinTypeScores
+                          ).reduce((a, b) => a + b, 0);
+                          // Calculate percentage
+                          const percentage =
+                            totalScore > 0 ? (score / totalScore) * 100 : 0;
 
-                      return (
-                        <div key={type} className="bg-white p-3 rounded-lg shadow-sm">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-medium text-gray-800">{type}</span>
-                            <span className="font-bold text-[#A10550]">{percentage.toFixed(1)}%</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          return (
                             <div
-                              className="bg-[#A10550] h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${percentage}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                              key={type}
+                              className="bg-white p-3 rounded-lg shadow-sm"
+                            >
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="font-medium text-gray-800">
+                                  {type}
+                                </span>
+                                <span className="font-bold text-[#A10550]">
+                                  {percentage.toFixed(1)}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className="bg-[#A10550] h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${percentage}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Your answers (collapsible) */}
               <details className="group mb-6">
                 <summary className="flex justify-between items-center cursor-pointer list-none bg-gray-100 p-4 rounded-lg">
-                  <h4 className="text-xl font-semibold text-gray-900">Your Answers</h4>
+                  <h4 className="text-xl font-semibold text-gray-900">
+                    Your Answers
+                  </h4>
                   <div className="text-[#A10550] group-open:rotate-180 transition-transform">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -937,15 +1002,22 @@ const Quiz = () => {
                   </div>
                 </summary>
                 <div className="p-4 border border-gray-200 border-t-0 rounded-b-lg">
-                  {quizResult.userResponses && Array.isArray(quizResult.userResponses) ? (
+                  {quizResult.userResponses &&
+                  Array.isArray(quizResult.userResponses) ? (
                     <div className="space-y-4">
                       {quizResult.userResponses.map((response, index) => (
-                        <div key={index} className="border-b border-gray-100 pb-3 last:border-0">
+                        <div
+                          key={index}
+                          className="border-b border-gray-100 pb-3 last:border-0"
+                        >
                           <p className="text-gray-800 font-medium mb-1">
                             {index + 1}. {response.questionText}
                           </p>
                           <p className="text-gray-600">
-                            Your Answer: <span className="text-[#A10550]">{response.answerText}</span>
+                            Your Answer:{" "}
+                            <span className="text-[#A10550]">
+                              {response.answerText}
+                            </span>
                           </p>
                           <div className="flex gap-2 mt-1 text-xs">
                             <span className="px-2 py-0.5 bg-pink-50 text-[#A10550] rounded-full">
@@ -959,7 +1031,9 @@ const Quiz = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-gray-600">No user responses available.</p>
+                    <p className="text-center text-gray-600">
+                      No user responses available.
+                    </p>
                   )}
                 </div>
               </details>
