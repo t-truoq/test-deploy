@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocation } from "react-router-dom";
-import { Calendar, Users, Clock } from "lucide-react";
+import { Calendar, Users, Clock, MessageCircleWarning } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function AppSidebar() {
@@ -14,10 +14,15 @@ export default function AppSidebar() {
     ? [
         { name: "Appointments", icon: Calendar, path: "/staff/home" },
         { name: "Clients", icon: Users, path: "/staff/clients" },
-        { name: "Staff", icon: Users, path: "/staff/staff-list" },
+        { name: "Skin therapist", icon: Users, path: "/staff/skintherapist" },
         { name: "Staff Schedule", icon: Clock, path: "/staff/schedule" },
+        {
+          name: "Feedback",
+          icon: MessageCircleWarning,
+          path: "/staff/feedback",
+        },
       ]
-    : []; // Nếu không phải staff route, danh sách trống
+    : [];
 
   return (
     <div className="w-64 min-h-screen bg-white border-r border-gray-200 p-4 flex flex-col">

@@ -17,11 +17,11 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     // Xóa token và thông tin user từ localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     // Chuyển hướng về trang home
-    navigate('/');
+    navigate("/");
   };
 
   const mainNav = [
@@ -35,11 +35,11 @@ export default function Sidebar() {
     { name: "Calendar", icon: Calendar, path: "/admin/calendar" },
     { name: "Contact", icon: Contact, path: "/admin/contact" },
     { name: "Invoice", icon: FileText, path: "/admin/invoice" },
-    { 
-      name: "Logout", 
-      icon: LogOut, 
+    {
+      name: "Logout",
+      icon: LogOut,
       path: "/",
-      onClick: handleLogout 
+      onClick: handleLogout,
     },
   ];
 

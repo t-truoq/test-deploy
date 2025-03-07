@@ -28,6 +28,7 @@ import HomeStaff from "./pages/Staff/HomeStaff";
 import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
 import Quiz from "./components/Quiz/Quiz";
 import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
+import FeedbackStaff from "./pages/Staff/FeedbackStaff";
 
 function App() {
   const location = useLocation();
@@ -46,7 +47,8 @@ function App() {
     "/staff/appointments",
     "/staff/schedule",
     "/staff/clients",
-    "/staff/staff-list",
+    "/staff/skintherapist",
+    "/staff/feedback",
   ];
 
   return (
@@ -82,9 +84,10 @@ function App() {
             <Route path="/staff/home" element={<HomeStaff />} />
             <Route path="/staff/appointments" element={<HomeStaff />} />
             <Route path="/staff/clients" element={<HomeStaff />} />
-            <Route path="/staff/staff-list" element={<HomeStaff />} />
+            <Route path="/staff/skintherapist" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
-            <Route path="/" element={<Home />} />n
+            <Route path="/staff/feedback" element={<FeedbackStaff />} />
+            <Route path="/" element={<Home />} />
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}

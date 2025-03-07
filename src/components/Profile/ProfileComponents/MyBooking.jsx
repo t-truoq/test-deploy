@@ -1150,6 +1150,15 @@ const MyBooking = () => {
     const storedServices = localStorage.getItem("selectedServicesForBooking")
     console.log("Retrieved selectedServices from localStorage:", storedServices)
     if (storedServices) {
+    const storedServiceIds = localStorage.getItem(
+      "selectedServiceIdsForBooking"
+    );
+    console.log(
+      "Retrieved selectedServiceIds from localStorage:",
+      storedServiceIds
+    ); // Thêm log để kiểm tra
+
+    if (storedServiceIds) {
       try {
         const parsedServices = JSON.parse(storedServices)
         if (Array.isArray(parsedServices) && parsedServices.length > 0) {
@@ -1188,6 +1197,9 @@ const MyBooking = () => {
           setBookings(sortedBookings)
         } else {
           throw new Error("Invalid response format: Expected an array of bookings")
+          throw new Error(
+            "Invalid response format: Expected an array of bookings"
+          );
         }
       } catch (error) {
         console.error("Error fetching bookings:", error)
@@ -1232,6 +1244,20 @@ const MyBooking = () => {
           setSpecialists(response.data)
         } else {
           throw new Error("Invalid response format: Expected an array of specialists")
+            setError(
+              error.response.data.message ||
+                "Failed to load bookings. Please try again."
+            );
+          }
+        } else if (error.request) {
+          console.log("No response received:", error.request);
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
+        } else {
+          setError(
+            error.message || "Failed to load bookings. Please try again."
+          );
         }
       } catch (error) {
         console.error("Error fetching specialists:", error)
@@ -1253,6 +1279,10 @@ const MyBooking = () => {
     ? bookings.filter((booking) => {
         const bookingDateFormatted = new Date(booking.bookingDate).toISOString().split("T")[0]
         return bookingDateFormatted === searchDate
+        const bookingDate = new Date(booking.bookingDate)
+          .toISOString()
+          .split("T")[0]; // Lấy ngày dưới dạng YYYY-MM-DD
+        return bookingDate === searchDate;
       })
     : bookings
 
@@ -1377,6 +1407,16 @@ const MyBooking = () => {
         }
       } else {
         setBookingError("Failed to connect to server. Please try again.")
+        console.log("Error response:", error.response.data);
+        setError(
+          error.response.data.message ||
+            "Failed to confirm payment and create booking. Please try again."
+        );
+      } else {
+        setError(
+          error.message ||
+            "Failed to confirm payment and create booking. Please try again."
+        );
       }
     } finally {
       setIsBooking(false)
@@ -1404,6 +1444,14 @@ const MyBooking = () => {
 
       console.log("Cancel booking response:", response.data)
       setRefresh((prev) => !prev)
+      // Cập nhật danh sách booking sau khi hủy
+      setBookings((prevBookings) =>
+        prevBookings.map((booking) =>
+          booking.bookingId === bookingId
+            ? { ...booking, status: "CANCELLED" }
+            : booking
+        )
+      );
     } catch (error) {
       console.error("Error canceling booking:", error)
       if (error.response) {
@@ -1416,6 +1464,10 @@ const MyBooking = () => {
           setError("You do not have permission to cancel this booking.")
         } else {
           setError(error.response.data.message || "Failed to cancel booking. Please try again.")
+          setError(
+            error.response.data.message ||
+              "Failed to cancel booking. Please try again."
+          );
         }
       } else {
         setError("Failed to cancel booking. Please try again.")
@@ -1445,6 +1497,23 @@ const MyBooking = () => {
       console.log("Check-in booking response:", response.data)
       setRefresh((prev) => !prev)
       alert("Check-in successful!")
+        }
+      );
+
+      console.log("Check-in booking response:", response.data);
+
+      // Cập nhật danh sách booking sau khi check-in
+      setBookings((prevBookings) =>
+        prevBookings.map((booking) =>
+          booking.bookingId === bookingId
+            ? {
+                ...booking,
+                checkInTime: new Date().toISOString(),
+                status: "IN_PROGRESS",
+              }
+            : booking
+        )
+      );
     } catch (error) {
       console.error("Error checking in booking:", error)
       if (error.response) {
@@ -1455,6 +1524,10 @@ const MyBooking = () => {
           }, 2000)
         } else {
           setError(error.response.data.message || "Failed to check-in booking. Please try again.")
+          setError(
+            error.response.data.message ||
+              "Failed to check-in booking. Please try again."
+          );
         }
       } else {
         setError("Failed to check-in booking. Please try again.")
@@ -1484,6 +1557,23 @@ const MyBooking = () => {
       console.log("Check-out booking response:", response.data)
       setRefresh((prev) => !prev)
       alert("Check-out successful!")
+        }
+      );
+
+      console.log("Check-out booking response:", response.data);
+
+      // Cập nhật danh sách booking sau khi check-out
+      setBookings((prevBookings) =>
+        prevBookings.map((booking) =>
+          booking.bookingId === bookingId
+            ? {
+                ...booking,
+                checkOutTime: new Date().toISOString(),
+                status: "COMPLETED",
+              }
+            : booking
+        )
+      );
     } catch (error) {
       console.error("Error checking out booking:", error)
       if (error.response) {
@@ -1493,7 +1583,13 @@ const MyBooking = () => {
             navigate("/login")
           }, 2000)
         } else {
+
           setError(error.response.data.message || "Failed to check-out booking. Please try again.")
+
+          setError(
+            error.response.data.message ||
+              "Failed to check-out booking. Please try again."
+          );
         }
       } else {
         setError("Failed to check-out booking. Please try again.")
@@ -1577,6 +1673,10 @@ const MyBooking = () => {
     const details = await fetchBookingDetails(booking.bookingId)
     setBookingDetails(details)
     setIsPopupOpen(true)
+  if (loading) {
+    return (
+      <div className="text-center py-8 text-gray-600">Loading bookings...</div>
+    );
   }
 
   const closePopup = () => {
@@ -1660,11 +1760,62 @@ const MyBooking = () => {
           <Link
             to="/login"
             className="inline-flex items-center px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <nav className="py-4">
+        <ol className="flex items-center space-x-2">
+          <li>
+            <Link to="/" className="text-gray-800 hover:text-[#A10550]">
+              Home
+            </Link>
+          </li>
+          <li className="text-gray-500">/</li>
+          <li className="text-[#A10550]">My Bookings</li>
+        </ol>
+      </nav>
+
+      <h2 className="text-3xl font-bold mb-6 text-gray-800">My Bookings</h2>
+
+      {/* Hiển thị danh sách dịch vụ đã chọn để xác nhận */}
+      {selectedServiceIds.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold mb-4">
+            Selected Services for Booking
+          </h3>
+          <ul className="space-y-2">
+            {selectedServiceIds.map((serviceId) => (
+              <li key={serviceId} className="bg-gray-100 p-2 rounded-md">
+                Service ID: {serviceId}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={handleConfirmPayment}
+            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             Go to Login
             <ArrowRight className="ml-2 w-4 h-4" />
           </Link>
         </div>
+      )}
+
+      {/* Thanh tìm kiếm theo ngày */}
+      <div className="mb-6">
+        <label
+          htmlFor="searchDate"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Search by Date
+        </label>
+        <input
+          type="date"
+          id="searchDate"
+          value={searchDate}
+          onChange={(e) => setSearchDate(e.target.value)}
+          className="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A10550] focus:border-[#A10550]"
+          placeholder="YYYY-MM-DD"
+        />
       </div>
     )
   }
@@ -1713,6 +1864,69 @@ const MyBooking = () => {
                 <div>
                   <p className="text-sm text-gray-500">Booking Date</p>
                   <p className="font-medium text-gray-800">{formatDate(confirmedBooking.bookingDate)}</p>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Booking ID: {booking.bookingId}
+                  </h3>
+                  <p className="mt-2 text-gray-600">
+                    <span className="font-medium">Date:</span>{" "}
+                    {booking.bookingDate}
+                  </p>
+                  <p className="mt-1 text-gray-600">
+                    <span className="font-medium">Time Slot:</span>{" "}
+                    {booking.startTime} (Start)
+                  </p>
+                  <p className="mt-1 text-gray-600">
+                    <span className="font-medium">Total Price:</span> $
+                    {booking.totalPrice || "N/A"}
+                  </p>
+                  <p className="mt-1 text-gray-600">
+                    <span className="font-medium">Status:</span>{" "}
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-sm font-medium ${
+                        booking.status === "PENDING"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : booking.status === "CONFIRMED"
+                          ? "bg-blue-100 text-blue-800"
+                          : booking.status === "IN_PROGRESS"
+                          ? "bg-green-100 text-green-800"
+                          : booking.status === "COMPLETED"
+                          ? "bg-teal-100 text-teal-800"
+                          : booking.status === "CANCELLED"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
+                  </p>
+                  <p className="mt-1 text-gray-600">
+                    <span className="font-medium">Payment Status:</span>{" "}
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-sm font-medium ${
+                        booking.paymentStatus === "PENDING"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : booking.paymentStatus === "SUCCESS"
+                          ? "bg-green-100 text-green-800"
+                          : booking.paymentStatus === "FAILED"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {booking.paymentStatus}
+                    </span>
+                  </p>
+                  {booking.checkInTime && (
+                    <p className="mt-1 text-gray-600">
+                      <span className="font-medium">Check-in Time:</span>{" "}
+                      {new Date(booking.checkInTime).toLocaleString()}
+                    </p>
+                  )}
+                  {booking.checkOutTime && (
+                    <p className="mt-1 text-gray-600">
+                      <span className="font-medium">Check-out Time:</span>{" "}
+                      {new Date(booking.checkOutTime).toLocaleString()}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-start mb-2">
@@ -2169,6 +2383,15 @@ const MyBooking = () => {
                     <h3 className="text-lg font-semibold text-rose-700">Booking Cancelled</h3>
                   </div>
                   <p className="text-gray-600 mt-2">This booking has been cancelled and no payment is required.</p>
+                  {booking.status === "IN_PROGRESS" &&
+                    !booking.checkOutTime && (
+                      <button
+                        onClick={() => handleCheckOut(booking.bookingId)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Check-out
+                      </button>
+                    )}
                 </div>
               )}
 
