@@ -22,7 +22,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/user",
+//           "https://b64a-118-69-182-149.ngrok-free.app/api/bookings/user",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@
 //       }
 
 //       const response = await axios.post(
-//         `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+//         `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
 //         {},
 //         {
 //           headers: {
@@ -131,7 +131,7 @@
 //       }
 
 //       const response = await axios.post(
-//         `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+//         `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
 //         {},
 //         {
 //           headers: {
@@ -178,7 +178,7 @@
 //       }
 
 //       const response = await axios.post(
-//         `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+//         `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
 //         {},
 //         {
 //           headers: {
@@ -407,7 +407,7 @@ const MyBooking = () => {
         }
 
         const response = await axios.get(
-          "https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/user",
+          "https://b64a-118-69-182-149.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -491,7 +491,7 @@ const MyBooking = () => {
       const startTime = "10:00"; // Giờ bắt đầu, theo định dạng API
 
       const response = await axios.post(
-        "https://fa9f-118-69-182-149.ngrok-free.app/api/bookings",
+        "https://b64a-118-69-182-149.ngrok-free.app/api/bookings",
         {
           specialistId,
           bookingDate,
@@ -537,7 +537,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -584,7 +584,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -631,7 +631,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://fa9f-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {

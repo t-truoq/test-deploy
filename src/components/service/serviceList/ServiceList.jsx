@@ -283,7 +283,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+//           "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -323,7 +323,7 @@
 
 //     const fetchAllServices = async () => {
 //       try {
-//         const response = await axios.get("https://fa9f-118-69-182-149.ngrok-free.app/api/services", {
+//         const response = await axios.get("https://b64a-118-69-182-149.ngrok-free.app/api/services", {
 //           headers: {
 //             "ngrok-skip-browser-warning": "true",
 //           },
@@ -370,7 +370,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+//           "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -895,7 +895,7 @@ const ServiceList = () => {
         }
 
         const response = await axios.get(
-          "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+          "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -935,7 +935,7 @@ const ServiceList = () => {
 
     const fetchAllServices = async () => {
       try {
-        const response = await axios.get("https://fa9f-118-69-182-149.ngrok-free.app/api/services", {
+        const response = await axios.get("https://b64a-118-69-182-149.ngrok-free.app/api/services", {
           headers: {
             "ngrok-skip-browser-warning": "true",
           },
@@ -982,7 +982,7 @@ const ServiceList = () => {
         }
 
         const response = await axios.get(
-          "https://fa9f-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+          "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
