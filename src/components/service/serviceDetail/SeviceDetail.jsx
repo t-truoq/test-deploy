@@ -276,6 +276,17 @@ export default function ServiceDetail() {
         console.log("Service data:", response.data);
         setService(response.data); // API trả về object chi tiết dịch vụ
         setLoading(false);
+        const response = await axios.get(`https://b64a-118-69-182-149.ngrok-free.app/api/services/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true", // Bỏ qua cảnh báo ngrok
+          },
+        })
+
+        console.log("Service data:", response.data)
+        setService(response.data) // API trả về object chi tiết dịch vụ
+        setLoading(false)
       } catch (err) {
         console.error("Error fetching service:", err);
         if (err.response?.status === 404) {
