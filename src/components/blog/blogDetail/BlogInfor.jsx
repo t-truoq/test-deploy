@@ -81,7 +81,7 @@ const BlogDetail = () => {
         const token = localStorage.getItem("token");
 
         const response = await axios.get(
-          `https://b64a-118-69-182-149.ngrok-free.app/api/blogs/${id}`,
+          `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/blogs/${id}`,
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : undefined, // Gửi token nếu có

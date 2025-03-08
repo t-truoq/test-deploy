@@ -96,7 +96,7 @@ const MyBooking = () => {
           throw new Error("No token found. Please login again.")
         }
 
-        const response = await axios.get("https://b64a-118-69-182-149.ngrok-free.app/api/bookings/user", {
+        const response = await axios.get("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/user", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -158,7 +158,7 @@ const MyBooking = () => {
           throw new Error("No token found. Please login again.")
         }
 
-        const response = await axios.get("https://b64a-118-69-182-149.ngrok-free.app/api/users/specialists/active", {
+        const response = await axios.get("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/users/specialists/active", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -269,7 +269,7 @@ const MyBooking = () => {
     setErrorPopup("")
 
     try {
-      const response = await axios.post("https://b64a-118-69-182-149.ngrok-free.app/api/bookings", bookingData, {
+      const response = await axios.post("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings", bookingData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
@@ -376,7 +376,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -425,7 +425,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -472,7 +472,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.post(
-        `https://b64a-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -607,7 +607,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
   
       const response = await axios.post(
-        "https://b64a-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
