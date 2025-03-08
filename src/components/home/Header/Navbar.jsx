@@ -77,7 +77,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://b64a-118-69-182-149.ngrok-free.app/api/users/profile",
+//           "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/users/profile",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -483,7 +483,7 @@ const Navbar = () => {
           return
         }
 
-        const response = await axios.get("https://b64a-118-69-182-149.ngrok-free.app/api/users/profile", {
+        const response = await axios.get("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -625,7 +625,7 @@ const Navbar = () => {
                 Blog
               </NavLink>
               <NavLink
-                to="/therapist"
+                to="/specialist"
                 className={({ isActive }) =>
                   `text-sm font-medium transition-colors ${
                     isActive
@@ -634,7 +634,7 @@ const Navbar = () => {
                   }`
                 }
               >
-                Therapist
+                Specialist
               </NavLink>
               <NavLink
                 to="/services"

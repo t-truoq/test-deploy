@@ -283,7 +283,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+//           "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/quiz/recommended-services",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -323,7 +323,7 @@
 
 //     const fetchAllServices = async () => {
 //       try {
-//         const response = await axios.get("https://b64a-118-69-182-149.ngrok-free.app/api/services", {
+//         const response = await axios.get("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/services", {
 //           headers: {
 //             "ngrok-skip-browser-warning": "true",
 //           },
@@ -370,7 +370,7 @@
 //         }
 
 //         const response = await axios.get(
-//           "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+//           "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/quiz/recommended-services",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -919,7 +919,7 @@ const ServiceList = () => {
         }
 
         const response = await axios.get(
-          "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+          "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -971,7 +971,7 @@ const ServiceList = () => {
     const fetchAllServices = async () => {
       try {
         const response = await axios.get(
-          "https://b64a-118-69-182-149.ngrok-free.app/api/services",
+          "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -1027,7 +1027,7 @@ const ServiceList = () => {
         }
 
         const response = await axios.get(
-          "https://b64a-118-69-182-149.ngrok-free.app/api/quiz/recommended-services",
+          "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,

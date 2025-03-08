@@ -40,7 +40,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         `https://b64a-118-69-182-149.ngrok-free.app/forgotPassword/verifyMail/${email}`,
+//         `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/forgotPassword/verifyMail/${email}`,
 //         {}, // Backend có thể không yêu cầu body, gửi body rỗng
 //         {
 //           headers: {
@@ -92,7 +92,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         `https://b64a-118-69-182-149.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
+//         `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
 //         {},
 //         {
 //           headers: {
@@ -155,7 +155,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         `https://b64a-118-69-182-149.ngrok-free.app/forgotPassword/changePassword/${email}`,
+//         `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/forgotPassword/changePassword/${email}`,
 //         {
 //           password: newPassword,
 //           repeatPassword: confirmPassword, // Sửa để gửi repeatPassword theo yêu cầu của backend
@@ -581,7 +581,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `https://b64a-118-69-182-149.ngrok-free.app/forgotPassword/verifyMail/${email}`,
+        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/forgotPassword/verifyMail/${email}`,
         {}, // Backend có thể không yêu cầu body, gửi body rỗng
         {
           headers: {
@@ -642,7 +642,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `https://b64a-118-69-182-149.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
+        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
         {},
         {
           headers: {
@@ -718,7 +718,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `https://b64a-118-69-182-149.ngrok-free.app/forgotPassword/changePassword/${email}`,
+        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/forgotPassword/changePassword/${email}`,
         {
           password: newPassword,
           repeatPassword: confirmPassword,
