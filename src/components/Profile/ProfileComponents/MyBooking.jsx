@@ -1,8 +1,6 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom"
-import axios from "axios"
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import {
   Calendar,
   Clock,
@@ -21,97 +19,100 @@ import {
   X,
   CreditCardIcon,
   ChevronRight,
-} from "lucide-react"
+} from "lucide-react";
 
 const MyBooking = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const searchParams = useSearchParams() // Sử dụng để lấy query params từ redirect
-  const [bookings, setBookings] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [errorPopup, setErrorPopup] = useState("")
-  const [refresh, setRefresh] = useState(false)
-  const [searchDate, setSearchDate] = useState("")
-  const [selectedServices, setSelectedServices] = useState([])
-  const [bookingDate, setBookingDate] = useState("")
-  const [startTime, setStartTime] = useState("")
-  const [selectedSpecialist, setSelectedSpecialist] = useState("")
-  const [specialists, setSpecialists] = useState([])
-  const [isBooking, setIsBooking] = useState(false)
-  const [confirmedBooking, setConfirmedBooking] = useState(null)
-  const [isPopupOpen, setIsPopupOpen] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState(null)
-  const [bookingDetails, setBookingDetails] = useState(null)
-  const [isPaying, setIsPaying] = useState(false)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams(); // Sử dụng để lấy query params từ redirect
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorPopup, setErrorPopup] = useState("");
+  const [refresh, setRefresh] = useState(false);
+  const [searchDate, setSearchDate] = useState("");
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [bookingDate, setBookingDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [selectedSpecialist, setSelectedSpecialist] = useState("");
+  const [specialists, setSpecialists] = useState([]);
+  const [isBooking, setIsBooking] = useState(false);
+  const [confirmedBooking, setConfirmedBooking] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [bookingDetails, setBookingDetails] = useState(null);
+  const [isPaying, setIsPaying] = useState(false);
 
   // Fetch bookings, selected services, and specialists from localStorage/API
   useEffect(() => {
-    const storedServices = localStorage.getItem("selectedServicesForBooking")
-    console.log("Retrieved selectedServices from localStorage:", storedServices)
+    const storedServices = localStorage.getItem("selectedServicesForBooking");
+    console.log("Retrieved selectedServices from localStorage:", storedServices);
     if (storedServices) {
       try {
-        const parsedServices = JSON.parse(storedServices)
+        const parsedServices = JSON.parse(storedServices);
         if (Array.isArray(parsedServices) && parsedServices.length > 0) {
-          setSelectedServices(parsedServices)
+          setSelectedServices(parsedServices);
         } else {
-          setSelectedServices([])
+          setSelectedServices([]);
         }
       } catch (error) {
-        console.error("Error parsing selectedServices from localStorage:", error)
-        setSelectedServices([])
+        console.error("Error parsing selectedServices from localStorage:", error);
+        setSelectedServices([]);
       }
     }
 
     const params = Object.fromEntries(searchParams);
-  const vnp_ResponseCode = params["vnp_ResponseCode"];
-  const vnp_TxnRef = params["vnp_TxnRef"]; // Có thể chứa "Booking-<bookingId>"
+    const vnp_ResponseCode = params["vnp_ResponseCode"];
+    const vnp_TxnRef = params["vnp_TxnRef"]; // Có thể chứa "Booking-<bookingId>"
 
-  // Kiểm tra nếu có thông tin từ localStorage (sau khi thanh toán)
-  const lastPaidBookingId = localStorage.getItem("lastPaidBookingId");
+    // Kiểm tra nếu có thông tin từ localStorage (sau khi thanh toán)
+    const lastPaidBookingId = localStorage.getItem("lastPaidBookingId");
 
-  if (vnp_ResponseCode === "00" && (vnp_TxnRef || lastPaidBookingId)) {
-    const bookingId = lastPaidBookingId
-      ? parseInt(lastPaidBookingId)
-      : parseInt(vnp_TxnRef.split("-")[1]); // Trích xuất bookingId từ vnp_TxnRef
-    const booking = bookings.find((b) => b.bookingId === bookingId);
-    if (booking) {
-      setSelectedBooking(booking);
-      fetchBookingDetails(bookingId).then((details) => {
-        if (details) {
-          setBookingDetails({ ...details, paymentStatus: "SUCCESS" });
-          setIsPopupOpen(true);
-          // Xóa thông tin tạm sau khi xử lý
-          localStorage.removeItem("lastPaidBookingId");
-        }
-      });
+    if (vnp_ResponseCode === "00" && (vnp_TxnRef || lastPaidBookingId)) {
+      const bookingId = lastPaidBookingId
+        ? parseInt(lastPaidBookingId)
+        : parseInt(vnp_TxnRef.split("-")[1]); // Trích xuất bookingId từ vnp_TxnRef
+      const booking = bookings.find((b) => b.bookingId === bookingId);
+      if (booking) {
+        setSelectedBooking(booking);
+        fetchBookingDetails(bookingId).then((details) => {
+          if (details) {
+            setBookingDetails({ ...details, paymentStatus: "SUCCESS" });
+            setIsPopupOpen(true);
+            // Xóa thông tin tạm sau khi xử lý
+            localStorage.removeItem("lastPaidBookingId");
+          }
+        });
+      }
+    } else if (vnp_ResponseCode && vnp_ResponseCode !== "00") {
+      setErrorPopup("Payment failed. Please try again.");
     }
-  } else if (vnp_ResponseCode && vnp_ResponseCode !== "00") {
-    setErrorPopup("Payment failed. Please try again.");
-  }
 
     const fetchBookings = async () => {
       try {
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error("No token found. Please login again.")
+          throw new Error("No token found. Please login again.");
         }
 
-        const response = await axios.get("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-        })
+        const response = await axios.get(
+          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/user",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        console.log("Fetch bookings response:", response.data)
+        console.log("Fetch bookings response:", response.data);
         if (Array.isArray(response.data)) {
           const sortedBookings = [...response.data].sort((a, b) => {
-            const dateA = a.createdAt ? new Date(a.createdAt) : new Date(a.bookingDate)
-            const dateB = b.createdAt ? new Date(b.createdAt) : new Date(b.bookingDate)
-            return dateB - dateA
-          })
-          setBookings(sortedBookings)
+            const dateA = a.createdAt ? new Date(a.createdAt) : new Date(a.bookingDate);
+            const dateB = b.createdAt ? new Date(b.createdAt) : new Date(b.bookingDate);
+            return dateB - dateA;
+          });
+          setBookings(sortedBookings);
 
           if (sortedBookings.length === 0) {
             const defaultBooking = {
@@ -122,67 +123,70 @@ const MyBooking = () => {
               paymentStatus: "SUCCESS",
               totalPrice: 50.0,
               createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            }
-            setBookings([defaultBooking])
+            };
+            setBookings([defaultBooking]);
           }
         } else {
-          throw new Error("Invalid response format: Expected an array of bookings")
+          throw new Error("Invalid response format: Expected an array of bookings");
         }
       } catch (error) {
-        console.error("Error fetching bookings:", error)
+        console.error("Error fetching bookings:", error);
         if (error.response) {
           if (error.response.status === 401) {
-            setErrorPopup("Unauthorized: Please login again.")
+            setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => {
-              navigate("/login")
-            }, 2000)
+              navigate("/login");
+            }, 2000);
           } else if (error.response.status === 403) {
-            setErrorPopup("You do not have permission to access your bookings.")
+            setErrorPopup("You do not have permission to access your bookings.");
           } else if (error.response.status === 404) {
-            setErrorPopup("No bookings found.")
+            setErrorPopup("No bookings found.");
           } else {
-            setErrorPopup(error.response.data.message || "Failed to load bookings. Please try again.")
+            setErrorPopup(error.response.data.message || "Failed to load bookings. Please try again.");
           }
         } else if (error.request) {
-          setErrorPopup("Unable to connect to server. CORS issue or server error. Please try again.")
+          setErrorPopup("Unable to connect to server. CORS issue or server error. Please try again.");
         } else {
-          setErrorPopup(error.message || "Failed to load bookings. Please try again.")
+          setErrorPopup(error.message || "Failed to load bookings. Please try again.");
         }
       }
-    }
+    };
 
     const fetchSpecialists = async () => {
       try {
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error("No token found. Please login again.")
+          throw new Error("No token found. Please login again.");
         }
 
-        const response = await axios.get("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/users/specialists/active", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-        })
+        const response = await axios.get(
+          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users/specialists/active",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        console.log("Fetch specialists response:", response.data)
+        console.log("Fetch specialists response:", response.data);
         if (Array.isArray(response.data)) {
-          setSpecialists(response.data)
+          setSpecialists(response.data);
         } else {
-          throw new Error("Invalid response format: Expected an array of specialists")
+          throw new Error("Invalid response format: Expected an array of specialists");
         }
       } catch (error) {
-        console.error("Error fetching specialists:", error)
-        setErrorPopup("Failed to load specialists. Please try again.")
-        setSpecialists([])
+        console.error("Error fetching specialists:", error);
+        setErrorPopup("Failed to load specialists. Please try again.");
+        setSpecialists([]);
       }
-    }
+    };
 
     Promise.all([fetchBookings(), fetchSpecialists()]).finally(() => {
-      setLoading(false)
-    })
-  }, [navigate, refresh])
+      setLoading(false);
+    });
+  }, [navigate, refresh]);
 
   // Xử lý redirect sau thanh toán
   useEffect(() => {
@@ -207,53 +211,53 @@ const MyBooking = () => {
   }, [searchParams, bookings]);
 
   useEffect(() => {
-    setRefresh((prev) => !prev)
-  }, [location])
+    setRefresh((prev) => !prev);
+  }, [location]);
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-        const bookingDateFormatted = new Date(booking.bookingDate).toISOString().split("T")[0]
-        return bookingDateFormatted === searchDate
+        const bookingDateFormatted = new Date(booking.bookingDate).toISOString().split("T")[0];
+        return bookingDateFormatted === searchDate;
       })
-    : bookings
+    : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
-    const totalDuration = services.reduce((sum, service) => sum + service.duration, 0)
-    const startDateTime = new Date(`${bookingDate}T${startTime}:00`)
-    const endDateTime = new Date(startDateTime.getTime() + totalDuration * 60000)
-    const timeSlot = `${startTime}-${endDateTime.toTimeString().slice(0, 5)}`
+    const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
+    const startDateTime = new Date(`${bookingDate}T${startTime}:00`);
+    const endDateTime = new Date(startDateTime.getTime() + totalDuration * 60000);
+    const timeSlot = `${startTime}-${endDateTime.toTimeString().slice(0, 5)}`;
 
     return bookings.some((booking) => {
-      if (booking.status === "CANCELLED" || booking.bookingId === 1) return false
-      const existingDate = new Date(booking.bookingDate).toISOString().split("T")[0]
-      const existingTimeSlot = booking.timeSlot
-      return existingDate === bookingDate && existingTimeSlot === timeSlot
-    })
-  }
+      if (booking.status === "CANCELLED" || booking.bookingId === 1) return false;
+      const existingDate = new Date(booking.bookingDate).toISOString().split("T")[0];
+      const existingTimeSlot = booking.timeSlot;
+      return existingDate === bookingDate && existingTimeSlot === timeSlot;
+    });
+  };
 
   const handleConfirmBooking = async () => {
     if (!bookingDate || !startTime) {
-      setErrorPopup("Please select a booking date and start time.")
-      return
+      setErrorPopup("Please select a booking date and start time.");
+      return;
     }
 
     if (isBooking) {
-      setErrorPopup("Booking in progress... Please wait.")
-      return
+      setErrorPopup("Booking in progress... Please wait.");
+      return;
     }
 
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     if (!token) {
-      setErrorPopup("No token found. Please login again.")
+      setErrorPopup("No token found. Please login again.");
       setTimeout(() => {
-        navigate("/login")
-      }, 2000)
-      return
+        navigate("/login");
+      }, 2000);
+      return;
     }
 
     if (checkBookingConflict(bookingDate, startTime, selectedServices)) {
-      setErrorPopup("You already have a booking at this time.")
-      return
+      setErrorPopup("You already have a booking at this time.");
+      return;
     }
 
     const bookingData = {
@@ -261,122 +265,126 @@ const MyBooking = () => {
       bookingDate: bookingDate,
       startTime: startTime,
       serviceIds: selectedServices.map((service) => Number(service.serviceId)),
-    }
+    };
 
-    console.log("Booking data to be sent:", bookingData)
+    console.log("Booking data to be sent:", bookingData);
 
-    setIsBooking(true)
-    setErrorPopup("")
+    setIsBooking(true);
+    setErrorPopup("");
 
     try {
-      const response = await axios.post("https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings", bookingData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
-          "Content-Type": "application/json",
-        },
-      })
+      const response = await axios.post(
+        "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings",
+        bookingData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      console.log("Booking response:", response.data)
+      console.log("Booking response:", response.data);
 
       setConfirmedBooking({
         services: [...selectedServices],
         bookingDate,
         startTime,
         totalPrice: selectedServices.reduce((sum, service) => sum + service.price, 0),
-      })
+      });
 
-      setSelectedServices([])
-      localStorage.removeItem("selectedServicesForBooking")
-      setBookingDate("")
-      setStartTime("")
-      setSelectedSpecialist("")
-      setRefresh((prev) => !prev)
-      setErrorPopup("")
+      setSelectedServices([]);
+      localStorage.removeItem("selectedServicesForBooking");
+      setBookingDate("");
+      setStartTime("");
+      setSelectedSpecialist("");
+      setRefresh((prev) => !prev);
+      setErrorPopup("");
     } catch (error) {
-      console.error("Error creating booking:", error)
+      console.error("Error creating booking:", error);
       if (error.response) {
-        const errorCode = error.response.data.errorCode
-        const errorMessage = error.response.data.message || "An error occurred."
+        const errorCode = error.response.data.errorCode;
+        const errorMessage = error.response.data.message || "An error occurred.";
         switch (errorCode) {
           case "UNAUTHENTICATED":
-            setErrorPopup("Unauthorized: Please login again.")
+            setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => {
-              navigate("/login")
-            }, 2000)
-            break
+              navigate("/login");
+            }, 2000);
+            break;
           case "SERVICE_NOT_EXISTED":
-            setErrorPopup("One or more selected services do not exist.")
-            break
+            setErrorPopup("One or more selected services do not exist.");
+            break;
           case "BOOKING_SERVICE_LIMIT_EXCEEDED":
-            setErrorPopup("Too many services selected. Maximum limit exceeded.")
-            break
+            setErrorPopup("Too many services selected. Maximum limit exceeded.");
+            break;
           case "TIME_SLOT_OUTSIDE_WORKING_HOURS":
-            setErrorPopup("Selected time is outside working hours (8:00 - 20:00).")
-            break
+            setErrorPopup("Selected time is outside working hours (8:00 - 20:00).");
+            break;
           case "BOOKING_DATE_IN_PAST":
-            setErrorPopup("Booking date cannot be in the past.")
-            break
+            setErrorPopup("Booking date cannot be in the past.");
+            break;
           case "BOOKING_DATE_TOO_FAR_IN_FUTURE":
-            setErrorPopup("Booking date is too far in the future.")
-            break
+            setErrorPopup("Booking date is too far in the future.");
+            break;
           case "BOOKING_TIME_CONFLICT":
-            setErrorPopup("You already have a booking at this time.")
-            break
+            setErrorPopup("You already have a booking at this time.");
+            break;
           case "SKIN_THERAPIST_NOT_EXISTED":
-            setErrorPopup("Selected specialist does not exist.")
-            break
+            setErrorPopup("Selected specialist does not exist.");
+            break;
           case "SPECIALIST_NOT_ACTIVE":
-            setErrorPopup("Selected specialist is not active.")
-            break
+            setErrorPopup("Selected specialist is not active.");
+            break;
           case "TIME_SLOT_UNAVAILABLE":
-            setErrorPopup("Selected specialist is not available at this time.")
-            break
+            setErrorPopup("Selected specialist is not available at this time.");
+            break;
           default:
-            setErrorPopup(errorMessage || "Failed to create booking. Please try again.")
+            setErrorPopup(errorMessage || "Failed to create booking. Please try again.");
         }
       } else {
-        setErrorPopup("Failed to connect to server. Please try again.")
+        setErrorPopup("Failed to connect to server. Please try again.");
       }
     } finally {
-      setIsBooking(false)
+      setIsBooking(false);
     }
-  }
+  };
 
   const handleCancelBooking = async (bookingId) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        setErrorPopup("No token found. Please login again.")
+        setErrorPopup("No token found. Please login again.");
         setTimeout(() => {
-          navigate("/login")
-        }, 2000)
-        return
+          navigate("/login");
+        }, 2000);
+        return;
       }
 
-      const booking = bookings.find((b) => b.bookingId === bookingId)
+      const booking = bookings.find((b) => b.bookingId === bookingId);
       if (!booking) {
-        setErrorPopup("Booking not found.")
-        return
+        setErrorPopup("Booking not found.");
+        return;
       }
 
       if (bookingId === 1) {
-        setErrorPopup("Cannot cancel the default booking.")
-        return
+        setErrorPopup("Cannot cancel the default booking.");
+        return;
       }
 
-      const [startTime] = booking.timeSlot.split("-")
-      const bookingStartDateTime = new Date(`${booking.bookingDate}T${startTime}:00`)
-      const currentDateTime = new Date()
-      const timeDifference = (bookingStartDateTime - currentDateTime) / (1000 * 60 * 60)
+      const [startTime] = booking.timeSlot.split("-");
+      const bookingStartDateTime = new Date(`${booking.bookingDate}T${startTime}:00`);
+      const currentDateTime = new Date();
+      const timeDifference = (bookingStartDateTime - currentDateTime) / (1000 * 60 * 60);
 
       if (timeDifference < 24) {
-        setErrorPopup("Cannot cancel booking less than 24 hours before start time.")
-        return
+        setErrorPopup("Cannot cancel booking less than 24 hours before start time.");
+        return;
       }
 
       const response = await axios.post(
-        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -385,47 +393,47 @@ const MyBooking = () => {
             "Content-Type": "application/json",
           },
         }
-      )
+      );
 
-      console.log("Cancel booking response:", response.data)
-      setRefresh((prev) => !prev)
+      console.log("Cancel booking response:", response.data);
+      setRefresh((prev) => !prev);
     } catch (error) {
-      console.error("Error canceling booking:", error)
+      console.error("Error canceling booking:", error);
       if (error.response) {
         if (error.response.status === 401) {
-          setErrorPopup("Unauthorized: Please login again.")
+          setErrorPopup("Unauthorized: Please login again.");
           setTimeout(() => {
-            navigate("/login")
-          }, 2000)
+            navigate("/login");
+          }, 2000);
         } else if (error.response.status === 403) {
-          setErrorPopup("You do not have permission to cancel this booking.")
+          setErrorPopup("You do not have permission to cancel this booking.");
         } else {
-          setErrorPopup(error.response.data.message || "Failed to cancel booking. Please try again.")
+          setErrorPopup(error.response.data.message || "Failed to cancel booking. Please try again.");
         }
       } else {
-        setErrorPopup("Failed to cancel booking. Please try again.")
+        setErrorPopup("Failed to cancel booking. Please try again.");
       }
     }
-  }
+  };
 
   const handleCheckIn = async (bookingId) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        setErrorPopup("No token found. Please login again.")
+        setErrorPopup("No token found. Please login again.");
         setTimeout(() => {
-          navigate("/login")
-        }, 2000)
-        return
+          navigate("/login");
+        }, 2000);
+        return;
       }
 
       if (bookingId === 1) {
-        setErrorPopup("Cannot check-in the default booking.")
-        return
+        setErrorPopup("Cannot check-in the default booking.");
+        return;
       }
 
       const response = await axios.post(
-        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -434,45 +442,45 @@ const MyBooking = () => {
             "Content-Type": "application/json",
           },
         }
-      )
+      );
 
-      console.log("Check-in booking response:", response.data)
-      setRefresh((prev) => !prev)
+      console.log("Check-in booking response:", response.data);
+      setRefresh((prev) => !prev);
     } catch (error) {
-      console.error("Error checking in booking:", error)
+      console.error("Error checking in booking:", error);
       if (error.response) {
         if (error.response.status === 401) {
-          setErrorPopup("Unauthorized: Please login again.")
+          setErrorPopup("Unauthorized: Please login again.");
           setTimeout(() => {
-            navigate("/login")
-          }, 2000)
+            navigate("/login");
+          }, 2000);
         } else {
-          setErrorPopup(error.response.data.message || "Failed to check-in booking. Please try again.")
+          setErrorPopup(error.response.data.message || "Failed to check-in booking. Please try again.");
         }
       } else {
-        setErrorPopup("Failed to check-in booking. Please try again.")
+        setErrorPopup("Failed to check-in booking. Please try again.");
       }
     }
-  }
+  };
 
   const handleCheckOut = async (bookingId) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        setErrorPopup("No token found. Please login again.")
+        setErrorPopup("No token found. Please login again.");
         setTimeout(() => {
-          navigate("/login")
-        }, 2000)
-        return
+          navigate("/login");
+        }, 2000);
+        return;
       }
 
       if (bookingId === 1) {
-        setErrorPopup("Cannot check-out the default booking.")
-        return
+        setErrorPopup("Cannot check-out the default booking.");
+        return;
       }
 
       const response = await axios.post(
-        `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -481,42 +489,42 @@ const MyBooking = () => {
             "Content-Type": "application/json",
           },
         }
-      )
+      );
 
-      console.log("Check-out booking response:", response.data)
-      setRefresh((prev) => !prev)
+      console.log("Check-out booking response:", response.data);
+      setRefresh((prev) => !prev);
     } catch (error) {
-      console.error("Error checking out booking:", error)
+      console.error("Error checking out booking:", error);
       if (error.response) {
         if (error.response.status === 401) {
-          setErrorPopup("Unauthorized: Please login again.")
+          setErrorPopup("Unauthorized: Please login again.");
           setTimeout(() => {
-            navigate("/login")
-          }, 2000)
+            navigate("/login");
+          }, 2000);
         } else {
-          setErrorPopup(error.response.data.message || "Failed to check-out booking. Please try again.")
+          setErrorPopup(error.response.data.message || "Failed to check-out booking. Please try again.");
         }
       } else {
-        setErrorPopup("Failed to check-out booking. Please try again.")
+        setErrorPopup("Failed to check-out booking. Please try again.");
       }
     }
-  }
+  };
 
   const fetchBookingDetails = async (bookingId) => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-        setErrorPopup("No token found. Please login again.")
+        setErrorPopup("No token found. Please login again.");
         setTimeout(() => {
-          navigate("/login")
-        }, 2000)
-        return null
+          navigate("/login");
+        }, 2000);
+        return null;
       }
 
-      const booking = bookings.find((b) => b.bookingId === bookingId)
+      const booking = bookings.find((b) => b.bookingId === bookingId);
       if (!booking) {
-        setErrorPopup("Booking not found.")
-        return null
+        setErrorPopup("Booking not found.");
+        return null;
       }
 
       if (bookingId === 1) {
@@ -526,23 +534,23 @@ const MyBooking = () => {
           specialist: { name: "Default Specialist", userId: 999, specialization: "Skin Therapist" },
           totalDuration: 60,
           totalPrice: 50.0,
-        }
-        return defaultBookingDetails
+        };
+        return defaultBookingDetails;
       }
 
       const mockServices = [
         { id: 1, name: "Facial Treatment", duration: 60, price: 89.99 },
         { id: 2, name: "Deep Cleansing", duration: 45, price: 69.99 },
         { id: 3, name: "Anti-Aging Treatment", duration: 75, price: 129.99 },
-      ]
+      ];
 
-      const numServices = Math.floor(Math.random() * 3) + 1
-      const selectedMockServices = mockServices.slice(0, numServices)
+      const numServices = Math.floor(Math.random() * 3) + 1;
+      const selectedMockServices = mockServices.slice(0, numServices);
 
       const specialist =
         specialists.length > 0
           ? specialists[Math.floor(Math.random() * specialists.length)]
-          : { name: "Jane Smith", userId: 123, specialization: "Skin Therapist" }
+          : { name: "Jane Smith", userId: 123, specialization: "Skin Therapist" };
 
       const bookingDetails = {
         ...booking,
@@ -550,34 +558,34 @@ const MyBooking = () => {
         specialist: specialist,
         totalDuration: selectedMockServices.reduce((sum, service) => sum + service.duration, 0),
         totalPrice: selectedMockServices.reduce((sum, service) => sum + service.price, 0),
-      }
+      };
 
-      return bookingDetails
+      return bookingDetails;
     } catch (error) {
-      console.error("Error fetching booking details:", error)
-      setErrorPopup("Failed to fetch booking details. Please try again.")
-      return null
+      console.error("Error fetching booking details:", error);
+      setErrorPopup("Failed to fetch booking details. Please try again.");
+      return null;
     }
-  }
+  };
 
   const handleViewDetails = async (booking) => {
-    setSelectedBooking(booking)
-    const details = await fetchBookingDetails(booking.bookingId)
+    setSelectedBooking(booking);
+    const details = await fetchBookingDetails(booking.bookingId);
     if (details) {
-      setBookingDetails(details)
-      setIsPopupOpen(true)
+      setBookingDetails(details);
+      setIsPopupOpen(true);
     }
-  }
+  };
 
   const closePopup = () => {
-    setIsPopupOpen(false)
-    setSelectedBooking(null)
-    setBookingDetails(null)
-  }
+    setIsPopupOpen(false);
+    setSelectedBooking(null);
+    setBookingDetails(null);
+  };
 
   const closeErrorPopup = () => {
-    setErrorPopup("")
-  }
+    setErrorPopup("");
+  };
 
   const handlePayment = async () => {
     try {
@@ -590,24 +598,30 @@ const MyBooking = () => {
         }, 2000);
         return;
       }
-  
+
       if (!selectedBooking || !bookingDetails) {
         setErrorPopup("No booking selected for payment.");
         return;
       }
-  
+
+      // Kiểm tra nếu chưa check-in
+      if (!selectedBooking.checkInTime) {
+        setErrorPopup("Please checkin before payment.");
+        return;
+      }
+
       const amount = Math.round(bookingDetails.totalPrice * 100);
       const orderInfo = `Booking-${selectedBooking.bookingId}`;
-  
+
       const paymentData = {
         amount: amount,
         orderInfo: orderInfo,
       };
-  
+
       console.log("Payment data to be sent:", paymentData);
-  
+
       const response = await axios.post(
-        "https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -617,9 +631,9 @@ const MyBooking = () => {
           },
         }
       );
-  
+
       console.log("Payment response:", response.data);
-  
+
       if (response.data && response.data.code === 0 && response.data.result) {
         // Lưu bookingId vào localStorage để sử dụng sau khi redirect
         localStorage.setItem("lastPaidBookingId", selectedBooking.bookingId);
@@ -643,47 +657,47 @@ const MyBooking = () => {
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "PENDING":
-        return "bg-amber-100 text-amber-800"
+        return "bg-amber-100 text-amber-800";
       case "CONFIRMED":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "IN_PROGRESS":
-        return "bg-emerald-100 text-emerald-800"
+        return "bg-emerald-100 text-emerald-800";
       case "COMPLETED":
-        return "bg-teal-100 text-teal-800"
+        return "bg-teal-100 text-teal-800";
       case "CANCELLED":
-        return "bg-rose-100 text-rose-800"
+        return "bg-rose-100 text-rose-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const getPaymentBadgeClass = (status) => {
     switch (status) {
       case "PENDING":
-        return "bg-amber-100 text-amber-800"
+        return "bg-amber-100 text-amber-800";
       case "SUCCESS":
-        return "bg-emerald-100 text-emerald-800"
+        return "bg-emerald-100 text-emerald-800";
       case "FAILED":
-        return "bg-rose-100 text-rose-800"
+        return "bg-rose-100 text-rose-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
-    const date = new Date(dateString)
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   const formatTime = (timeString) => {
-    if (!timeString) return "N/A"
-    return timeString
-  }
+    if (!timeString) return "N/A";
+    return timeString;
+  };
 
   if (loading) {
     return (
@@ -693,7 +707,7 @@ const MyBooking = () => {
           <p className="mt-4 text-lg font-medium text-gray-700">Loading your bookings...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -915,7 +929,7 @@ const MyBooking = () => {
         ) : (
           <div className="space-y-6">
             {filteredBookings.map((booking, index) => {
-              const displayNumber = filteredBookings.length - index
+              const displayNumber = filteredBookings.length - index;
 
               return (
                 <div
@@ -1029,15 +1043,15 @@ const MyBooking = () => {
                     </div>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         )}
       </div>
 
-      {/* Error Popup */}
+      {/* Error Popup - Update to ensure it's always on top with higher z-index */}
       {errorPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full">
             <div className="flex flex-col items-center">
               <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
@@ -1053,9 +1067,9 @@ const MyBooking = () => {
         </div>
       )}
 
-      {/* Booking Details Popup */}
+      {/* Booking Details Popup - Update z-index to be high but below error popup */}
       {isPopupOpen && selectedBooking && bookingDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9000] p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden">
             <div className="w-full md:w-2/3 p-6 overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
@@ -1181,27 +1195,29 @@ const MyBooking = () => {
                     </div>
                   </div>
 
-                  {selectedBooking.bookingId !== 1 && bookingDetails.paymentStatus === "PENDING" && selectedBooking.status !== "CANCELLED" && (
-                    <button
-                      onClick={handlePayment}
-                      disabled={isPaying}
-                      className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
-                        isPaying ? "bg-gray-400 text-white cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"
-                      } mb-4`}
-                    >
-                      {isPaying ? (
-                        <>
-                          <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <DollarSign className="w-5 h-5 mr-2" />
-                          Pay Now
-                        </>
-                      )}
-                    </button>
-                  )}
+                  {selectedBooking.bookingId !== 1 &&
+                    bookingDetails.paymentStatus === "PENDING" &&
+                    selectedBooking.status !== "CANCELLED" && (
+                      <button
+                        onClick={handlePayment}
+                        disabled={isPaying}
+                        className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
+                          isPaying ? "bg-gray-400 text-white cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"
+                        } mb-4`}
+                      >
+                        {isPaying ? (
+                          <>
+                            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <DollarSign className="w-5 h-5 mr-2" />
+                            Pay Now
+                          </>
+                        )}
+                      </button>
+                    )}
                 </>
               ) : (
                 <div className="bg-rose-50 rounded-xl p-4 mb-6">
@@ -1217,8 +1233,8 @@ const MyBooking = () => {
                 {selectedBooking.bookingId !== 1 && selectedBooking.status === "PENDING" && (
                   <button
                     onClick={() => {
-                      handleCancelBooking(selectedBooking.bookingId)
-                      closePopup()
+                      handleCancelBooking(selectedBooking.bookingId);
+                      closePopup();
                     }}
                     className="w-full flex items-center justify-center px-4 py-2 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200 transition-colors"
                   >
@@ -1229,8 +1245,8 @@ const MyBooking = () => {
                 {selectedBooking.bookingId !== 1 && selectedBooking.status === "CONFIRMED" && !selectedBooking.checkInTime && (
                   <button
                     onClick={() => {
-                      handleCheckIn(selectedBooking.bookingId)
-                      closePopup()
+                      handleCheckIn(selectedBooking.bookingId);
+                      closePopup();
                     }}
                     className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                   >
@@ -1241,8 +1257,8 @@ const MyBooking = () => {
                 {selectedBooking.bookingId !== 1 && selectedBooking.status === "IN_PROGRESS" && !selectedBooking.checkOutTime && (
                   <button
                     onClick={() => {
-                      handleCheckOut(selectedBooking.bookingId)
-                      closePopup()
+                      handleCheckOut(selectedBooking.bookingId);
+                      closePopup();
                     }}
                     className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
@@ -1262,7 +1278,7 @@ const MyBooking = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MyBooking
+export default MyBooking;
