@@ -1,13 +1,13 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-<<<<<<< HEAD
+
   baseURL:
     "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api",
-=======
+
   baseURL: "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api",
   baseURL: 'https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api',
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
+
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

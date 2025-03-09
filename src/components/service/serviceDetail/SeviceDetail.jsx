@@ -272,10 +272,10 @@ export default function ServiceDetail() {
             },
           }
         );
-<<<<<<< HEAD
-=======
 
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
+
+
+
 
         console.log("Service data:", response.data);
         setService(response.data); // API trả về object chi tiết dịch vụ

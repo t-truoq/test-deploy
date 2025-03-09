@@ -1,6 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, User, Clock, Share2, Facebook, Twitter, Linkedin, Link2, ChevronUp, MessageCircle, Heart, Bookmark } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  Clock,
+  Share2,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Link2,
+  ChevronUp,
+  MessageCircle,
+  Heart,
+  Bookmark,
+} from "lucide-react";
 import axios from "axios";
 
 const BlogDetail = () => {
@@ -21,39 +35,20 @@ const BlogDetail = () => {
     const fetchBlogDetail = async () => {
       try {
         setLoading(true);
-        // const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         const headers = {
           "ngrok-skip-browser-warning": "true",
           "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : undefined,
         };
-        // if (token) {
-        //   headers.Authorization = `Bearer ${token}`;
-        // }
 
         const response = await axios.get(
           `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/blogs/${id}`,
-<<<<<<< HEAD
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : undefined, // Gửi token nếu có
-              "ngrok-skip-browser-warning": "true",
-              "Content-Type": "application/json",
-            },
-          }
-=======
           { headers }
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
         );
 
         const blogData = response.data;
         const formattedBlog = {
-<<<<<<< HEAD
-          id: response.data.blogId,
-          title: response.data.title,
-          content: response.data.content,
-          author: response.data.author.name,
-          date: new Date(response.data.createdAt).toLocaleDateString("en-US", {
-=======
           id: blogData.blogId,
           title: blogData.title,
           content: blogData.content,
@@ -61,26 +56,18 @@ const BlogDetail = () => {
           authorRole: "Beauty Expert",
           authorImage: `https://ui-avatars.com/api/?name=${blogData.author.name}&background=A10550&color=fff`,
           date: new Date(blogData.createdAt).toLocaleDateString("en-US", {
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
             year: "numeric",
             month: "long",
             day: "numeric",
           }),
-<<<<<<< HEAD
           image:
-            response.data.images && response.data.images.length > 0
-              ? response.data.images[0].url
-              : "/Placeholder.svg", // Lấy hình ảnh từ images[0].url hoặc dùng placeholder
-          category: "Blog", // Giá trị mặc định vì API không có category
-=======
-          readTime: `${Math.max(Math.ceil(blogData.content.length / 1000), 1)} min read`,
-          image: blogData.images && blogData.images.length > 0
-            ? blogData.images[0].url
-            : "/placeholder.svg?height=600&width=1200",
+            blogData.images && blogData.images.length > 0
+              ? blogData.images[0].url
+              : "/placeholder.svg?height=600&width=1200",
           category: ["Skincare", "Beauty Tips", "Wellness", "Treatments", "Lifestyle"][
             Math.floor(Math.random() * 5)
           ],
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
+          readTime: `${Math.max(Math.ceil(blogData.content.length / 1000), 1)} min read`,
         };
 
         setBlog(formattedBlog);
@@ -88,7 +75,6 @@ const BlogDetail = () => {
         fetchRelatedPosts();
       } catch (error) {
         console.error("Error fetching blog detail:", error);
-<<<<<<< HEAD
         if (error.response) {
           console.log("Error response:", error.response.data);
           console.log("Status:", error.response.status);
@@ -101,8 +87,7 @@ const BlogDetail = () => {
             setError("Blog post not found.");
           } else {
             setError(
-              error.response.data.message ||
-                "Failed to load blog post. Please try again."
+              error.response.data.message || "Failed to load blog post. Please try again."
             );
           }
         } else if (error.request) {
@@ -111,17 +96,8 @@ const BlogDetail = () => {
             "Unable to connect to server. CORS issue or server error. Please try again."
           );
         } else {
-          setError(
-            error.message || "Failed to load blog post. Please try again."
-          );
-=======
-        if (error.response && error.response.status === 401) {
-          window.location.href = `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/oauth2/authorization/google`;
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
+          setError(error.message || "Failed to load blog post. Please try again.");
         }
-        setError(
-          error.response?.data?.message || "Failed to load blog post. Please try again."
-        );
       } finally {
         setLoading(false);
       }
@@ -133,10 +109,8 @@ const BlogDetail = () => {
         const headers = {
           "ngrok-skip-browser-warning": "true",
           "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : undefined,
         };
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
 
         const response = await axios.get(
           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/blogs",
@@ -145,9 +119,9 @@ const BlogDetail = () => {
 
         if (Array.isArray(response.data)) {
           const otherPosts = response.data
-            .filter(post => post.blogId.toString() !== id)
+            .filter((post) => post.blogId.toString() !== id)
             .slice(0, 3);
-          const formattedPosts = otherPosts.map(post => ({
+          const formattedPosts = otherPosts.map((post) => ({
             id: post.blogId,
             title: post.title,
             excerpt: post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content,
@@ -157,9 +131,10 @@ const BlogDetail = () => {
               month: "long",
               day: "numeric",
             }),
-            image: post.images && post.images.length > 0
-              ? post.images[0].url
-              : "/placeholder.svg?height=200&width=300",
+            image:
+              post.images && post.images.length > 0
+                ? post.images[0].url
+                : "/placeholder.svg?height=200&width=300",
             category: ["Skincare", "Beauty Tips", "Wellness", "Treatments", "Lifestyle"][
               Math.floor(Math.random() * 5)
             ],
@@ -175,28 +150,16 @@ const BlogDetail = () => {
     window.scrollTo(0, 0);
   }, [id, navigate]);
 
-<<<<<<< HEAD
-  if (loading) {
-    return (
-      <div className="text-center py-8 text-gray-600">Loading blog post...</div>
-    );
-  }
-=======
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
     };
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleShare = (platform) => {
@@ -227,7 +190,7 @@ const BlogDetail = () => {
 
   const handleLike = () => {
     setLiked(!liked);
-    setLikeCount(prev => liked ? prev - 1 : prev + 1);
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
   };
 
   const formatContent = (content) => {
@@ -257,8 +220,18 @@ const BlogDetail = () => {
       <div className="min-h-screen w-full h-auto bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
           <div className="w-16 h-16 mx-auto mb-4 text-red-500">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <p className="text-gray-600 mb-6">{error || "Blog post not found"}</p>
@@ -276,7 +249,6 @@ const BlogDetail = () => {
   const formattedContent = formatContent(blog.content);
 
   return (
-<<<<<<< HEAD
     <div className="bg-gray-100 min-h-screen pb-12">
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -288,19 +260,21 @@ const BlogDetail = () => {
               <ArrowLeft className="mr-2" size={20} />
               <span className="font-medium">Back to Blog</span>
             </Link>
-=======
-    <div className="min-h-screen w-full h-auto bg-gray-50">
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="relative w-full h-[50vh] md:h-[60vh]">
         <div className="absolute inset-0">
-          <img 
-            src={blog.image || "/placeholder.svg"} 
-            alt={blog.title} 
+          <img
+            src={blog.image || "/placeholder.svg"}
+            alt={blog.title}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
         </div>
-        
+
         <div className="relative h-full max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-16">
           <Link
             to="/blog"
@@ -309,15 +283,15 @@ const BlogDetail = () => {
             <ArrowLeft className="mr-2" size={20} />
             <span className="font-medium">Back to Blog</span>
           </Link>
-          
+
           <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm text-white mb-4 w-fit">
             {blog.category}
           </span>
-          
+
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-4xl">
             {blog.title}
           </h1>
-          
+
           <div className="flex items-center">
             <img
               src={blog.authorImage || "/placeholder.svg"}
@@ -333,43 +307,11 @@ const BlogDetail = () => {
                 <span>{blog.readTime}</span>
               </div>
             </div>
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
-      <main className="max-w-4xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
-        <article className="bg-white shadow-lg rounded-lg overflow-hidden">
-          <img
-            src={blog.image}
-            alt={blog.title}
-            className="w-full h-64 object-cover"
-          />
-
-          <div className="p-8">
-            <div className="flex items-center text-sm text-gray-500 mb-4">
-              <Calendar size={16} className="mr-2" />
-              <span>{blog.date}</span>
-              <User size={16} className="ml-4 mr-2" />
-              <span>{blog.author}</span>
-              <Tag size={16} className="ml-4 mr-2" />
-              <span>{blog.category}</span>
-            </div>
-
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              {blog.title}
-            </h1>
-
-            <div className="prose max-w-none">
-              {blog.content.split("\n\n").map((paragraph, index) => (
-                <p key={index} className="mb-4 text-gray-700 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
-=======
-      {/* Main Content */}
-      <div className="max-w-[1920px] w-full h-auto mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Article Content */}
           <div className="lg:col-span-2">
@@ -377,11 +319,11 @@ const BlogDetail = () => {
               {/* Social Sharing */}
               <div className="flex justify-between items-center mb-8 pb-8 border-b border-gray-100 w-full">
                 <div className="flex items-center space-x-4">
-                  <button 
+                  <button
                     onClick={handleLike}
-                    className={`flex items-center space-x-1 ${liked ? 'text-[#A10550]' : 'text-gray-500'} hover:text-[#A10550] transition-colors`}
+                    className={`flex items-center space-x-1 ${liked ? "text-[#A10550]" : "text-gray-500"} hover:text-[#A10550] transition-colors`}
                   >
-                    <Heart className={liked ? 'fill-[#A10550]' : ''} size={20} />
+                    <Heart className={liked ? "fill-[#A10550]" : ""} size={20} />
                     <span>{likeCount}</span>
                   </button>
                   <button className="flex items-center space-x-1 text-gray-500 hover:text-[#A10550] transition-colors">
@@ -389,41 +331,41 @@ const BlogDetail = () => {
                     <span>Comments</span>
                   </button>
                 </div>
-                
+
                 <div className="relative">
-                  <button 
+                  <button
                     onClick={() => setShowShareOptions(!showShareOptions)}
                     className="flex items-center space-x-1 text-gray-500 hover:text-[#A10550] transition-colors"
                   >
                     <Share2 size={20} />
                     <span>Share</span>
                   </button>
-                  
+
                   {showShareOptions && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg p-2 z-10">
-                      <button 
-                        onClick={() => handleShare('facebook')}
+                      <button
+                        onClick={() => handleShare("facebook")}
                         className="flex items-center w-full p-2 hover:bg-gray-100 rounded-md"
                       >
                         <Facebook size={18} className="mr-2 text-blue-600" />
                         <span>Facebook</span>
                       </button>
-                      <button 
-                        onClick={() => handleShare('twitter')}
+                      <button
+                        onClick={() => handleShare("twitter")}
                         className="flex items-center w-full p-2 hover:bg-gray-100 rounded-md"
                       >
                         <Twitter size={18} className="mr-2 text-blue-400" />
                         <span>Twitter</span>
                       </button>
-                      <button 
-                        onClick={() => handleShare('linkedin')}
+                      <button
+                        onClick={() => handleShare("linkedin")}
                         className="flex items-center w-full p-2 hover:bg-gray-100 rounded-md"
                       >
                         <Linkedin size={18} className="mr-2 text-blue-700" />
                         <span>LinkedIn</span>
                       </button>
-                      <button 
-                        onClick={() => handleShare('copy')}
+                      <button
+                        onClick={() => handleShare("copy")}
                         className="flex items-center w-full p-2 hover:bg-gray-100 rounded-md"
                       >
                         <Link2 size={18} className="mr-2 text-gray-600" />
@@ -433,7 +375,7 @@ const BlogDetail = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Article Body */}
               <div className="prose prose-lg max-w-none w-full h-auto">
                 {formattedContent.map((item, index) => {
@@ -452,7 +394,7 @@ const BlogDetail = () => {
                   }
                 })}
               </div>
-              
+
               {/* Tags */}
               <div className="mt-12 pt-8 border-t border-gray-100 w-full h-auto">
                 <div className="flex flex-wrap gap-2">
@@ -467,7 +409,7 @@ const BlogDetail = () => {
                   </span>
                 </div>
               </div>
-              
+
               {/* Author Bio */}
               <div className="mt-12 p-6 bg-gray-50 rounded-xl w-full h-auto">
                 <div className="flex items-start">
@@ -480,19 +422,19 @@ const BlogDetail = () => {
                     <h3 className="text-xl font-bold text-gray-800 mb-1">{blog.author}</h3>
                     <p className="text-gray-600 mb-4">{blog.authorRole}</p>
                     <p className="text-gray-700">
-                      A passionate beauty expert with years of experience in the skincare industry. 
-                      Dedicated to helping clients achieve their best skin through personalized treatments and advice.
+                      A passionate beauty expert with years of experience in the skincare industry. Dedicated to helping
+                      clients achieve their best skin through personalized treatments and advice.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
-           {/* Comments Section */}
+
+            {/* Comments Section */}
             <div className="bg-white rounded-2xl shadow-md p-8 md:p-12 mt-8 w-full h-auto">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Comments</h3>
-              
-              Comment Form
+
+              {/* Comment Form */}
               <div className="mb-8 w-full h-auto">
                 <textarea
                   placeholder="Leave a comment..."
@@ -503,7 +445,7 @@ const BlogDetail = () => {
                   Post Comment
                 </button>
               </div>
-              
+
               {/* Sample Comments */}
               <div className="space-y-6 w-full h-auto">
                 <div className="border-b border-gray-100 pb-6">
@@ -519,7 +461,8 @@ const BlogDetail = () => {
                         <span className="text-sm text-gray-500">2 days ago</span>
                       </div>
                       <p className="text-gray-700">
-                        This article was so helpful! I've been struggling with my skincare routine and these tips are exactly what I needed.
+                        This article was so helpful! I've been struggling with my skincare routine and these tips are
+                        exactly what I needed.
                       </p>
                       <div className="mt-2 flex items-center space-x-4">
                         <button className="text-sm text-gray-500 hover:text-[#A10550]">Reply</button>
@@ -530,7 +473,7 @@ const BlogDetail = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <div className="flex items-start">
                     <img
@@ -544,7 +487,8 @@ const BlogDetail = () => {
                         <span className="text-sm text-gray-500">1 week ago</span>
                       </div>
                       <p className="text-gray-700">
-                        I've been using these products for a month now and have seen amazing results. Would recommend to anyone!
+                        I've been using these products for a month now and have seen amazing results. Would recommend to
+                        anyone!
                       </p>
                       <div className="mt-2 flex items-center space-x-4">
                         <button className="text-sm text-gray-500 hover:text-[#A10550]">Reply</button>
@@ -556,39 +500,38 @@ const BlogDetail = () => {
                   </div>
                 </div>
               </div>
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
             </div>
           </div>
-          
+
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Bookmark Button */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-8 w-full h-auto">
-              <button 
+              <button
                 onClick={() => setBookmarked(!bookmarked)}
                 className="w-full flex items-center justify-center space-x-2 py-3 border-2 border-[#A10550] rounded-lg font-medium transition-colors"
                 style={{
-                  backgroundColor: bookmarked ? '#A10550' : 'white',
-                  color: bookmarked ? 'white' : '#A10550'
+                  backgroundColor: bookmarked ? "#A10550" : "white",
+                  color: bookmarked ? "white" : "#A10550",
                 }}
               >
-                <Bookmark className={bookmarked ? 'fill-white' : ''} size={18} />
-                <span>{bookmarked ? 'Bookmarked' : 'Bookmark This Article'}</span>
+                <Bookmark className={bookmarked ? "fill-white" : ""} size={18} />
+                <span>{bookmarked ? "Bookmarked" : "Bookmark This Article"}</span>
               </button>
             </div>
-            
+
             {/* Related Posts */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-8 w-full h-auto">
               <h3 className="text-xl font-bold text-gray-800 mb-6">Related Articles</h3>
               <div className="space-y-6">
-                {relatedPosts.map(post => (
+                {relatedPosts.map((post) => (
                   <Link key={post.id} to={`/blog/${post.id}`} className="block group">
                     <div className="flex items-start">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 mr-4">
-                        <img 
-                          src={post.image || "/placeholder.svg"} 
+                        <img
+                          src={post.image || "/placeholder.svg"}
                           alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
                       </div>
                       <div>
@@ -602,7 +545,7 @@ const BlogDetail = () => {
                 ))}
               </div>
             </div>
-            
+
             {/* Categories */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-8 w-full h-auto">
               <h3 className="text-xl font-bold text-gray-800 mb-6">Categories</h3>
@@ -624,7 +567,7 @@ const BlogDetail = () => {
                 </Link>
               </div>
             </div>
-            
+
             {/* Newsletter */}
             <div className="bg-gradient-to-r from-[#3D021E] to-[#A10550] text-white rounded-xl shadow-md p-6 w-full h-auto">
               <h3 className="text-xl font-bold mb-4">Subscribe to Our Newsletter</h3>
@@ -647,8 +590,8 @@ const BlogDetail = () => {
             </div>
           </div>
         </div>
-      </div>
-      
+      </main>
+
       {/* Scroll to Top Button */}
       {showScrollTop && (
         <button

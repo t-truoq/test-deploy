@@ -28,13 +28,13 @@ import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
 import Quiz from "./components/Quiz/Quiz";
 import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
 import FeedbackStaff from "./pages/Staff/FeedbackStaff";
-<<<<<<< HEAD
+
 import HomeSkinTheorapist from "./pages/SkinTherapist/Home";
 import FeedbackSK from "./pages/SkinTherapist/Feedback";
 import ProfilePage from "./pages/SkinTherapist/Profile";
-=======
+
 import Specialist from "./components/Therapist/SpecialistPage";
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
+
 
 function App() {
   const location = useLocation();

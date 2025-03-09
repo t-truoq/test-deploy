@@ -1,183 +1,5 @@
-// // import React from 'react'
-// // import { allBlogPosts } from "../../../../data/blog/blogListView"
-// // import { Link, useNavigate } from "react-router-dom";
+"use client";
 
-// // export default function BlogHome() {
-// //   const navigate = useNavigate();
-
-// //   const handleClick = () => {
-// //     navigate("/services");
-// //     window.scrollTo({
-// //       top: 0,
-// //       behavior: "smooth",
-// //     });
-// //   };
-
-// //   return (
-// //     <section className="py-16">
-// //         <h2 className="text-3xl font-bold text-center mb-12">Our Blog</h2>
-// //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 max-w-7xl mx-auto px-4">
-// //           {allBlogPosts.slice(0,3).map((post) => (
-// //             <Link
-// //               to={`/blog/${post.id}`}
-// //               onClick={handleClick}
-// //               key={post.id}
-// //               className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
-// //             >
-// //               <div className="relative h-64 w-full">
-// //                 <img
-// //                   src={post.image || "/placeholder.svg"}
-// //                   alt={post.title}
-// //                   className="object-cover w-full h-full"
-// //                 />
-// //               </div>
-// //               <div className="p-6 bg-pink-50">
-// //                 <h3 className="text-xl font-bold text-gray-900 mb-2">{post.title}</h3>
-// //                 <div className="text-sm text-gray-600 mb-3">
-// //                   {post.category} | {post.author} | {post.date}
-// //                 </div>
-// //                 <p className="text-gray-600 line-clamp-2">{post.excerpt}</p>
-// //               </div>
-// //             </Link>
-// //           ))}
-// //         </div>
-// //       </section>
-// //   )
-// // }
-// import React, { useState, useEffect } from "react";
-// import { Link, useNavigate } from "react-router-dom";
-// import axios from "axios";
-
-// export default function BlogHome() {
-//   const navigate = useNavigate();
-//   const [blogs, setBlogs] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   // Lấy danh sách blog từ API
-//   useEffect(() => {
-//     const fetchBlogs = async () => {
-//       try {
-//         const response = await axios.get(
-//           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/blogs",
-//           {
-//             headers: {
-//               "ngrok-skip-browser-warning": "true",
-//               "Content-Type": "application/json",
-//             },
-//           }
-//         );
-
-//         console.log("Fetch blogs response:", response.data);
-
-//         if (Array.isArray(response.data)) {
-//           // Format dữ liệu từ API để phù hợp với giao diện
-//           const formattedBlogs = response.data.map((blog) => ({
-//             id: blog.blogId,
-//             title: blog.title,
-//             excerpt:
-//               blog.content.length > 100
-//                 ? blog.content.substring(0, 100) + "..."
-//                 : blog.content,
-//             author: blog.author.name,
-//             date: new Date(blog.createdAt).toLocaleDateString("en-US", {
-//               year: "numeric",
-//               month: "long",
-//               day: "numeric",
-//             }),
-//             image:
-//               blog.images && blog.images.length > 0
-//                 ? blog.images[0].url
-//                 : "/placeholder.svg",
-//             category: "Blog", // Giá trị mặc định vì API không có category
-//           }));
-//           setBlogs(formattedBlogs);
-//         } else {
-//           throw new Error(
-//             "Invalid response format: Expected an array of blogs"
-//           );
-//         }
-//       } catch (error) {
-//         console.error("Error fetching blogs:", error);
-//         if (error.response) {
-//           console.log("Error response:", error.response.data);
-//           console.log("Status:", error.response.status);
-//           if (error.response.status === 404) {
-//             setError("No blogs found.");
-//           } else {
-//             setError(
-//               error.response.data.message ||
-//                 "Failed to load blogs. Please try again."
-//             );
-//           }
-//         } else if (error.request) {
-//           console.log("No response received:", error.request);
-//           setError(
-//             "Unable to connect to server. CORS issue or server error. Please try again."
-//           );
-//         } else {
-//           setError(error.message || "Failed to load blogs. Please try again.");
-//         }
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchBlogs();
-//   }, []);
-
-//   const handleClick = (blogId) => {
-//     navigate(`/blog/${blogId}`);
-//     window.scrollTo({
-//       top: 0,
-//       behavior: "smooth",
-//     });
-//   };
-
-//   if (loading) {
-//     return (
-//       <div className="text-center py-8 text-gray-600">Loading blogs...</div>
-//     );
-//   }
-
-//   if (error) {
-//     return <div className="text-center py-8 text-red-600">{error}</div>;
-//   }
-
-//   return (
-//     <section className="py-16">
-//       <h2 className="text-3xl font-bold text-center mb-12">Our Blog</h2>
-//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 max-w-7xl mx-auto px-4">
-//         {blogs.slice(0, 3).map((post) => (
-//           <Link
-//             to={`/blog/${post.id}`}
-//             onClick={() => handleClick(post.id)}
-//             key={post.id}
-//             className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
-//           >
-//             <div className="relative h-64 w-full">
-//               <img
-//                 src={post.image}
-//                 alt={post.title}
-//                 className="object-cover w-full h-full"
-//               />
-//             </div>
-//             <div className="p-6 bg-pink-50">
-//               <h3 className="text-xl font-bold text-gray-900 mb-2">
-//                 {post.title}
-//               </h3>
-//               <div className="text-sm text-gray-600 mb-3">
-//                 {post.category} | {post.author} | {post.date}
-//               </div>
-//               <p className="text-gray-600 line-clamp-2">{post.excerpt}</p>
-//             </div>
-//           </Link>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// }
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -187,22 +9,8 @@ export default function BlogHome() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-=======
 
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
-
-export default function BlogHome() {
-  const navigate = useNavigate()
-  const [blogs, setBlogs] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
-
-  // Lấy danh sách blog từ API
+  // Fetch blogs from API
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -213,13 +21,13 @@ export default function BlogHome() {
               "ngrok-skip-browser-warning": "true",
               "Content-Type": "application/json",
             },
-          },
-        )
+          }
+        );
 
-        console.log("Fetch blogs response:", response.data)
+        console.log("Fetch blogs response:", response.data);
 
         if (Array.isArray(response.data)) {
-          // Format dữ liệu từ API để phù hợp với giao diện
+          // Format data from API to match the UI
           const formattedBlogs = response.data.map((blog) => ({
             id: blog.blogId,
             title: blog.title,
@@ -227,7 +35,7 @@ export default function BlogHome() {
               blog.content.length > 100
                 ? blog.content.substring(0, 100) + "..."
                 : blog.content,
-            author: blog.author.name,
+            author: blog.author?.name || "Unknown Author",
             date: new Date(blog.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -237,27 +45,20 @@ export default function BlogHome() {
               blog.images && blog.images.length > 0
                 ? blog.images[0].url
                 : "/placeholder.svg",
-            category: "Blog", // Giá trị mặc định vì API không có category
-          }))
-          setBlogs(formattedBlogs)
+            category: blog.category || "Blog", // Use category from API if available
+          }));
+          setBlogs(formattedBlogs);
         } else {
-<<<<<<< HEAD
-          throw new Error(
-            "Invalid response format: Expected an array of blogs"
-          );
-=======
-          throw new Error("Invalid response format: Expected an array of blogs")
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
+          throw new Error("Invalid response format: Expected an array of blogs");
         }
       } catch (error) {
-        console.error("Error fetching blogs:", error)
+        console.error("Error fetching blogs:", error);
         if (error.response) {
-          console.log("Error response:", error.response.data)
-          console.log("Status:", error.response.status)
+          console.log("Error response:", error.response.data);
+          console.log("Status:", error.response.status);
           if (error.response.status === 404) {
-            setError("No blogs found.")
+            setError("No blogs found.");
           } else {
-<<<<<<< HEAD
             setError(
               error.response.data.message ||
                 "Failed to load blogs. Please try again."
@@ -268,94 +69,59 @@ export default function BlogHome() {
           setError(
             "Unable to connect to server. CORS issue or server error. Please try again."
           );
-=======
-            setError(error.response.data.message || "Failed to load blogs. Please try again.")
-          }
-        } else if (error.request) {
-          console.log("No response received:", error.request)
-          setError("Unable to connect to server. CORS issue or server error. Please try again.")
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
         } else {
-          setError(error.message || "Failed to load blogs. Please try again.")
+          setError(error.message || "Failed to load blogs. Please try again.");
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchBlogs()
-  }, [])
+    fetchBlogs();
+  }, []);
 
   const handleClick = (blogId) => {
-    navigate(`/blog/${blogId}`)
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    })
-  }
+    navigate(`/blog/${blogId}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (loading) {
     return (
-<<<<<<< HEAD
-      <div className="text-center py-8 text-gray-600">Loading blogs...</div>
+      <section className="py-16 md:py-24 w-full">
+        <div className="max-w-[1920px] mx-auto px-4 md:px-8">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12">
+            Our Blog
+          </h2>
+          <div className="text-center py-12 text-xl text-gray-600">
+            Loading blogs...
+          </div>
+        </div>
+      </section>
     );
   }
 
   if (error) {
-    return <div className="text-center py-8 text-red-600">{error}</div>;
-  }
-
-  return (
-    <section className="py-16">
-      <h2 className="text-3xl font-bold text-center mb-12">Our Blog</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 max-w-7xl mx-auto px-4">
-        {blogs.slice(0, 3).map((post) => (
-          <Link
-            to={`/blog/${post.id}`}
-            onClick={() => handleClick(post.id)}
-            key={post.id}
-            className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
-          >
-            <div className="relative h-64 w-full">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="object-cover w-full h-full"
-              />
-            </div>
-            <div className="p-6 bg-pink-50">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                {post.title}
-              </h3>
-              <div className="text-sm text-gray-600 mb-3">
-                {post.category} | {post.author} | {post.date}
-=======
-      <section className="py-16 md:py-24 w-full">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12">Our Blog</h2>
-          <div className="text-center py-12 text-xl text-gray-600">Loading blogs...</div>
-        </div>
-      </section>
-    )
-  }
-
-  if (error) {
     return (
       <section className="py-16 md:py-24 w-full">
         <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12">Our Blog</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12">
+            Our Blog
+          </h2>
           <div className="text-center py-12 text-xl text-red-600">{error}</div>
         </div>
       </section>
-    )
+    );
   }
 
   return (
     <section className="py-16 md:py-24 w-full">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6">Our Blog</h2>
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6">
+          Our Blog
+        </h2>
         <p className="text-lg md:text-xl text-gray-600 text-center max-w-3xl mx-auto mb-12">
-          Discover the latest skincare tips, trends, and insights from our beauty experts
+          Discover the latest skincare tips, trends, and insights from our beauty
+          experts
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -368,11 +134,10 @@ export default function BlogHome() {
             >
               <div className="relative aspect-[16/9] w-full overflow-hidden">
                 <img
-                  src={post.image || "/placeholder.svg"}
+                  src={post.image}
                   alt={post.title}
                   className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
                 />
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
               </div>
               <div className="p-6 md:p-8 bg-pink-50 h-full flex flex-col">
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#A10550] transition-colors">
@@ -381,8 +146,12 @@ export default function BlogHome() {
                 <div className="text-sm md:text-base text-gray-600 mb-4">
                   {post.category} | {post.author} | {post.date}
                 </div>
-                <p className="text-gray-600 text-base md:text-lg line-clamp-3 mb-4 flex-grow">{post.excerpt}</p>
-                <div className="text-[#A10550] font-medium group-hover:underline">Read more</div>
+                <p className="text-gray-600 text-base md:text-lg line-clamp-3 mb-4 flex-grow">
+                  {post.excerpt}
+                </p>
+                <div className="text-[#A10550] font-medium group-hover:underline">
+                  Read more
+                </div>
               </div>
             </Link>
           ))}
@@ -398,11 +167,5 @@ export default function BlogHome() {
         </div>
       </div>
     </section>
-<<<<<<< HEAD
   );
 }
-=======
-  )
-}
-
->>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
