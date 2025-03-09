@@ -1,17 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
+import { Search, MoreHorizontal } from "lucide-react";
+import { EditClientModal } from "./EditClientModal";
+
+const API_URL =
+  "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users";
+=======
 import { Search, MoreHorizontal, Plus } from "lucide-react";
 import { AddClientModal } from "./AddClientModal";
 import { EditClientModal } from "./EditClientModal";
 
 const API_URL = "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users";
 
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
 export function StaffClients() {
   const [clients, setClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(null);
-  const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [clientToDelete, setClientToDelete] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,6 +102,8 @@ export function StaffClients() {
     }
   };
 
+<<<<<<< HEAD
+=======
   const handleAddClient = (newClient) => {
     const client = {
       ...newClient,
@@ -106,6 +115,7 @@ export function StaffClients() {
     setClients([...clients, client]);
   };
 
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="p-6 border-b border-gray-200">
@@ -116,13 +126,6 @@ export function StaffClients() {
               Manage your client database
             </p>
           </div>
-          <button
-            className="px-4 py-2 text-white bg-pink-500 rounded-md flex items-center hover:bg-pink-600 transition-colors duration-300"
-            onClick={() => setIsAddClientModalOpen(true)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Client
-          </button>
         </div>
       </div>
 
@@ -270,12 +273,6 @@ export function StaffClients() {
         onClose={() => setEditingClient(null)}
         client={editingClient}
         onSave={handleSaveEditedClient}
-      />
-
-      <AddClientModal
-        isOpen={isAddClientModalOpen}
-        onClose={() => setIsAddClientModalOpen(false)}
-        onAdd={handleAddClient}
       />
 
       {clientToDelete && (

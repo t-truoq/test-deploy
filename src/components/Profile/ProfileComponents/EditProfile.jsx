@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import { useState, useEffect } from "react";
+=======
 import { useState, useEffect, useRef } from "react"; // Thêm useRef
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
 import { Check, AlertCircle, Eye, EyeOff, Save } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -626,6 +630,8 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
+<<<<<<< HEAD
+=======
 
 // import { useState } from "react";
 // import { Check, AlertCircle, Eye, EyeOff, Save } from "lucide-react";
@@ -957,3 +963,4 @@ export default EditProfile;
 // };
 
 // export default ChangePassword;
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379

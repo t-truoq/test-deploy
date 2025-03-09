@@ -28,7 +28,13 @@ import MyBooking from "./components/Profile/ProfileComponents/MyBooking";
 import Quiz from "./components/Quiz/Quiz";
 import MySkinType from "./components/Profile/ProfileComponents/MySkinType";
 import FeedbackStaff from "./pages/Staff/FeedbackStaff";
+<<<<<<< HEAD
+import HomeSkinTheorapist from "./pages/SkinTherapist/Home";
+import FeedbackSK from "./pages/SkinTherapist/Feedback";
+import ProfilePage from "./pages/SkinTherapist/Profile";
+=======
 import Specialist from "./components/Therapist/SpecialistPage";
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
 
 function App() {
   const location = useLocation();
@@ -49,6 +55,9 @@ function App() {
     "/staff/clients",
     "/staff/skintherapist",
     "/staff/feedback",
+    "/skintherapist/home",
+    "/skintherapist/feedback",
+    "/skintherapist/profile",
   ];
 
   return (
@@ -87,7 +96,15 @@ function App() {
             <Route path="/staff/skintherapist" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
             <Route path="/staff/feedback" element={<FeedbackStaff />} />
-            <Route path="/" element={<Home />} />
+            {/* Skin theorapist router*/}
+
+            <Route
+              path="/skintherapist/home"
+              element={<HomeSkinTheorapist />}
+            />
+            <Route path="/skintherapist/feedback" element={<FeedbackSK />} />
+
+            <Route path="/skintherapist/profile" element={<ProfilePage />} />
           </Routes>
         </main>
         {!hiddenNavbarAndFooter.includes(location.pathname) && <Footer />}

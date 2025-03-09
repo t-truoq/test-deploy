@@ -243,7 +243,11 @@ export default function SignIn() {
     setIsLoading(true);
     try {
       const response = await axios.get(
+<<<<<<< HEAD
+        `/login/oauth2/code/google?code=${code}`,
+=======
         `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
         { headers: { "Content-Type": "application/json" } }
       );
 
@@ -272,7 +276,11 @@ export default function SignIn() {
             navigate("/admin/home");
             break;
           case "STAFF":
+<<<<<<< HEAD
+            navigate("/staff/home");
+=======
             navigate("/staff");
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
             break;
           case "SPECIALIST":
             navigate("/specialist");
@@ -310,7 +318,12 @@ export default function SignIn() {
       console.log("Request data:", { email, password });
       const response = await axios.post(
         "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/auth/token",
+<<<<<<< HEAD
+
+        { email, password },
+=======
         { email, password },  
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
         { headers: { "Content-Type": "application/json" } }
       );
 
@@ -339,7 +352,11 @@ export default function SignIn() {
             navigate("/staff/home");
             break;
           case "SPECIALIST":
+<<<<<<< HEAD
+            navigate("/skintherapist/home");
+=======
             navigate("/specialist");
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
             break;
           case "CUSTOMER":
             navigate("/");
@@ -373,8 +390,12 @@ export default function SignIn() {
   };
 
   const handleGoogleLogin = () => {
+<<<<<<< HEAD
+    window.location.href = "/oauth2/authorization/google";
+=======
     window.location.href =
       "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/oauth2/authorization/google";
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
   };
 
   return (

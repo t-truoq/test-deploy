@@ -307,12 +307,20 @@
 
 //     const fetchAllServices = async () => {
 //       try {
+<<<<<<< HEAD
+//         const response = await axios.get("https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/services", {
+//           headers: {
+//             "ngrok-skip-browser-warning": "true",
+//           },
+//         });
+=======
 //         const response = await axios.get(
 //           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/services",
 //           {
 //             headers: { "ngrok-skip-browser-warning": "true" },
 //           }
 //         );
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
 
 //         if (Array.isArray(response.data)) {
 //           const servicesWithImages = await attachImagesToServices(response.data);
@@ -333,6 +341,63 @@
 //     });
 //   }, [navigate, hasFetched, isLoggedIn]);
 
+<<<<<<< HEAD
+//   // Gọi lại API nếu skinTypeResult thay đổi (người dùng làm lại quiz)
+//   useEffect(() => {
+//     if (!skinTypeResult || hasFetched) return;
+
+//     const fetchRecommendedServices = async () => {
+//       try {
+//         const token = localStorage.getItem("token");
+//         if (!token) {
+//           throw new Error("No token found. Please login again.");
+//         }
+
+//         const response = await axios.get(
+//           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/quiz/recommended-services",
+//           {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               "ngrok-skip-browser-warning": "true",
+//               "Content-Type": "application/json",
+//             },
+//           },
+//         );
+
+//         console.log("Recommended services data:", response.data);
+//         if (Array.isArray(response.data)) {
+//           setRecommendedServices(response.data);
+//           setFilteredRecommendedServices(response.data);
+//         } else {
+//           throw new Error("Recommended services data is not an array");
+//         }
+//       } catch (error) {
+//         console.error("Error fetching recommended services:", error);
+//         if (error.response) {
+//           if (error.response.status === 401) {
+//             setError("Unauthorized: Please login again.");
+//             setTimeout(() => {
+//               navigate("/login");
+//             }, 2000);
+//           } else if (error.response.status === 400 || error.response.status === 404) {
+//             setError("No recommended services found. Please complete the skin type quiz to see recommended services.");
+//           } else {
+//             setError(error.response.data.message || "Failed to load recommended services. Please try again.");
+//           }
+//         } else if (error.request) {
+//           setError("Unable to connect to server. Please try again.");
+//         } else {
+//           setError(error.message || "Failed to load recommended services. Please try again.");
+//         }
+//       }
+//     };
+
+//     fetchRecommendedServices();
+//   }, [skinTypeResult, navigate, hasFetched]);
+
+//   // Load selected services from localStorage when component mounts
+=======
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
 //   useEffect(() => {
 //     const storedServices = localStorage.getItem("selectedServicesForBooking");
 //     if (storedServices) {
@@ -600,9 +665,18 @@ const LoginRequiredModal = ({ isOpen, onClose, onLogin, action }) => {
               />
             </svg>
           </div>
+<<<<<<< HEAD
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Login Required
+          </h3>
+          <p className="text-sm text-gray-600 mb-6">
+            You need to be logged in to {getActionText()}. Would you like to
+            login now?
+=======
           <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">Login Required</h3>
           <p className="text-gray-600 mb-8">
             You need to be logged in to {getActionText()}. Would you like to login now?
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           </p>
           <div className="flex justify-center space-x-4">
             <button
@@ -629,7 +703,8 @@ const ServiceList = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [recommendedServices, setRecommendedServices] = useState([]);
   const [allServices, setAllServices] = useState([]);
-  const [filteredRecommendedServices, setFilteredRecommendedServices] = useState([]);
+  const [filteredRecommendedServices, setFilteredRecommendedServices] =
+    useState([]);
   const [filteredAllServices, setFilteredAllServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -699,10 +774,20 @@ const ServiceList = () => {
     };
 
     setSelectedServices((prev) => {
-      const updatedServices = prev.some((s) => s.serviceId === service.serviceId)
+      const updatedServices = prev.some(
+        (s) => s.serviceId === service.serviceId
+      )
         ? prev.filter((s) => s.serviceId !== service.serviceId)
         : [...prev, serviceWithDuration];
+<<<<<<< HEAD
+
+      localStorage.setItem(
+        "selectedServicesForBooking",
+        JSON.stringify(updatedServices)
+      );
+=======
       localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices));
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
       return updatedServices;
     });
   };
@@ -714,7 +799,10 @@ const ServiceList = () => {
       if (updatedServices.length === 0) {
         localStorage.removeItem("selectedServicesForBooking");
       } else {
-        localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices));
+        localStorage.setItem(
+          "selectedServicesForBooking",
+          JSON.stringify(updatedServices)
+        );
       }
       return updatedServices;
     });
@@ -743,10 +831,14 @@ const ServiceList = () => {
     }
 
     let updatedWishlist = [...wishlist];
-    const isInWishlist = updatedWishlist.some((item) => item.serviceId === service.serviceId);
+    const isInWishlist = updatedWishlist.some(
+      (item) => item.serviceId === service.serviceId
+    );
 
     if (isInWishlist) {
-      updatedWishlist = updatedWishlist.filter((item) => item.serviceId !== service.serviceId);
+      updatedWishlist = updatedWishlist.filter(
+        (item) => item.serviceId !== service.serviceId
+      );
     } else {
       updatedWishlist.push(service);
     }
@@ -792,8 +884,23 @@ const ServiceList = () => {
     }
 
     try {
+<<<<<<< HEAD
+      // Lưu danh sách serviceId vào localStorage
+      const selectedServiceIds = selectedServices.map(
+        (service) => service.serviceId
+      );
+      console.log(
+        "Saving selectedServiceIds to localStorage:",
+        selectedServiceIds
+      ); // Thêm log để kiểm tra
+      localStorage.setItem(
+        "selectedServiceIdsForBooking",
+        JSON.stringify(selectedServiceIds)
+      );
+=======
       const selectedServiceIds = selectedServices.map((service) => service.serviceId);
       localStorage.setItem("selectedServiceIdsForBooking", JSON.stringify(selectedServiceIds));
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
       setBookingSuccess("Proceeding to booking confirmation...");
       setBookingError("");
       navigate("/mybooking");
@@ -853,6 +960,34 @@ const ServiceList = () => {
         }
       } catch (error) {
         console.error("Error fetching recommended services:", error);
+<<<<<<< HEAD
+        if (error.response) {
+          if (error.response.status === 401) {
+            setError("Unauthorized: Please login again.");
+            setTimeout(() => {
+              navigate("/login");
+            }, 2000);
+          } else if (
+            error.response.status === 400 ||
+            error.response.status === 404
+          ) {
+            setError(
+              "No recommended services found. Please complete the skin type quiz to see recommended services."
+            );
+          } else {
+            setError(
+              error.response.data.message ||
+                "Failed to load recommended services. Please try again."
+            );
+          }
+        } else if (error.request) {
+          setError("Unable to connect to server. Please try again.");
+        } else {
+          setError(
+            error.message ||
+              "Failed to load recommended services. Please try again."
+          );
+=======
         if (error.response?.status === 401) {
           setError("Unauthorized: Please login again.");
           setTimeout(() => navigate("/login"), 2000);
@@ -860,6 +995,7 @@ const ServiceList = () => {
           setError("No recommended services found. Please complete the skin type quiz.");
         } else {
           setError(error.response?.data.message || "Failed to load recommended services.");
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
         }
       }
     };
@@ -869,7 +1005,13 @@ const ServiceList = () => {
         const response = await axios.get(
           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/services",
           {
+<<<<<<< HEAD
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+            },
+=======
             headers: { "ngrok-skip-browser-warning": "true" },
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           }
         );
 
@@ -882,16 +1024,104 @@ const ServiceList = () => {
         }
       } catch (error) {
         console.error("Error fetching all services:", error);
+<<<<<<< HEAD
+        if (error.response) {
+          if (error.response.status === 404) {
+            setError("No services found.");
+          } else {
+            setError(
+              error.response.data.message ||
+                "Failed to load services. Please try again."
+            );
+          }
+        } else if (error.request) {
+          setError("Unable to connect to server. Please try again.");
+        } else {
+          setError(
+            error.message || "Failed to load services. Please try again."
+          );
+        }
+=======
         setError(error.response?.data.message || "Failed to load services.");
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
       }
     };
 
-    Promise.all([fetchRecommendedServices(), fetchAllServices()]).finally(() => {
-      setLoading(false);
-      setHasFetched(true);
-    });
+    Promise.all([fetchRecommendedServices(), fetchAllServices()]).finally(
+      () => {
+        setLoading(false);
+        setHasFetched(true);
+      }
+    );
   }, [navigate, hasFetched, isLoggedIn]);
 
+<<<<<<< HEAD
+  // Gọi lại API nếu skinTypeResult thay đổi (người dùng làm lại quiz)
+  useEffect(() => {
+    if (!skinTypeResult || hasFetched) return;
+
+    const fetchRecommendedServices = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found. Please login again.");
+        }
+
+        const response = await axios.get(
+          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/quiz/recommended-services",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Recommended services data:", response.data);
+        if (Array.isArray(response.data)) {
+          setRecommendedServices(response.data);
+          setFilteredRecommendedServices(response.data);
+        } else {
+          throw new Error("Recommended services data is not an array");
+        }
+      } catch (error) {
+        console.error("Error fetching recommended services:", error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            setError("Unauthorized: Please login again.");
+            setTimeout(() => {
+              navigate("/login");
+            }, 2000);
+          } else if (
+            error.response.status === 400 ||
+            error.response.status === 404
+          ) {
+            setError(
+              "No recommended services found. Please complete the skin type quiz to see recommended services."
+            );
+          } else {
+            setError(
+              error.response.data.message ||
+                "Failed to load recommended services. Please try again."
+            );
+          }
+        } else if (error.request) {
+          setError("Unable to connect to server. Please try again.");
+        } else {
+          setError(
+            error.message ||
+              "Failed to load recommended services. Please try again."
+          );
+        }
+      }
+    };
+
+    fetchRecommendedServices();
+  }, [skinTypeResult, navigate, hasFetched]);
+
+=======
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
   // Load selected services from localStorage when component mounts
   useEffect(() => {
     const storedServices = localStorage.getItem("selectedServicesForBooking");
@@ -901,8 +1131,17 @@ const ServiceList = () => {
         if (Array.isArray(parsedServices) && parsedServices.length > 0) {
           setSelectedServices(parsedServices);
           setTimeout(() => {
+<<<<<<< HEAD
+            const bookingPanel = document.getElementById(
+              "booking-summary-panel"
+            );
+            if (bookingPanel) {
+              bookingPanel.scrollIntoView({ behavior: "smooth" });
+            }
+=======
             const bookingPanel = document.getElementById("booking-summary-panel");
             if (bookingPanel) bookingPanel.scrollIntoView({ behavior: "smooth" });
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           }, 500);
         }
       } catch (error) {
@@ -916,14 +1155,36 @@ const ServiceList = () => {
     const redirectInfo = localStorage.getItem("redirectAfterLogin");
     if (redirectInfo && isLoggedIn()) {
       try {
+<<<<<<< HEAD
+        const {
+          action,
+          serviceId,
+          selectedServices: savedServices,
+        } = JSON.parse(redirectInfo);
+
+        if (action === "detail" && serviceId) {
+          navigate(`/services/${serviceId}`);
+        } else if (
+          action === "booking" &&
+          savedServices &&
+          savedServices.length > 0
+        ) {
+          const servicesToSelect = allServices.filter((s) =>
+            savedServices.includes(s.serviceId)
+          );
+=======
         const { action, serviceId, selectedServices: savedServices } = JSON.parse(redirectInfo);
         if (action === "detail" && serviceId) {
           navigate(`/services/${serviceId}`);
         } else if (action === "booking" && savedServices?.length > 0) {
           const servicesToSelect = allServices.filter((s) => savedServices.includes(s.serviceId));
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           if (servicesToSelect.length > 0) {
             setSelectedServices(servicesToSelect);
-            localStorage.setItem("selectedServicesForBooking", JSON.stringify(servicesToSelect));
+            localStorage.setItem(
+              "selectedServicesForBooking",
+              JSON.stringify(servicesToSelect)
+            );
           }
         }
         localStorage.removeItem("redirectAfterLogin");
@@ -942,21 +1203,36 @@ const ServiceList = () => {
 
   if (loading) {
     return (
+<<<<<<< HEAD
+      <div className="text-center py-8 text-gray-600">Loading services...</div>
+=======
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#A10550] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-xl text-gray-600">Loading luxury services...</p>
         </div>
       </div>
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
     );
   }
 
   if (error && !allServices.length) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white flex items-center justify-center p-4">
+<<<<<<< HEAD
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center">
+          <div className="w-16 h-16 mx-auto mb-4 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+=======
         <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-100">
           <div className="w-20 h-20 mx-auto mb-6 text-gray-500">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -1007,14 +1283,24 @@ const ServiceList = () => {
         </div>
       </div>
 
+<<<<<<< HEAD
+      {/* Thông báo booking */}
+      {bookingError && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+=======
       {/* Notification messages */}
       {bookingError && (
         <div className="mb-10 p-6 bg-red-50 text-red-700 rounded-xl text-lg border border-red-100 shadow-sm">
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           {bookingError}
         </div>
       )}
       {bookingSuccess && (
+<<<<<<< HEAD
+        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+=======
         <div className="mb-10 p-6 bg-green-50 text-green-700 rounded-xl text-lg border border-green-100 shadow-sm">
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
           {bookingSuccess}
         </div>
       )}
@@ -1022,6 +1308,13 @@ const ServiceList = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-16 py-8">
         {/* Main content - Services */}
         <div className="lg:col-span-2">
+<<<<<<< HEAD
+          {/* Phần Recommended Services */}
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800">
+              Recommended Services for Your Skin Type
+            </h2>
+=======
           {/* Recommended Services Section */}
           <div className="mb-20">
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-12 text-gray-800 relative inline-block">
@@ -1029,6 +1322,7 @@ const ServiceList = () => {
               <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-[#A10550]"></span>
             </h2>
 
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
             {error ? (
               <div className="text-center py-12 bg-gray-50 rounded-xl">
                 <p className="text-xl text-gray-600 mb-6">{error}</p>
@@ -1040,11 +1334,17 @@ const ServiceList = () => {
                 </Link>
               </div>
             ) : recommendedServices.length === 0 ? (
+<<<<<<< HEAD
+              <div className="text-center py-8 text-gray-600">
+                No recommended services available. Please complete the skin type
+                quiz to see recommendations.
+=======
               <div className="text-center py-12 bg-gray-50 rounded-xl">
                 <p className="text-xl text-gray-600 mb-6">
                   No recommended services available. Please complete the skin type quiz to see personalized
                   recommendations.
                 </p>
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
                 <Link
                   to="/quiz"
                   className="inline-block px-8 py-4 bg-[#A10550] text-white rounded-lg hover:bg-[#800440] transition-colors duration-300 font-medium"
@@ -1060,9 +1360,13 @@ const ServiceList = () => {
                     service={service}
                     onSelect={handleSelect}
                     onViewDetails={() => handleViewDetails(service)}
-                    isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+                    isSelected={selectedServices.some(
+                      (s) => s.serviceId === service.serviceId
+                    )}
                     onAddToWishlist={handleAddToWishlist}
-                    isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+                    isInWishlist={wishlist.some(
+                      (item) => item.serviceId === service.serviceId
+                    )}
                     variant="recommended"
                   />
                 ))}
@@ -1070,6 +1374,16 @@ const ServiceList = () => {
             )}
           </div>
 
+<<<<<<< HEAD
+          {/* Phần All Services */}
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800">
+              All Services
+            </h2>
+            {filteredAllServices.length === 0 ? (
+              <div className="text-center py-8 text-gray-600">
+                No services available at the moment.
+=======
           {/* All Services Section */}
           <div className="mb-20">
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-12 text-gray-800 relative inline-block">
@@ -1080,6 +1394,7 @@ const ServiceList = () => {
             {filteredAllServices.length === 0 ? (
               <div className="text-center py-12 bg-gray-50 rounded-xl">
                 <p className="text-xl text-gray-600">No services available at the moment.</p>
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
               </div>
             ) : (
               <div className="space-y-10">
@@ -1089,9 +1404,13 @@ const ServiceList = () => {
                     service={service}
                     onSelect={handleSelect}
                     onViewDetails={() => handleViewDetails(service)}
-                    isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+                    isSelected={selectedServices.some(
+                      (s) => s.serviceId === service.serviceId
+                    )}
                     onAddToWishlist={handleAddToWishlist}
-                    isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+                    isInWishlist={wishlist.some(
+                      (item) => item.serviceId === service.serviceId
+                    )}
                     variant="all"
                   />
                 ))}
