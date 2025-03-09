@@ -21,7 +21,7 @@
 //         }
 
 //         const response = await axios.get(
-//           `https://6bc4-2405-4802-8132-b860-d454-d4f4-c346-cd13.ngrok-free.app/api/bookings/${bookingId}`,
+//           `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}`,
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
