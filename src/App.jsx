@@ -32,7 +32,6 @@ import FeedbackStaff from "./pages/Staff/FeedbackStaff";
 import HomeSkinTheorapist from "./pages/SkinTherapist/Home";
 import FeedbackSK from "./pages/SkinTherapist/Feedback";
 import ProfilePage from "./pages/SkinTherapist/Profile";
-
 import Specialist from "./components/Therapist/SpecialistPage";
 
 
