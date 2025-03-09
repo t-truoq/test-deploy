@@ -35,12 +35,7 @@ export default function Sidebar() {
     { name: "Calendar", icon: Calendar, path: "/admin/calendar" },
     { name: "Contact", icon: Contact, path: "/admin/contact" },
     { name: "Invoice", icon: FileText, path: "/admin/invoice" },
-    {
-      name: "Logout",
-      icon: LogOut,
-      path: "/",
-      onClick: handleLogout,
-    },
+    { name: "Logout", icon: LogOut, onClick: handleLogout },
   ];
 
   return (

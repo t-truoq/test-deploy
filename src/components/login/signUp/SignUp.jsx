@@ -193,7 +193,7 @@ export default function SignUp() {
 
       // Gửi yêu cầu POST tới API để đăng ký
       const response = await axios.post(
-        "https://b64a-118-69-182-149.ngrok-free.app/api/users",
+        "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users",
         signupData,
         {
           headers: {
@@ -215,11 +215,16 @@ export default function SignUp() {
         console.log("Error response:", error.response.data);
         console.log("Status:", error.response.status);
         if (error.response.status === 400) {
-          setError(error.response.data.message || "Bad request: Invalid data provided.");
+          setError(
+            error.response.data.message || "Bad request: Invalid data provided."
+          );
         } else if (error.response.status === 409) {
           setError(error.response.data.message || "Email already exists.");
         } else {
-          setError(error.response.data.message || "Failed to sign up. Please try again.");
+          setError(
+            error.response.data.message ||
+              "Failed to sign up. Please try again."
+          );
         }
       } else if (error.request) {
         console.log("No response received:", error.request);
@@ -237,7 +242,9 @@ export default function SignUp() {
       <BackgroundLogin />
       <div className="w-full max-w-md mx-auto p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg">
         <div className="space-y-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Create Your Account</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Create Your Account
+          </h1>
 
           {/* Thông báo lỗi */}
           {error && (
@@ -290,7 +297,11 @@ export default function SignUp() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer"
               >
-                {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                {showPassword ? (
+                  <EyeOffIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
               </button>
             </div>
 
@@ -325,9 +336,15 @@ export default function SignUp() {
                 onChange={(e) => setAgreeTerms(e.target.checked)}
                 className="h-4 w-4 text-[#FF6B2B] focus:ring-[#FF6B2B] border-gray-300 rounded"
               />
-              <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-900">
+              <label
+                htmlFor="agree-terms"
+                className="ml-2 block text-sm text-gray-900"
+              >
                 I agree to the{" "}
-                <Link to="/terms" className="text-[#FF6B2B] hover:text-[#FF8F5B]">
+                <Link
+                  to="/terms"
+                  className="text-[#FF6B2B] hover:text-[#FF8F5B]"
+                >
                   Terms and Conditions
                 </Link>
               </label>
@@ -373,7 +390,9 @@ export default function SignUp() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+              <span className="px-2 bg-white text-gray-500">
+                Or sign up with
+              </span>
             </div>
           </div>
 
@@ -393,7 +412,11 @@ export default function SignUp() {
               type="button"
               className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                className="w-5 h-5 mr-2"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z" />
               </svg>
               Facebook

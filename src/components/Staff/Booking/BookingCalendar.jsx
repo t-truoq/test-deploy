@@ -12,7 +12,6 @@ import {
   isToday,
 } from "date-fns";
 import PropTypes from "prop-types";
-import { NewAppointmentButton } from "./NewAppointmentButton";
 
 // Mock data for appointments
 const appointments = [
@@ -68,7 +67,7 @@ const appointments = [
   },
 ];
 
-export function AppointmentCalendar({
+export function BookingCalendar({
   onAppointmentSelect,
   selectedAppointmentId,
 }) {
@@ -178,7 +177,6 @@ export function AppointmentCalendar({
             </svg>
           </button>
         </div>
-        <NewAppointmentButton />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
@@ -294,7 +292,7 @@ export function AppointmentCalendar({
   );
 }
 
-AppointmentCalendar.propTypes = {
+BookingCalendar.propTypes = {
   onAppointmentSelect: PropTypes.func.isRequired,
   selectedAppointmentId: PropTypes.string,
 };

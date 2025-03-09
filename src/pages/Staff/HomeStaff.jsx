@@ -2,13 +2,13 @@
 
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { AppointmentDetails } from "../../components/Staff/Appointment/AppointmentDetails";
 import { StaffClients } from "../../components/Staff/Client/StaffClient";
 import { StaffList } from "../../components/Staff/Employee/StaffList";
 import { StaffSchedule } from "../../components/Staff/StaffSchedule";
-import { AppointmentCalendar } from "../../components/Staff/Appointment/AppointmentCalendar";
 import AppSidebar from "../../components/Staff/Sidebar";
 import { Header } from "../../components/Staff/Header/Header";
+import { BookingCalendar } from "../../components/Staff/Booking/BookingCalendar";
+import { BookingDetails } from "../../components/Staff/Booking/BookingDetails";
 
 export default function HomeStaff() {
   const [selectedAppointment, setSelectedAppointment] = React.useState(null);
@@ -21,14 +21,14 @@ export default function HomeStaff() {
         return (
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 min-w-0">
-              <AppointmentCalendar
+              <BookingCalendar
                 onAppointmentSelect={setSelectedAppointment}
                 selectedAppointmentId={selectedAppointment}
               />
             </div>
             <div className="w-full md:w-96 border rounded-lg bg-white shadow">
               {selectedAppointment ? (
-                <AppointmentDetails appointmentId={selectedAppointment} />
+                <BookingDetails bookingId={selectedAppointment} />
               ) : (
                 <div className="p-6 text-center text-gray-500">
                   Select an appointment to view details

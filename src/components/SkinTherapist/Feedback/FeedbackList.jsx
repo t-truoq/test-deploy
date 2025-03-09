@@ -7,7 +7,6 @@ export default function FeedbackList({ filter }) {
   const navigate = useNavigate();
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [responseText, setResponseText] = useState("");
   const [feedbackItems, setFeedbackItems] = useState([]);
   const [error, setError] = useState("");
 
@@ -21,23 +20,19 @@ export default function FeedbackList({ filter }) {
       }
 
       try {
-        // Cấu hình headers với token và ngrok-skip-browser-warning
         const headers = {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
           "Content-Type": "application/json",
         };
 
-        // Gọi API feedbacks
         const feedbackResponse = await axios.get(
           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/feedbacks",
           { headers }
         );
 
-        // Log dữ liệu để kiểm tra
         console.log("Feedback Response:", feedbackResponse.data);
 
-        // Kiểm tra xem dữ liệu có phải JSON không
         if (
           typeof feedbackResponse.data === "string" &&
           feedbackResponse.data.startsWith("<!DOCTYPE")
@@ -48,17 +43,15 @@ export default function FeedbackList({ filter }) {
           return;
         }
 
-        // Ánh xạ dữ liệu phản hồi (tạm thời không dùng customers và specialists)
         const mappedData = feedbackResponse.data.map((item) => ({
           id: item.feedbackId,
-          customer: `Khách hàng ID: ${item.customerId}`, // Thay vì tên, dùng ID nếu không có API customers
-          email: "Email không khả dụng", // Cần API customers để lấy email
+          customer: `Khách hàng ID: ${item.customerId}`,
+          email: "Email không khả dụng",
           avatar: "/placeholder.svg?height=40&width=40",
-          service: `Dịch vụ ID: ${item.specialistId}`, // Thay vì tên dịch vụ, dùng ID nếu không có API specialists
+          service: `Dịch vụ ID: ${item.specialistId}`,
           message: item.comment,
           rating: item.rating,
           date: item.createdAt.split("T")[0],
-          response: item.response || "",
         }));
 
         setFeedbackItems(mappedData);
@@ -117,23 +110,6 @@ export default function FeedbackList({ filter }) {
     setSelectedFeedback(null);
   };
 
-  useEffect(() => {
-    if (selectedFeedback) {
-      setResponseText(selectedFeedback.response || "");
-    }
-  }, [selectedFeedback]);
-
-  const handleSaveResponse = () => {
-    const updatedItems = feedbackItems.map((item) => {
-      if (item.id === selectedFeedback.id) {
-        return { ...item, response: responseText };
-      }
-      return item;
-    });
-    setFeedbackItems(updatedItems);
-    closeModal();
-  };
-
   const filteredItems =
     filter === 0
       ? feedbackItems
@@ -184,21 +160,6 @@ export default function FeedbackList({ filter }) {
                   </div>
                   <p className="text-sm font-medium"> {item.service}</p>
                   <p className="mt-2 text-sm">{item.message}</p>
-
-                  {item.response && (
-                    <div className="mt-4 pl-4 border-l-2 border-primary/20">
-                      <p className="text-sm font-medium">
-                        Phản hồi của chúng tôi:
-                      </p>
-                      <p className="text-sm text-gray-500">{item.response}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <button className="text-xs px-3 py-1 text-gray-600 hover:bg-gray-100 rounded">
-                    {item.response ? "Chỉnh sửa phản hồi" : "Phản hồi"}
-                  </button>
                 </div>
               </div>
             </div>
@@ -259,17 +220,6 @@ export default function FeedbackList({ filter }) {
                   {selectedFeedback.message}
                 </p>
               </div>
-
-              <div>
-                <p className="text-sm font-medium">Phản hồi của chúng tôi</p>
-                <textarea
-                  placeholder="Nhập phản hồi của bạn tại đây..."
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  rows={4}
-                  value={responseText}
-                  onChange={(e) => setResponseText(e.target.value)}
-                ></textarea>
-              </div>
             </div>
 
             <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
@@ -277,13 +227,7 @@ export default function FeedbackList({ filter }) {
                 onClick={closeModal}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
-                Hủy
-              </button>
-              <button
-                onClick={handleSaveResponse}
-                className="px-4 py-2 bg-[#4A0404] hover:bg-[#3A0303] text-white rounded-md transition-colors"
-              >
-                Lưu phản hồi
+                Đóng
               </button>
             </div>
           </div>

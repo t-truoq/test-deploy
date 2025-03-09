@@ -1,26 +1,24 @@
 "use client";
 
 import { useLocation } from "react-router-dom";
-import { Calendar, Users, Clock, MessageCircleWarning } from "lucide-react";
+import { Calendar, Users, MessageCircleWarning } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function AppSidebar() {
+export default function SKsidebar() {
   const location = useLocation();
   const pathname = location.pathname;
 
-  const isStaffRoute = pathname.startsWith("/staff");
+  const isStaffRoute = pathname.startsWith("/skintherapist");
 
   const mainNav = isStaffRoute
     ? [
-        { name: "Appointments", icon: Calendar, path: "/staff/home" },
-        { name: "Clients", icon: Users, path: "/staff/clients" },
-        { name: "Skin therapist", icon: Users, path: "/staff/skintherapist" },
-        { name: "Staff Schedule", icon: Clock, path: "/staff/schedule" },
+        { name: "Schedule", icon: Calendar, path: "/skintherapist/home" },
         {
           name: "Feedback",
           icon: MessageCircleWarning,
-          path: "/staff/feedback",
+          path: "/skintherapist/feedback",
         },
+        { name: "Profile", icon: Users, path: "/skintherapist/profile" },
       ]
     : [];
 
@@ -28,7 +26,7 @@ export default function AppSidebar() {
     <div className="w-64 min-h-screen bg-white border-r border-gray-200 p-4 flex flex-col">
       {/* Logo */}
       <Link
-        to="/staff/home"
+        to="/skintherapist/home"
         className="flex items-center text-pink-700 font-bold text-xl uppercase"
       >
         <img

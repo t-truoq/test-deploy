@@ -4,7 +4,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
 
-// Mock data for a single appointment
+// Mock data for appointments (notes and room removed)
 const appointments = [
   {
     id: "1",
@@ -18,8 +18,6 @@ const appointments = [
     date: new Date(2025, 2, 3),
     therapist: "Sarah Johnson",
     status: "confirmed",
-    notes: "Client prefers medium pressure. Has lower back sensitivity.",
-    room: "Harmony Suite 2",
   },
   {
     id: "2",
@@ -33,8 +31,6 @@ const appointments = [
     date: new Date(2025, 2, 3),
     therapist: "David Wilson",
     status: "confirmed",
-    notes: "First time trying hot stone therapy. No known allergies.",
-    room: "Tranquility Room 1",
   },
   {
     id: "3",
@@ -48,8 +44,6 @@ const appointments = [
     date: new Date(2025, 2, 3),
     therapist: "Lisa Martinez",
     status: "pending",
-    notes: "Sensitive skin. Prefers organic products only.",
-    room: "Serenity Suite 3",
   },
   {
     id: "4",
@@ -63,8 +57,6 @@ const appointments = [
     date: new Date(2025, 2, 4),
     therapist: "Sarah Johnson",
     status: "confirmed",
-    notes: "Recovering from minor shoulder injury. Extra care needed.",
-    room: "Harmony Suite 1",
   },
   {
     id: "5",
@@ -78,17 +70,15 @@ const appointments = [
     date: new Date(2025, 2, 4),
     therapist: "David Wilson",
     status: "cancelled",
-    notes: "Cancelled due to illness. Reschedule for next week.",
-    room: "Tranquility Room 2",
   },
 ];
 
-export function AppointmentDetails({ appointmentId }) {
-  const appointment = appointments.find((a) => a.id === appointmentId);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+export function BookingDetails({ bookingId }) {
+  const booking = appointments.find((a) => a.id === bookingId);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
 
-  if (!appointment) {
+  if (!booking) {
     return (
       <div className="p-6 text-center text-gray-500">Appointment not found</div>
     );
@@ -133,21 +123,21 @@ export function AppointmentDetails({ appointmentId }) {
             </h2>
             <p className="text-sm text-gray-500">View and manage appointment</p>
           </div>
-          {getStatusBadge(appointment.status)}
+          {getStatusBadge(booking.status)}
         </div>
       </div>
 
       <div className="flex-1 overflow-auto p-4">
         <div className="flex items-center gap-4 mb-6">
           <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-medium">
-            {appointment.clientName
+            {booking.clientName
               .split(" ")
               .map((n) => n[0])
               .join("")}
           </div>
           <div>
             <h3 className="font-semibold text-lg text-gray-800">
-              {appointment.clientName}
+              {booking.clientName}
             </h3>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <svg
@@ -164,7 +154,7 @@ export function AppointmentDetails({ appointmentId }) {
                   d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                 />
               </svg>
-              <span>{appointment.clientPhone}</span>
+              <span>{booking.clientPhone}</span>
             </div>
           </div>
         </div>
@@ -188,7 +178,7 @@ export function AppointmentDetails({ appointmentId }) {
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                {format(appointment.date, "MMMM d, yyyy")}
+                {format(booking.date, "MMMM d, yyyy")}
               </span>
             </div>
             <div className="flex flex-col">
@@ -208,7 +198,7 @@ export function AppointmentDetails({ appointmentId }) {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {appointment.time} ({appointment.duration} min)
+                {booking.time} ({booking.duration} min)
               </span>
             </div>
           </div>
@@ -219,13 +209,13 @@ export function AppointmentDetails({ appointmentId }) {
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">Service</span>
               <span className="font-medium text-gray-800">
-                {appointment.service}
+                {booking.service}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">Price</span>
               <span className="font-medium text-gray-800">
-                ${appointment.price}
+                ${booking.price}
               </span>
             </div>
             <div className="flex justify-between">
@@ -245,22 +235,9 @@ export function AppointmentDetails({ appointmentId }) {
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                {appointment.therapist}
+                {booking.therapist}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Room</span>
-              <span className="text-gray-800">{appointment.room}</span>
-            </div>
-          </div>
-
-          <hr className="border-gray-200" />
-
-          <div>
-            <h4 className="text-sm text-gray-500 mb-1">Notes</h4>
-            <p className="text-sm bg-gray-100 p-3 rounded-md text-gray-800">
-              {appointment.notes}
-            </p>
           </div>
         </div>
       </div>
@@ -294,11 +271,10 @@ export function AppointmentDetails({ appointmentId }) {
                 </svg>
                 <div>
                   <p className="font-medium text-gray-800">
-                    {appointment.service} with {appointment.clientName}
+                    {booking.service} with {booking.clientName}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {format(appointment.date, "MMMM d, yyyy")} at{" "}
-                    {appointment.time}
+                    {format(booking.date, "MMMM d, yyyy")} at {booking.time}
                   </p>
                 </div>
               </div>
@@ -320,144 +296,107 @@ export function AppointmentDetails({ appointmentId }) {
           </div>
         )}
 
-        {/* Edit Dialog */}
-        {isEditDialogOpen && (
+        {/* Status Edit Dialog */}
+        {isStatusDialogOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Edit Appointment
+                Edit Appointment Status
               </h3>
               <p className="text-gray-600 mb-4">
-                Make changes to the appointment details.
+                Change the status of this appointment.
               </p>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="date"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Date
-                    </label>
-                    <input
-                      id="date"
-                      type="date"
-                      defaultValue={format(appointment.date, "yyyy-MM-dd")}
-                      className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="time"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Time
-                    </label>
-                    <input
-                      id="time"
-                      type="time"
-                      defaultValue="10:00"
-                      className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="service"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Service
-                  </label>
-                  <select
-                    id="service"
-                    defaultValue={appointment.service}
-                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="Deep Tissue Massage">
-                      Deep Tissue Massage
-                    </option>
-                    <option value="Swedish Massage">Swedish Massage</option>
-                    <option value="Hot Stone Therapy">Hot Stone Therapy</option>
-                    <option value="Aromatherapy">Aromatherapy</option>
-                    <option value="Facial Treatment">Facial Treatment</option>
-                  </select>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="therapist"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Therapist
-                  </label>
-                  <select
-                    id="therapist"
-                    defaultValue={appointment.therapist}
-                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="Sarah Johnson">Sarah Johnson</option>
-                    <option value="David Wilson">David Wilson</option>
-                    <option value="Lisa Martinez">Lisa Martinez</option>
-                  </select>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="notes"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Notes
-                  </label>
-                  <textarea
-                    id="notes"
-                    defaultValue={appointment.notes}
-                    rows={3}
-                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+              <div className="flex items-center gap-4 p-4 border rounded-md bg-gray-50 mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-blue-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
+                </svg>
+                <div>
+                  <p className="font-medium text-gray-800">
+                    {booking.service} with {booking.clientName}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {format(booking.date, "MMMM d, yyyy")} at {booking.time}
+                  </p>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 mt-4">
+              <div className="grid gap-4 mb-6">
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="status"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Status
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      className="px-4 py-2 border border-yellow-500 text-yellow-600 rounded-md hover:bg-yellow-50 flex items-center justify-center"
+                      onClick={() => setIsStatusDialogOpen(false)}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                      Pending
+                    </button>
+                    <button
+                      className="px-4 py-2 border border-green-500 text-green-600 rounded-md hover:bg-green-50 flex items-center justify-center"
+                      onClick={() => setIsStatusDialogOpen(false)}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                      Confirm
+                    </button>
+                    <button
+                      className="px-4 py-2 border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 flex items-center justify-center"
+                      onClick={() => setIsStatusDialogOpen(false)}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                      Check In
+                    </button>
+                    <button
+                      className="px-4 py-2 border border-purple-500 text-purple-600 rounded-md hover:bg-purple-50 flex items-center justify-center"
+                      onClick={() => setIsStatusDialogOpen(false)}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-purple-500 mr-2"></span>
+                      Check Out
+                    </button>
+                    <button
+                      className="px-4 py-2 border border-red-500 text-red-600 rounded-md hover:bg-red-50 flex items-center justify-center"
+                      onClick={() => setIsStatusDialogOpen(false)}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
                 <button
                   className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
-                  onClick={() => setIsEditDialogOpen(false)}
+                  onClick={() => setIsStatusDialogOpen(false)}
                 >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600"
-                  onClick={() => setIsEditDialogOpen(false)}
-                >
-                  Save Changes
+                  Close
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        <button
-          className="px-3 py-1 bg-red-500 text-white rounded-md text-sm font-medium flex items-center"
-          onClick={() => setIsCancelDialogOpen(true)}
-          disabled={appointment.status === "cancelled"}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-          Cancel
-        </button>
-
+        {/* Footer with Edit Status button on the right */}
+        <div className="flex gap-2">
+          {/* Empty div for left side - add buttons here if needed */}
+        </div>
         <div className="flex gap-2">
           <button
-            className="px-3 py-1 bg-pink-500 text-white rounded-md text-sm font-medium flex items-center"
-            onClick={() => setIsEditDialogOpen(true)}
+            className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm font-medium flex items-center"
+            onClick={() => setIsStatusDialogOpen(true)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -470,10 +409,10 @@ export function AppointmentDetails({ appointmentId }) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                d="M7 11l5-5m0 0l5 5m-5-5v12"
               />
             </svg>
-            Edit
+            Edit Status
           </button>
         </div>
       </div>
@@ -481,6 +420,6 @@ export function AppointmentDetails({ appointmentId }) {
   );
 }
 
-AppointmentDetails.propTypes = {
-  appointmentId: PropTypes.string.isRequired,
+BookingDetails.propTypes = {
+  bookingId: PropTypes.string.isRequired,
 };
