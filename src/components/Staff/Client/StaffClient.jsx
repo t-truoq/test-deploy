@@ -1,11 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { Search, MoreHorizontal } from "lucide-react";
 import { EditClientModal } from "./EditClientModal";
 
 const API_URL =
   "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users";
+=======
+import { Search, MoreHorizontal, Plus } from "lucide-react";
+import { AddClientModal } from "./AddClientModal";
+import { EditClientModal } from "./EditClientModal";
+
+const API_URL = "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users";
+
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
 export function StaffClients() {
   const [clients, setClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,6 +102,20 @@ export function StaffClients() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleAddClient = (newClient) => {
+    const client = {
+      ...newClient,
+      id: (Math.max(...clients.map((c) => parseInt(c.id))) + 1).toString(),
+      visits: 0,
+      createdAt: new Date().toLocaleDateString(),
+      updatedAt: new Date().toLocaleDateString(),
+    };
+    setClients([...clients, client]);
+  };
+
+>>>>>>> 710d75bb43befc20ae257bed1defaf1e5a9f7379
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="p-6 border-b border-gray-200">
