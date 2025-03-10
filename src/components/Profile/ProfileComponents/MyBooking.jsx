@@ -71,7 +71,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://af95-118-69-182-149.ngrok-free.app/api/bookings/user",
+//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -132,7 +132,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://af95-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+//           "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -247,7 +247,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         "https://af95-118-69-182-149.ngrok-free.app/api/bookings",
+//         "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
 //         bookingData,
 //         {
 //           headers: {
@@ -350,7 +350,7 @@
 //       }
 
 //       await axios.post(
-//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
 //         {},
 //         {
 //           headers: {
@@ -397,7 +397,7 @@
 //       }
 
 //       await axios.post(
-//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
 //         {},
 //         {
 //           headers: {
@@ -444,7 +444,7 @@
 //       }
 
 //       await axios.post(
-//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
 //         {},
 //         {
 //           headers: {
@@ -491,7 +491,6 @@
 //         return null;
 //       }
 
-//       // Mock data for default booking
 //       if (bookingId === 1) {
 //         return {
 //           ...booking,
@@ -502,96 +501,24 @@
 //         };
 //       }
 
-//       // Fetch details from API
-//       const response = await axios.get(
-//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//             "ngrok-skip-browser-warning": "true",
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-
-//       const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
-//       console.log("Full booking data from API:", JSON.stringify(bookingData, null, 2));
-
-//       // Fallback duration map for known services
-//       const serviceDurationMap = {
-//         "Lấy Nhân Mụn Chuẩn Y Khoa": 45, // Assuming 45 minutes
-//         "Exo Booster": 30, // Assuming 30 minutes
-//         // Add more services as needed
-//       };
-
-//       // Map services data with enhanced duration handling
-//       let services = [];
-//       if (bookingData.services && Array.isArray(bookingData.services)) {
-//         services = bookingData.services.map((service, index) => {
-//           const duration = service.duration != null ? Number(service.duration) : (service.durationMinutes || serviceDurationMap[service.name] || 0);
-//           const price = service.price != null ? Number(service.price) : 0;
-//           console.log(`Service ${index + 1}: name=${service.name}, duration=${duration}, price=${price}`);
-//           return {
-//             id: service.id || index + 1,
-//             name: service.name || `Service #${index + 1}`,
-//             duration: service.duration,
-//             price: service.price,
-//           };
-//         });
-//       } else if (bookingData.serviceNames && Array.isArray(bookingData.serviceNames)) {
-//         services = bookingData.serviceNames.map((name, index) => {
-//           const duration = bookingData.durations && Array.isArray(bookingData.durations) && bookingData.durations[index] != null
-//             ? Number(bookingData.durations[index])
-//             : (bookingData.serviceDurations && Array.isArray(bookingData.serviceDurations) && bookingData.serviceDurations[index] != null
-//               ? Number(bookingData.serviceDurations[index])
-//               : (serviceDurationMap[name] || 0)); // Use the duration map as a fallback
-//           const price = bookingData.servicePrices && Array.isArray(bookingData.servicePrices) && bookingData.servicePrices[index] != null
-//             ? Number(bookingData.servicePrices[index])
-//             : (bookingData.totalPrice / (bookingData.serviceNames.length || 1) || 0);
-//           console.log(`Service ${index + 1} (fallback): name=${name}, duration=${duration}, price=${price}`);
-//           return {
-//             id: index + 1,
-//             name,
-//             duration,
-//             price,
-//           };
-//         });
-//       } else {
-//         console.warn("No services or serviceNames found in bookingData:", JSON.stringify(bookingData, null, 2));
-//         services = [];
-//       }
-
-//       // Log services array for debugging
-//       console.log("Mapped services array:", services);
-
-//       // Find specialist based on specialistId from fetched specialists list
-//       const specialistId = bookingData.specialistId || booking.specialistId || null;
-//       const specialistFromList = specialists.find((spec) => spec.userId === specialistId);
-
-//       const specialist = specialistFromList || {
-//         name: bookingData.specialistName || "Not assigned",
-//         userId: specialistId || 0,
-//         specialization: bookingData.specialization || "Skin Therapist",
-//       };
-
-//       console.log("Specialist ID from booking:", specialistId);
-//       console.log("Found specialist from list:", specialistFromList);
-
-//       // Calculate totalDuration with validation
-//       const totalDuration = services.reduce((sum, service) => {
-//         const duration = Number.isFinite(Number(service.duration)) ? Number(service.duration) : 0;
-//         console.log(`Adding duration: ${duration} (from service ${service.name})`);
-//         return sum + duration;
-//       }, 0);
-
-//       console.log("Calculated totalDuration:", totalDuration);
+//       const mockServices = [
+//         { id: 1, name: "Facial Treatment", duration: 60, price: 89.99 },
+//         { id: 2, name: "Deep Cleansing", duration: 45, price: 69.99 },
+//         { id: 3, name: "Anti-Aging Treatment", duration: 75, price: 129.99 },
+//       ];
+//       const numServices = Math.floor(Math.random() * 3) + 1;
+//       const selectedMockServices = mockServices.slice(0, numServices);
+//       const specialist =
+//         specialists.length > 0
+//           ? specialists[Math.floor(Math.random() * specialists.length)]
+//           : { name: "Jane Smith", userId: 123, specialization: "Skin Therapist" };
 
 //       return {
 //         ...booking,
-//         services,
+//         services: selectedMockServices,
 //         specialist,
-//         totalDuration,
-//         totalPrice: bookingData.totalPrice != null ? Number(bookingData.totalPrice) : booking.totalPrice || 0,
+//         totalDuration: selectedMockServices.reduce((sum, service) => sum + service.duration, 0),
+//         totalPrice: selectedMockServices.reduce((sum, service) => sum + service.price, 0),
 //       };
 //     } catch (error) {
 //       console.error("Error fetching booking details:", error);
@@ -637,7 +564,7 @@
 //         return;
 //       }
 
-//       const amount = Math.round(selectedBooking.totalPrice);
+//       const amount = Math.round(bookingDetails.totalPrice * 100);
 //       const orderInfo = `Booking-${selectedBooking.bookingId}`;
 
 //       const paymentData = { amount, orderInfo };
@@ -645,7 +572,7 @@
 //       console.log("Payment data to be sent:", paymentData);
 
 //       const response = await axios.post(
-//         "https://af95-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+//         "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
 //         paymentData,
 //         {
 //           headers: {
@@ -1086,7 +1013,7 @@
 //                         <User className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
 //                         <div>
 //                           <p className="text-sm text-gray-600">Specialist</p>
-//                           <p className="font-medium text-gray-900">{bookingDetails.specialist.name || "Not assigned"}</p>
+//                           <p className="font-medium text-gray-900">{bookingDetails.specialist.name}</p>
 //                           <p className="text-xs text-gray-500">{bookingDetails.specialist.specialization}</p>
 //                         </div>
 //                       </div>
@@ -1110,13 +1037,13 @@
 //                         <li key={index} className="p-4 hover:bg-gray-50">
 //                           <div className="flex justify-between items-start">
 //                             <div>
-//                               <h4 className="font-medium text-gray-900">{service.name || `Service #${index + 1}`}</h4>
+//                               <h4 className="font-medium text-gray-900">{service.name}</h4>
 //                               <p className="text-sm text-gray-600 flex items-center mt-1">
-//                                 <Timer className="w-4 h-4 mr-1 text-gray-400" /> {service.duration || 0} minutes
+//                                 <Timer className="w-4 h-4 mr-1 text-gray-400" /> {service.duration} minutes
 //                               </p>
 //                             </div>
 //                             <div className="text-right">
-//                               <p className="font-semibold text-rose-600">${service.price ? service.price.toFixed(2) : "0.00"}</p>
+//                               <p className="font-semibold text-rose-600">${service.price.toFixed(2)}</p>
 //                             </div>
 //                           </div>
 //                         </li>
@@ -1124,7 +1051,7 @@
 //                     </ul>
 //                     <div className="bg-gray-50 p-4 flex justify-between items-center border-t border-gray-200">
 //                       <p className="font-medium text-gray-800">Total</p>
-//                       <p className="font-bold text-rose-600 text-lg">${selectedBooking.totalPrice.toFixed(2)}</p>
+//                       <p className="font-bold text-rose-600 text-lg">${bookingDetails.totalPrice.toFixed(2)}</p>
 //                     </div>
 //                   </div>
 //                 </div>
@@ -1152,7 +1079,7 @@
 //                       </div>
 //                       <div className="flex justify-between items-center pt-2 border-t border-gray-100">
 //                         <p className="font-medium text-gray-800">Total</p>
-//                         <p className="font-bold text-rose-600">${selectedBooking.totalPrice.toFixed(2)}</p>
+//                         <p className="font-bold text-rose-600">${bookingDetails.totalPrice.toFixed(2)}</p>
 //                       </div>
 //                     </div>
 //                     {selectedBooking.bookingId !== 1 &&
@@ -1242,7 +1169,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 import axios from "axios";
 import {
   Calendar,
@@ -1287,11 +1219,19 @@ const MyBooking = () => {
 
   // Fetch bookings, selected services, and specialists
   useEffect(() => {
-    const storedServiceIds = localStorage.getItem("selectedServiceIdsForBooking");
-    console.log("Retrieved selectedServiceIds from localStorage:", storedServiceIds);
+    const storedServiceIds = localStorage.getItem(
+      "selectedServiceIdsForBooking"
+    );
+    console.log(
+      "Retrieved selectedServiceIds from localStorage:",
+      storedServiceIds
+    );
 
     const storedServices = localStorage.getItem("selectedServicesForBooking");
-    console.log("Retrieved selectedServices from localStorage:", storedServices);
+    console.log(
+      "Retrieved selectedServices from localStorage:",
+      storedServices
+    );
     if (storedServices) {
       try {
         const parsedServices = JSON.parse(storedServices);
@@ -1301,7 +1241,10 @@ const MyBooking = () => {
           setSelectedServices([]);
         }
       } catch (error) {
-        console.error("Error parsing selectedServices from localStorage:", error);
+        console.error(
+          "Error parsing selectedServices from localStorage:",
+          error
+        );
         setSelectedServices([]);
       }
     }
@@ -1312,7 +1255,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/bookings/user",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1334,17 +1277,23 @@ const MyBooking = () => {
           if (sortedBookings.length === 0) {
             const defaultBooking = {
               bookingId: 1,
-              bookingDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+              bookingDate: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0],
               timeSlot: "14:00-15:00",
               status: "COMPLETED",
               paymentStatus: "SUCCESS",
               totalPrice: 50.0,
-              createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(
+                Date.now() - 24 * 60 * 60 * 1000
+              ).toISOString(),
             };
             setBookings([defaultBooking]);
           }
         } else {
-          throw new Error("Invalid response format: Expected an array of bookings");
+          throw new Error(
+            "Invalid response format: Expected an array of bookings"
+          );
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -1353,16 +1302,25 @@ const MyBooking = () => {
             setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => navigate("/login"), 2000);
           } else if (error.response.status === 403) {
-            setErrorPopup("You do not have permission to access your bookings.");
+            setErrorPopup(
+              "You do not have permission to access your bookings."
+            );
           } else if (error.response.status === 404) {
             setErrorPopup("No bookings found.");
           } else {
-            setErrorPopup(error.response.data.message || "Failed to load bookings. Please try again.");
+            setErrorPopup(
+              error.response.data.message ||
+                "Failed to load bookings. Please try again."
+            );
           }
         } else if (error.request) {
-          setErrorPopup("Unable to connect to server. CORS issue or server error. Please try again.");
+          setErrorPopup(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
-          setErrorPopup(error.message || "Failed to load bookings. Please try again.");
+          setErrorPopup(
+            error.message || "Failed to load bookings. Please try again."
+          );
         }
       }
     };
@@ -1373,7 +1331,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1387,7 +1345,9 @@ const MyBooking = () => {
         if (Array.isArray(response.data)) {
           setSpecialists(response.data);
         } else {
-          throw new Error("Invalid response format: Expected an array of specialists");
+          throw new Error(
+            "Invalid response format: Expected an array of specialists"
+          );
         }
       } catch (error) {
         console.error("Error fetching specialists:", error);
@@ -1396,7 +1356,9 @@ const MyBooking = () => {
       }
     };
 
-    Promise.all([fetchBookings(), fetchSpecialists()]).finally(() => setLoading(false));
+    Promise.all([fetchBookings(), fetchSpecialists()]).finally(() =>
+      setLoading(false)
+    );
   }, [navigate, refresh]);
 
   // Handle payment redirect
@@ -1432,20 +1394,30 @@ const MyBooking = () => {
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-        const bookingDateFormatted = new Date(booking.bookingDate).toISOString().split("T")[0];
+        const bookingDateFormatted = new Date(booking.bookingDate)
+          .toISOString()
+          .split("T")[0];
         return bookingDateFormatted === searchDate;
       })
     : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
-    const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
+    const totalDuration = services.reduce(
+      (sum, service) => sum + service.duration,
+      0
+    );
     const startDateTime = new Date(`${bookingDate}T${startTime}:00`);
-    const endDateTime = new Date(startDateTime.getTime() + totalDuration * 60000);
+    const endDateTime = new Date(
+      startDateTime.getTime() + totalDuration * 60000
+    );
     const timeSlot = `${startTime}-${endDateTime.toTimeString().slice(0, 5)}`;
 
     return bookings.some((booking) => {
-      if (booking.status === "CANCELLED" || booking.bookingId === 1) return false;
-      const existingDate = new Date(booking.bookingDate).toISOString().split("T")[0];
+      if (booking.status === "CANCELLED" || booking.bookingId === 1)
+        return false;
+      const existingDate = new Date(booking.bookingDate)
+        .toISOString()
+        .split("T")[0];
       const existingTimeSlot = booking.timeSlot;
       return existingDate === bookingDate && existingTimeSlot === timeSlot;
     });
@@ -1456,39 +1428,39 @@ const MyBooking = () => {
       setErrorPopup("Please select a booking date and start time.");
       return;
     }
-  
+
     if (isBooking) {
       setErrorPopup("Booking in progress... Please wait.");
       return;
     }
-  
+
     const token = localStorage.getItem("token");
     if (!token) {
       setErrorPopup("No token found. Please login again.");
       setTimeout(() => navigate("/login"), 2000);
       return;
     }
-  
+
     if (checkBookingConflict(bookingDate, startTime, selectedServices)) {
       setErrorPopup("You already have a booking at this time.");
       return;
     }
-  
+
     const bookingData = {
       specialistId: selectedSpecialist ? Number(selectedSpecialist) : null,
       bookingDate,
       startTime,
       serviceIds: selectedServices.map((service) => Number(service.serviceId)),
     };
-  
+
     console.log("Booking data to be sent:", bookingData);
-  
+
     setIsBooking(true);
     setErrorPopup("");
-  
+
     try {
       const response = await axios.post(
-        "https://af95-118-69-182-149.ngrok-free.app/api/bookings",
+        "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -1498,29 +1470,21 @@ const MyBooking = () => {
           },
         }
       );
-  
+
       console.log("Booking response:", response.data);
-      const newBookingId = response.data.bookingId; // Đảm bảo API trả về bookingId
-  
-      // Log và lưu selectedServices vào localStorage
-      console.log("Saving selectedServices to localStorage:", selectedServices);
-      const storedServicesKey = `selectedServicesForBooking_${newBookingId}`;
-      localStorage.setItem(storedServicesKey, JSON.stringify(selectedServices));
-      console.log(`Saved to localStorage with key ${storedServicesKey}`);
-  
-      // Xác nhận dữ liệu đã lưu
-      const savedData = localStorage.getItem(storedServicesKey);
-      console.log(`Verified saved data: ${savedData}`);
-  
+
       setConfirmedBooking({
         services: [...selectedServices],
         bookingDate,
         startTime,
-        totalPrice: selectedServices.reduce((sum, service) => sum + service.price, 0),
+        totalPrice: selectedServices.reduce(
+          (sum, service) => sum + service.price,
+          0
+        ),
       });
-  
+
       setSelectedServices([]);
-      localStorage.removeItem("selectedServicesForBooking"); // Xóa key cũ
+      localStorage.removeItem("selectedServicesForBooking");
       setBookingDate("");
       setStartTime("");
       setSelectedSpecialist("");
@@ -1528,9 +1492,11 @@ const MyBooking = () => {
       setErrorPopup("");
     } catch (error) {
       console.error("Error creating booking:", error);
-      const errorMessage = error.response?.data.message || "Failed to create booking. Please try again.";
+      const errorMessage =
+        error.response?.data.message ||
+        "Failed to create booking. Please try again.";
       const errorCode = error.response?.data.errorCode;
-  
+
       switch (errorCode) {
         case "UNAUTHENTICATED":
           setErrorPopup("Unauthorized: Please login again.");
@@ -1543,7 +1509,9 @@ const MyBooking = () => {
           setErrorPopup("Too many services selected. Maximum limit exceeded.");
           break;
         case "TIME_SLOT_OUTSIDE_WORKING_HOURS":
-          setErrorPopup("Selected time is outside working hours (8:00 - 20:00).");
+          setErrorPopup(
+            "Selected time is outside working hours (8:00 - 20:00)."
+          );
           break;
         case "BOOKING_DATE_IN_PAST":
           setErrorPopup("Booking date cannot be in the past.");
@@ -1571,6 +1539,79 @@ const MyBooking = () => {
     }
   };
 
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorPopup("No token found. Please login again.");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
+      }
+
+      const booking = bookings.find((b) => b.bookingId === bookingId);
+      if (!booking) {
+        setErrorPopup("Booking not found.");
+        return;
+      }
+
+      if (bookingId === 1) {
+        setErrorPopup("Cannot cancel the default booking.");
+        return;
+      }
+
+      const [startTime] = booking.timeSlot.split("-");
+      const bookingStartDateTime = new Date(
+        `${booking.bookingDate}T${startTime}:00`
+      );
+      const currentDateTime = new Date();
+      const timeDifference =
+        (bookingStartDateTime - currentDateTime) / (1000 * 60 * 60);
+
+      if (timeDifference < 24) {
+        setErrorPopup(
+          "Cannot cancel booking less than 24 hours before start time."
+        );
+        return;
+      }
+
+      await axios.post(
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setBookings((prevBookings) =>
+        prevBookings.map((b) =>
+          b.bookingId === bookingId ? { ...b, status: "CANCELLED" } : b
+        )
+      );
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      console.error("Error canceling booking:", error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          setErrorPopup("Unauthorized: Please login again.");
+          setTimeout(() => navigate("/login"), 2000);
+        } else if (error.response.status === 403) {
+          setErrorPopup("You do not have permission to cancel this booking.");
+        } else {
+          setErrorPopup(
+            error.response.data.message ||
+              "Failed to cancel booking. Please try again."
+          );
+        }
+      } else {
+        setErrorPopup("Failed to cancel booking. Please try again.");
+      }
+    }
+  };
+
   const handleCheckIn = async (bookingId) => {
     try {
       const token = localStorage.getItem("token");
@@ -1586,7 +1627,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -1599,7 +1640,13 @@ const MyBooking = () => {
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b.bookingId === bookingId ? { ...b, checkInTime: new Date().toISOString(), status: "IN_PROGRESS" } : b
+          b.bookingId === bookingId
+            ? {
+                ...b,
+                checkInTime: new Date().toISOString(),
+                status: "IN_PROGRESS",
+              }
+            : b
         )
       );
       setRefresh((prev) => !prev);
@@ -1610,7 +1657,10 @@ const MyBooking = () => {
           setErrorPopup("Unauthorized: Please login again.");
           setTimeout(() => navigate("/login"), 2000);
         } else {
-          setErrorPopup(error.response.data.message || "Failed to check-in booking. Please try again.");
+          setErrorPopup(
+            error.response.data.message ||
+              "Failed to check-in booking. Please try again."
+          );
         }
       } else {
         setErrorPopup("Failed to check-in booking. Please try again.");
@@ -1633,7 +1683,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -1646,7 +1696,13 @@ const MyBooking = () => {
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b.bookingId === bookingId ? { ...b, checkOutTime: new Date().toISOString(), status: "COMPLETED" } : b
+          b.bookingId === bookingId
+            ? {
+                ...b,
+                checkOutTime: new Date().toISOString(),
+                status: "COMPLETED",
+              }
+            : b
         )
       );
       setRefresh((prev) => !prev);
@@ -1657,7 +1713,10 @@ const MyBooking = () => {
           setErrorPopup("Unauthorized: Please login again.");
           setTimeout(() => navigate("/login"), 2000);
         } else {
-          setErrorPopup(error.response.data.message || "Failed to check-out booking. Please try again.");
+          setErrorPopup(
+            error.response.data.message ||
+              "Failed to check-out booking. Please try again."
+          );
         }
       } else {
         setErrorPopup("Failed to check-out booking. Please try again.");
@@ -1673,27 +1732,33 @@ const MyBooking = () => {
         setTimeout(() => navigate("/login"), 2000);
         return null;
       }
-  
+
       const booking = bookings.find((b) => b.bookingId === bookingId);
       if (!booking) {
         setErrorPopup("Booking not found.");
         return null;
       }
-  
+
       // Mock data for default booking
       if (bookingId === 1) {
         return {
           ...booking,
-          services: [{ id: 1, name: "Default Facial", duration: 60, price: 50.0 }],
-          specialist: { name: "Default Specialist", userId: 999, specialization: "Skin Therapist" },
+          services: [
+            { id: 1, name: "Default Facial", duration: 60, price: 50.0 },
+          ],
+          specialist: {
+            name: "Default Specialist",
+            userId: 999,
+            specialization: "Skin Therapist",
+          },
           totalDuration: 60,
           totalPrice: 50.0,
         };
       }
-  
+
       // Fetch details from API
       const response = await axios.get(
-        `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1702,143 +1767,114 @@ const MyBooking = () => {
           },
         }
       );
-  
-      const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
-      console.log("Full booking data from API:", JSON.stringify(bookingData, null, 2));
-  
-      // Get stored services from localStorage specific to this bookingId
-      const storedServicesKey = `selectedServicesForBooking_${bookingId}`;
-      const storedServices = localStorage.getItem(storedServicesKey);
-      console.log(`Stored services for booking ${bookingId} (key: ${storedServicesKey}):`, storedServices);
-  
-      let storedServicesMap = new Map();
-      if (storedServices) {
-        try {
-          const parsedServices = JSON.parse(storedServices);
-          if (Array.isArray(parsedServices)) {
-            parsedServices.forEach((service) => {
-              // Sử dụng tên dịch vụ mặc định
-              const serviceName = service.name;
-              storedServicesMap.set(serviceName, {
-                duration: Number(service.duration) || 0,
-                price: Number(service.price) || 0,
-              });
-              console.log(`Stored service: name=${serviceName}, duration=${service.duration}, price=${service.price}`);
-            });
-          } else {
-            console.error("Parsed services is not an array:", parsedServices);
-          }
-        } catch (error) {
-          console.error("Error parsing stored services:", error);
-        }
-      } else {
-        console.warn(`No stored services found in localStorage for key: ${storedServicesKey}`);
-      }
-  
-      // Map services data with duration and price from localStorage or API
+
+      const bookingData = Array.isArray(response.data)
+        ? response.data[0]
+        : response.data;
+      console.log(
+        "Full booking data from API:",
+        JSON.stringify(bookingData, null, 2)
+      );
+
+      // Map services data with enhanced debugging
       let services = [];
       if (bookingData.services && Array.isArray(bookingData.services)) {
+        // If bookingData.services exists, use it directly
         services = bookingData.services.map((service, index) => {
-          const serviceName = service.name;
-          const storedService = storedServicesMap.get(serviceName);
-          const duration = storedService?.duration ?? (Number(service.duration) || 0);
-          const price = storedService?.price ?? (Number(service.price) || 0);
+          const duration =
+            service.duration != null ? Number(service.duration) : 0; // Ensure conversion to number
           console.log(
-            `Service ${index + 1}: name=${serviceName}, duration=${duration}, price=${price}, storedService=${JSON.stringify(storedService)}`
+            `Service ${index + 1}: name=${
+              service.name
+            }, duration=${duration}, price=${service.price}`
           );
           return {
             id: service.id || index + 1,
-            name: serviceName || `Service #${index + 1}`,
-            duration,
-            price,
+            name: service.name || `Service #${index + 1}`,
+            duration: duration,
+            price: service.price != null ? Number(service.price) : 0,
           };
         });
-      } else if (bookingData.serviceNames && Array.isArray(bookingData.serviceNames)) {
+      } else if (
+        bookingData.serviceNames &&
+        Array.isArray(bookingData.serviceNames)
+      ) {
+        // Fallback to serviceNames if services is not provided
         services = bookingData.serviceNames.map((name, index) => {
-          const serviceName = name;
-          const storedService = storedServicesMap.get(serviceName);
-          const durationFromAPI =
+          const duration =
             bookingData.durations &&
             Array.isArray(bookingData.durations) &&
             bookingData.durations[index] != null
               ? Number(bookingData.durations[index])
-              : null;
-          const duration = storedService?.duration ?? durationFromAPI ?? 0;
-          const priceFromAPI =
+              : 0;
+          const price =
             bookingData.servicePrices &&
             Array.isArray(bookingData.servicePrices) &&
             bookingData.servicePrices[index] != null
               ? Number(bookingData.servicePrices[index])
-              : null;
-          const price = storedService?.price ?? priceFromAPI ?? (bookingData.totalPrice / (bookingData.serviceNames.length || 1) || 0);
+              : bookingData.totalPrice /
+                  (bookingData.serviceNames.length || 1) || 0;
           console.log(
-            `Service ${index + 1} (fallback): name=${serviceName}, duration=${duration}, price=${price}, storedService=${JSON.stringify(storedService)}`
+            `Service ${
+              index + 1
+            } (fallback): name=${name}, duration=${duration}, price=${price}`
           );
           return {
             id: index + 1,
-            name: serviceName,
+            name,
             duration,
             price,
           };
         });
       } else {
-        // Fallback to localStorage if API data is missing
-        if (storedServices) {
-          try {
-            const parsedServices = JSON.parse(storedServices);
-            if (Array.isArray(parsedServices)) {
-              services = parsedServices.map((service, index) => ({
-                id: index + 1,
-                name: service.name,
-                duration: Number(service.duration) || 0,
-                price: Number(service.price) || 0,
-              }));
-              console.log("Fallback services from localStorage:", services);
-            } else {
-              console.warn("Parsed services is not an array, falling back to empty array");
-              services = [];
-            }
-          } catch (error) {
-            console.error("Error parsing fallback stored services:", error);
-            services = [];
-          }
-        } else {
-          console.warn("No services or serviceNames found in bookingData, and no stored services:", JSON.stringify(bookingData, null, 2));
-          services = [];
-        }
+        console.warn(
+          "No services or serviceNames found in bookingData:",
+          JSON.stringify(bookingData, null, 2)
+        );
+        services = [];
       }
-  
+
       // Log services array for debugging
       console.log("Mapped services array:", services);
-  
+
       // Find specialist based on specialistId from fetched specialists list
-      const specialistId = bookingData.specialistId || booking.specialistId || null;
-      const specialistFromList = specialists.find((spec) => spec.userId === specialistId);
-  
+      const specialistId =
+        bookingData.specialistId || booking.specialistId || null;
+      const specialistFromList = specialists.find(
+        (spec) => spec.userId === specialistId
+      );
+
       const specialist = specialistFromList || {
         name: bookingData.specialistName || "Not assigned",
         userId: specialistId || 0,
         specialization: bookingData.specialization || "Skin Therapist",
       };
-  
+
       console.log("Specialist ID from booking:", specialistId);
       console.log("Found specialist from list:", specialistFromList);
-  
+
       // Calculate totalDuration with validation
       const totalDuration = services.reduce((sum, service) => {
-        const duration = Number.isFinite(Number(service.duration)) ? Number(service.duration) : 0;
-        console.log(`Adding duration: ${duration} (from service ${service.name})`);
+        const duration = Number.isFinite(Number(service.duration))
+          ? Number(service.duration)
+          : 0;
+        console.log(
+          `Adding duration: ${duration} (from service ${service.name})`
+        );
         return sum + duration;
       }, 0);
-  
+
       console.log("Calculated totalDuration:", totalDuration);
-  
+
       return {
         ...booking,
         services,
         specialist,
         totalDuration,
-        totalPrice: bookingData.totalPrice != null ? Number(bookingData.totalPrice) : booking.totalPrice || 0,
+        totalPrice:
+          bookingData.totalPrice != null
+            ? Number(bookingData.totalPrice)
+            : booking.totalPrice || 0,
       };
     } catch (error) {
       console.error("Error fetching booking details:", error);
@@ -1892,7 +1928,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://af95-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -1909,11 +1945,16 @@ const MyBooking = () => {
         localStorage.setItem("lastPaidBookingId", selectedBooking.bookingId);
         window.location.href = response.data.result;
       } else {
-        setErrorPopup("Payment URL not received from server or payment creation failed.");
+        setErrorPopup(
+          "Payment URL not received from server or payment creation failed."
+        );
       }
     } catch (error) {
       console.error("Error initiating payment:", error);
-      setErrorPopup(error.response?.data.message || "Failed to initiate payment. Please try again.");
+      setErrorPopup(
+        error.response?.data.message ||
+          "Failed to initiate payment. Please try again."
+      );
     } finally {
       setIsPaying(false);
     }
@@ -1951,7 +1992,11 @@ const MyBooking = () => {
 
   const formatDate = (dateString) =>
     dateString
-      ? new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+      ? new Date(dateString).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
       : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
@@ -1960,7 +2005,9 @@ const MyBooking = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 mx-auto text-rose-600 animate-spin" />
-          <p className="mt-4 text-lg font-medium text-gray-700">Loading your bookings...</p>
+          <p className="mt-4 text-lg font-medium text-gray-700">
+            Loading your bookings...
+          </p>
         </div>
       </div>
     );
@@ -1972,12 +2019,18 @@ const MyBooking = () => {
         <nav className="py-4 mb-4">
           <ol className="flex items-center space-x-2 text-sm">
             <li>
-              <Link to="/" className="text-gray-600 hover:text-rose-600 flex items-center">
+              <Link
+                to="/"
+                className="text-gray-600 hover:text-rose-600 flex items-center"
+              >
                 <Home className="w-4 h-4 mr-1" /> Home
               </Link>
             </li>
             <li>
-              <Link to="/services" className="text-gray-600 hover:text-rose-600 flex items-center">
+              <Link
+                to="/services"
+                className="text-gray-600 hover:text-rose-600 flex items-center"
+              >
                 <ChevronRight className="w-4 h-4 mr-1" /> Services
               </Link>
             </li>
@@ -1990,44 +2043,63 @@ const MyBooking = () => {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Bookings</h1>
-          <p className="text-gray-600">View and manage all your service appointments</p>
+          <p className="text-gray-600">
+            View and manage all your service appointments
+          </p>
         </div>
 
         {confirmedBooking && (
           <div className="mb-8 bg-white p-6 rounded-xl shadow-md border border-gray-100">
             <div className="flex items-center mb-4">
               <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-900">Booking Confirmed</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Booking Confirmed
+              </h2>
             </div>
             <div className="bg-green-50 rounded-lg p-4 mb-4">
               <div className="flex items-start mb-2">
                 <Calendar className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500">Booking Date</p>
-                  <p className="font-medium text-gray-800">{formatDate(confirmedBooking.bookingDate)}</p>
+                  <p className="font-medium text-gray-800">
+                    {formatDate(confirmedBooking.bookingDate)}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start mb-2">
                 <Clock className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500">Start Time</p>
-                  <p className="font-medium text-gray-800">{formatTime(confirmedBooking.startTime)}</p>
+                  <p className="font-medium text-gray-800">
+                    {formatTime(confirmedBooking.startTime)}
+                  </p>
                 </div>
               </div>
               <ul className="divide-y divide-green-100">
                 {confirmedBooking.services.map((service) => (
-                  <li key={service.serviceId} className="py-3 flex justify-between">
+                  <li
+                    key={service.serviceId}
+                    className="py-3 flex justify-between"
+                  >
                     <div>
-                      <p className="font-medium text-gray-800">{service.name}</p>
-                      <p className="text-sm text-gray-600">{service.duration} minutes</p>
+                      <p className="font-medium text-gray-800">
+                        {service.name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {service.duration} minutes
+                      </p>
                     </div>
-                    <p className="font-semibold text-green-600">${service.price.toFixed(2)}</p>
+                    <p className="font-semibold text-green-600">
+                      ${service.price.toFixed(2)}
+                    </p>
                   </li>
                 ))}
               </ul>
               <div className="mt-3 pt-3 border-t border-green-100 flex justify-between">
                 <p className="font-medium text-gray-800">Total</p>
-                <p className="font-semibold text-green-600">${confirmedBooking.totalPrice.toFixed(2)}</p>
+                <p className="font-semibold text-green-600">
+                  ${confirmedBooking.totalPrice.toFixed(2)}
+                </p>
               </div>
             </div>
           </div>
@@ -2037,24 +2109,38 @@ const MyBooking = () => {
           <div className="mb-8 bg-white p-6 rounded-xl shadow-md border border-gray-100">
             <div className="flex items-center mb-4">
               <Package className="w-5 h-5 text-rose-600 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-900">Selected Services</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Selected Services
+              </h2>
             </div>
             <div className="bg-rose-50 rounded-lg p-4 mb-4">
               <ul className="divide-y divide-rose-100">
                 {selectedServices.map((service) => (
-                  <li key={service.serviceId} className="py-3 flex justify-between">
+                  <li
+                    key={service.serviceId}
+                    className="py-3 flex justify-between"
+                  >
                     <div>
-                      <p className="font-medium text-gray-800">{service.name}</p>
-                      <p className="text-sm text-gray-600">{service.duration} minutes</p>
+                      <p className="font-medium text-gray-800">
+                        {service.name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {service.duration} minutes
+                      </p>
                     </div>
-                    <p className="font-semibold text-rose-600">${service.price.toFixed(2)}</p>
+                    <p className="font-semibold text-rose-600">
+                      ${service.price.toFixed(2)}
+                    </p>
                   </li>
                 ))}
               </ul>
               <div className="mt-3 pt-3 border-t border-rose-100 flex justify-between">
                 <p className="font-medium text-gray-800">Total</p>
                 <p className="font-semibold text-rose-600">
-                  ${selectedServices.reduce((sum, service) => sum + service.price, 0).toFixed(2)}
+                  $
+                  {selectedServices
+                    .reduce((sum, service) => sum + service.price, 0)
+                    .toFixed(2)}
                 </p>
               </div>
             </div>
@@ -2108,7 +2194,9 @@ const MyBooking = () => {
               onClick={handleConfirmBooking}
               disabled={isBooking}
               className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
-                isBooking ? "bg-gray-400 text-white cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"
+                isBooking
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-rose-600 text-white hover:bg-rose-700"
               }`}
             >
               {isBooking ? (
@@ -2129,7 +2217,9 @@ const MyBooking = () => {
         <div className="mb-8 bg-white p-6 rounded-xl shadow-md">
           <div className="flex items-center mb-4">
             <Calendar className="w-5 h-5 text-rose-600 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Filter by Date</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Filter by Date
+            </h2>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-grow">
@@ -2152,11 +2242,17 @@ const MyBooking = () => {
           </div>
         </div>
 
-        {filteredBookings.length === 0 && selectedServices.length === 0 && !confirmedBooking ? (
+        {filteredBookings.length === 0 &&
+        selectedServices.length === 0 &&
+        !confirmedBooking ? (
           <div className="bg-white rounded-xl shadow-md p-8 text-center">
             <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-medium text-gray-800 mb-2">No bookings found</h3>
-            <p className="text-gray-600 mb-6">You don't have any bookings yet.</p>
+            <h3 className="text-xl font-medium text-gray-800 mb-2">
+              No bookings found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              You don't have any bookings yet.
+            </p>
             <Link
               to="/services"
               className="inline-flex items-center px-5 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
@@ -2176,7 +2272,9 @@ const MyBooking = () => {
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                     <div className="flex-grow">
                       <div className="flex items-center mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900 mr-3">Booking #{displayNumber}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900 mr-3">
+                          Booking #{displayNumber}
+                        </h3>
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(
                             booking.status
@@ -2191,27 +2289,37 @@ const MyBooking = () => {
                             <Calendar className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
                               <p className="text-sm text-gray-500">Date</p>
-                              <p className="font-medium text-gray-800">{formatDate(booking.bookingDate)}</p>
+                              <p className="font-medium text-gray-800">
+                                {formatDate(booking.bookingDate)}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-start">
                             <Clock className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
                               <p className="text-sm text-gray-500">Time slot</p>
-                              <p className="font-medium text-gray-800">{formatTime(booking.timeSlot)}</p>
+                              <p className="font-medium text-gray-800">
+                                {formatTime(booking.timeSlot)}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-start">
                             <CreditCard className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-500">Total Price</p>
-                              <p className="font-medium text-gray-800">${booking.totalPrice || "N/A"}</p>
+                              <p className="text-sm text-gray-500">
+                                Total Price
+                              </p>
+                              <p className="font-medium text-gray-800">
+                                ${booking.totalPrice || "N/A"}
+                              </p>
                             </div>
                           </div>
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-gray-500">Payment Status</p>
+                            <p className="text-sm text-gray-500">
+                              Payment Status
+                            </p>
                             <span
                               className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPaymentBadgeClass(
                                 booking.paymentStatus
@@ -2222,44 +2330,61 @@ const MyBooking = () => {
                           </div>
                           {booking.checkInTime && (
                             <div>
-                              <p className="text-sm text-gray-500">Check-in Time</p>
-                              <p className="font-medium text-gray-800">{new Date(booking.checkInTime).toLocaleString()}</p>
+                              <p className="text-sm text-gray-500">
+                                Check-in Time
+                              </p>
+                              <p className="font-medium text-gray-800">
+                                {new Date(booking.checkInTime).toLocaleString()}
+                              </p>
                             </div>
                           )}
                           {booking.checkOutTime && (
                             <div>
-                              <p className="text-sm text-gray-500">Check-out Time</p>
-                              <p className="font-medium text-gray-800">{new Date(booking.checkOutTime).toLocaleString()}</p>
+                              <p className="text-sm text-gray-500">
+                                Check-out Time
+                              </p>
+                              <p className="font-medium text-gray-800">
+                                {new Date(
+                                  booking.checkOutTime
+                                ).toLocaleString()}
+                              </p>
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-col gap-3 min-w-[140px]">
-                      {booking.bookingId !== 1 && booking.status === "PENDING" && (
-                        <button
-                          onClick={() => handleCancelBooking(booking.bookingId)}
-                          className="w-full flex items-center justify-center px-4 py-2 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200"
-                        >
-                          <XCircle className="w-4 h-4 mr-2" /> Cancel
-                        </button>
-                      )}
-                      {booking.bookingId !== 1 && booking.status === "CONFIRMED" && !booking.checkInTime && (
-                        <button
-                          onClick={() => handleCheckIn(booking.bookingId)}
-                          className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Check-in
-                        </button>
-                      )}
-                      {booking.bookingId !== 1 && booking.status === "IN_PROGRESS" && !booking.checkOutTime && (
-                        <button
-                          onClick={() => handleCheckOut(booking.bookingId)}
-                          className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" /> Check-out
-                        </button>
-                      )}
+                      {booking.bookingId !== 1 &&
+                        booking.status === "PENDING" && (
+                          <button
+                            onClick={() =>
+                              handleCancelBooking(booking.bookingId)
+                            }
+                            className="w-full flex items-center justify-center px-4 py-2 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200"
+                          >
+                            <XCircle className="w-4 h-4 mr-2" /> Cancel
+                          </button>
+                        )}
+                      {booking.bookingId !== 1 &&
+                        booking.status === "CONFIRMED" &&
+                        !booking.checkInTime && (
+                          <button
+                            onClick={() => handleCheckIn(booking.bookingId)}
+                            className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" /> Check-in
+                          </button>
+                        )}
+                      {booking.bookingId !== 1 &&
+                        booking.status === "IN_PROGRESS" &&
+                        !booking.checkOutTime && (
+                          <button
+                            onClick={() => handleCheckOut(booking.bookingId)}
+                            className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" /> Check-out
+                          </button>
+                        )}
                       <button
                         onClick={() => handleViewDetails(booking)}
                         className="w-full flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
@@ -2279,7 +2404,9 @@ const MyBooking = () => {
             <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full">
               <div className="flex flex-col items-center">
                 <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-                <p className="text-lg font-medium text-gray-800 mb-6 text-center">{errorPopup}</p>
+                <p className="text-lg font-medium text-gray-800 mb-6 text-center">
+                  {errorPopup}
+                </p>
                 <button
                   onClick={closeErrorPopup}
                   className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
@@ -2296,15 +2423,26 @@ const MyBooking = () => {
             <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden">
               <div className="w-full md:w-2/3 p-6 overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Booking Details</h2>
-                  <button onClick={closePopup} className="text-gray-500 hover:text-rose-600">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Booking Details
+                  </h2>
+                  <button
+                    onClick={closePopup}
+                    className="text-gray-500 hover:text-rose-600"
+                  >
                     <X className="w-6 h-6" />
                   </button>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 mb-6">
-                  {filteredBookings.findIndex((b) => b.bookingId === selectedBooking.bookingId) !== -1 && (
+                  {filteredBookings.findIndex(
+                    (b) => b.bookingId === selectedBooking.bookingId
+                  ) !== -1 && (
                     <span className="text-lg font-semibold text-gray-800">
-                      Booking #{filteredBookings.length - filteredBookings.findIndex((b) => b.bookingId === selectedBooking.bookingId)}
+                      Booking #
+                      {filteredBookings.length -
+                        filteredBookings.findIndex(
+                          (b) => b.bookingId === selectedBooking.bookingId
+                        )}
                     </span>
                   )}
                   <span
@@ -2321,14 +2459,18 @@ const MyBooking = () => {
                       <Calendar className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-600">Date</p>
-                        <p className="font-medium text-gray-900">{formatDate(selectedBooking.bookingDate)}</p>
+                        <p className="font-medium text-gray-900">
+                          {formatDate(selectedBooking.bookingDate)}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start">
                       <Clock className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-600">Time</p>
-                        <p className="font-medium text-gray-900">{formatTime(selectedBooking.timeSlot)}</p>
+                        <p className="font-medium text-gray-900">
+                          {formatTime(selectedBooking.timeSlot)}
+                        </p>
                       </div>
                     </div>
                     {bookingDetails.specialist && (
@@ -2336,8 +2478,12 @@ const MyBooking = () => {
                         <User className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-600">Specialist</p>
-                          <p className="font-medium text-gray-900">{bookingDetails.specialist.name || "Not assigned"}</p>
-                          <p className="text-xs text-gray-500">{bookingDetails.specialist.specialization}</p>
+                          <p className="font-medium text-gray-900">
+                            {bookingDetails.specialist.name || "Not assigned"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {bookingDetails.specialist.specialization}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -2345,7 +2491,9 @@ const MyBooking = () => {
                       <Timer className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-600">Total Duration</p>
-                        <p className="font-medium text-gray-900">{bookingDetails.totalDuration} minutes</p>
+                        <p className="font-medium text-gray-900">
+                          {bookingDetails.totalDuration} minutes
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -2360,13 +2508,21 @@ const MyBooking = () => {
                         <li key={index} className="p-4 hover:bg-gray-50">
                           <div className="flex justify-between items-start">
                             <div>
-                              <h4 className="font-medium text-gray-900">{service.name || `Service #${index + 1}`}</h4>
+                              <h4 className="font-medium text-gray-900">
+                                {service.name || `Service #${index + 1}`}
+                              </h4>
                               <p className="text-sm text-gray-600 flex items-center mt-1">
-                                <Timer className="w-4 h-4 mr-1 text-gray-400" /> {service.duration || 0} minutes
+                                <Timer className="w-4 h-4 mr-1 text-gray-400" />{" "}
+                                {service.duration || 0} minutes
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="font-semibold text-rose-600">${service.price ? service.price.toFixed(0) : "0.00"}</p>
+                              <p className="font-semibold text-rose-600">
+                                $
+                                {service.price
+                                  ? service.price.toFixed(2)
+                                  : "0.00"}
+                              </p>
                             </div>
                           </div>
                         </li>
@@ -2374,7 +2530,9 @@ const MyBooking = () => {
                     </ul>
                     <div className="bg-gray-50 p-4 flex justify-between items-center border-t border-gray-200">
                       <p className="font-medium text-gray-800">Total</p>
-                      <p className="font-bold text-rose-600 text-lg">${selectedBooking.totalPrice.toFixed(0)}</p>
+                      <p className="font-bold text-rose-600 text-lg">
+                        ${selectedBooking.totalPrice.toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -2383,7 +2541,8 @@ const MyBooking = () => {
                 {selectedBooking.status !== "CANCELLED" && (
                   <>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                      <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" /> Payment
+                      <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" />{" "}
+                      Payment
                     </h3>
                     <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
                       <div className="flex justify-between items-center mb-2">
@@ -2402,7 +2561,9 @@ const MyBooking = () => {
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                         <p className="font-medium text-gray-800">Total</p>
-                        <p className="font-bold text-rose-600">${selectedBooking.totalPrice.toFixed(2)}</p>
+                        <p className="font-bold text-rose-600">
+                          ${selectedBooking.totalPrice.toFixed(2)}
+                        </p>
                       </div>
                     </div>
                     {selectedBooking.bookingId !== 1 &&
@@ -2412,12 +2573,15 @@ const MyBooking = () => {
                           onClick={handlePayment}
                           disabled={isPaying}
                           className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
-                            isPaying ? "bg-gray-400 text-white cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"
+                            isPaying
+                              ? "bg-gray-400 text-white cursor-not-allowed"
+                              : "bg-rose-600 text-white hover:bg-rose-700"
                           } mb-4`}
                         >
                           {isPaying ? (
                             <>
-                              <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Processing...
+                              <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
+                              Processing...
                             </>
                           ) : (
                             <>
@@ -2432,45 +2596,55 @@ const MyBooking = () => {
                   <div className="bg-rose-50 rounded-xl p-4 mb-6">
                     <div className="flex items-center">
                       <XCircle className="w-5 h-5 text-rose-600 mr-2" />
-                      <h3 className="text-lg font-semibold text-rose-700">Booking Cancelled</h3>
+                      <h3 className="text-lg font-semibold text-rose-700">
+                        Booking Cancelled
+                      </h3>
                     </div>
-                    <p className="text-gray-600 mt-2">This booking has been cancelled and no payment is required.</p>
+                    <p className="text-gray-600 mt-2">
+                      This booking has been cancelled and no payment is
+                      required.
+                    </p>
                   </div>
                 )}
                 <div className="space-y-3 mt-auto">
-                  {selectedBooking.bookingId !== 1 && selectedBooking.status === "PENDING" && (
-                    <button
-                      onClick={() => {
-                        handleCancelBooking(selectedBooking.bookingId);
-                        closePopup();
-                      }}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200"
-                    >
-                      <XCircle className="w-4 h-4 mr-2" /> Cancel Booking
-                    </button>
-                  )}
-                  {selectedBooking.bookingId !== 1 && selectedBooking.status === "CONFIRMED" && !selectedBooking.checkInTime && (
-                    <button
-                      onClick={() => {
-                        handleCheckIn(selectedBooking.bookingId);
-                        closePopup();
-                      }}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" /> Check-in
-                    </button>
-                  )}
-                  {selectedBooking.bookingId !== 1 && selectedBooking.status === "IN_PROGRESS" && !selectedBooking.checkOutTime && (
-                    <button
-                      onClick={() => {
-                        handleCheckOut(selectedBooking.bookingId);
-                        closePopup();
-                      }}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" /> Check-out
-                    </button>
-                  )}
+                  {selectedBooking.bookingId !== 1 &&
+                    selectedBooking.status === "PENDING" && (
+                      <button
+                        onClick={() => {
+                          handleCancelBooking(selectedBooking.bookingId);
+                          closePopup();
+                        }}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-rose-100 text-rose-700 rounded-lg hover:bg-rose-200"
+                      >
+                        <XCircle className="w-4 h-4 mr-2" /> Cancel Booking
+                      </button>
+                    )}
+                  {selectedBooking.bookingId !== 1 &&
+                    selectedBooking.status === "CONFIRMED" &&
+                    !selectedBooking.checkInTime && (
+                      <button
+                        onClick={() => {
+                          handleCheckIn(selectedBooking.bookingId);
+                          closePopup();
+                        }}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" /> Check-in
+                      </button>
+                    )}
+                  {selectedBooking.bookingId !== 1 &&
+                    selectedBooking.status === "IN_PROGRESS" &&
+                    !selectedBooking.checkOutTime && (
+                      <button
+                        onClick={() => {
+                          handleCheckOut(selectedBooking.bookingId);
+                          closePopup();
+                        }}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" /> Check-out
+                      </button>
+                    )}
                   <button
                     onClick={closePopup}
                     className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"

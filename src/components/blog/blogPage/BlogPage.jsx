@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  Search,
+  Calendar,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import axios from "axios";
 
 const BlogPage = () => {
@@ -22,7 +29,7 @@ const BlogPage = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/blogs",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/blogs",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -38,9 +45,13 @@ const BlogPage = () => {
             title: blog.title,
             content: blog.content,
             excerpt:
-              blog.content.length > 150 ? blog.content.substring(0, 150) + "..." : blog.content,
+              blog.content.length > 150
+                ? blog.content.substring(0, 150) + "..."
+                : blog.content,
             author: blog.author?.name || "Unknown Author",
-            authorImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author?.name || "Unknown")}&background=A10550&color=fff`,
+            authorImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              blog.author?.name || "Unknown"
+            )}&background=A10550&color=fff`,
             date: new Date(blog.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -50,13 +61,26 @@ const BlogPage = () => {
               blog.images && blog.images.length > 0
                 ? blog.images[0].url
                 : "/placeholder.svg?height=400&width=600",
-            category: blog.category || ["Skincare", "Beauty Tips", "Wellness", "Treatments", "Lifestyle"][Math.floor(Math.random() * 5)],
-            readTime: `${Math.max(Math.ceil(blog.content.length / 1000), 1)} min read`,
+            category:
+              blog.category ||
+              [
+                "Skincare",
+                "Beauty Tips",
+                "Wellness",
+                "Treatments",
+                "Lifestyle",
+              ][Math.floor(Math.random() * 5)],
+            readTime: `${Math.max(
+              Math.ceil(blog.content.length / 1000),
+              1
+            )} min read`,
           }));
           setBlogs(formattedBlogs);
           setFilteredBlogs(formattedBlogs);
         } else {
-          throw new Error("Invalid response format: Expected an array of blogs");
+          throw new Error(
+            "Invalid response format: Expected an array of blogs"
+          );
         }
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -66,11 +90,16 @@ const BlogPage = () => {
           if (error.response.status === 404) {
             setError("No blogs found.");
           } else {
-            setError(error.response.data.message || "Failed to load blogs. Please try again.");
+            setError(
+              error.response.data.message ||
+                "Failed to load blogs. Please try again."
+            );
           }
         } else if (error.request) {
           console.log("No response received:", error.request);
-          setError("Unable to connect to server. CORS issue or server error. Please try again.");
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
           setError(error.message || "Failed to load blogs. Please try again.");
         }
@@ -113,7 +142,8 @@ const BlogPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const getFeaturedPost = () => (filteredBlogs.length > 0 ? filteredBlogs[0] : null);
+  const getFeaturedPost = () =>
+    filteredBlogs.length > 0 ? filteredBlogs[0] : null;
 
   const featuredPost = getFeaturedPost();
 
@@ -179,7 +209,8 @@ const BlogPage = () => {
                 Beauty & Wellness Blog
               </h1>
               <p className="text-xl text-pink-100 max-w-2xl">
-                Discover the latest skincare tips, beauty trends, and wellness advice from our experts
+                Discover the latest skincare tips, beauty trends, and wellness
+                advice from our experts
               </p>
             </div>
             <div className="w-full md:w-auto">
@@ -191,7 +222,10 @@ const BlogPage = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full md:w-80 px-4 py-3 pl-12 rounded-full bg-white/20 backdrop-blur-sm text-white placeholder-pink-200 border border-pink-300/30 focus:outline-none focus:ring-2 focus:ring-white/50"
                 />
-                <Search className="absolute left-4 top-3.5 text-pink-200" size={18} />
+                <Search
+                  className="absolute left-4 top-3.5 text-pink-200"
+                  size={18}
+                />
               </div>
             </div>
           </div>
@@ -222,8 +256,13 @@ const BlogPage = () => {
       <main className="max-w-[1920px] w-full h-auto mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-16 w-full h-auto">
-            <h2 className="text-2xl font-bold text-gray-700 mb-4">No articles found</h2>
-            <p className="text-gray-500 mb-8">Try adjusting your search or filter to find what you're looking for</p>
+            <h2 className="text-2xl font-bold text-gray-700 mb-4">
+              No articles found
+            </h2>
+            <p className="text-gray-500 mb-8">
+              Try adjusting your search or filter to find what you're looking
+              for
+            </p>
             <button
               onClick={() => {
                 setSearchTerm("");
@@ -239,8 +278,13 @@ const BlogPage = () => {
             {/* Featured Post */}
             {featuredPost && currentPage === 1 && (
               <div className="mb-16 w-full h-auto">
-                <h2 className="text-2xl font-bold text-gray-800 mb-8">Featured Article</h2>
-                <Link to={`/blog/${featuredPost.id}`} className="block w-full h-auto">
+                <h2 className="text-2xl font-bold text-gray-800 mb-8">
+                  Featured Article
+                </h2>
+                <Link
+                  to={`/blog/${featuredPost.id}`}
+                  className="block w-full h-auto"
+                >
                   <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 w-full h-auto">
                     <div className="md:flex">
                       <div className="md:w-1/2 h-64 md:h-auto">
@@ -269,7 +313,9 @@ const BlogPage = () => {
                             className="w-10 h-10 rounded-full mr-4"
                           />
                           <div>
-                            <p className="font-medium text-gray-900">{featuredPost.author}</p>
+                            <p className="font-medium text-gray-900">
+                              {featuredPost.author}
+                            </p>
                             <div className="flex items-center text-sm text-gray-500">
                               <Calendar size={14} className="mr-1" />
                               <span className="mr-3">{featuredPost.date}</span>
@@ -291,49 +337,52 @@ const BlogPage = () => {
                 {selectedCategory === "All" ? "All Articles" : selectedCategory}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {currentPosts.map((post, index) =>
-                  index > 0 && (
-                    <Link
-                      key={post.id}
-                      to={`/blog/${post.id}`}
-                      className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full w-full"
-                    >
-                      <div className="relative h-48 w-full overflow-hidden">
-                        <img
-                          src={post.image || "/placeholder.svg"}
-                          alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="absolute top-4 left-4">
-                          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm text-[#A10550]">
-                            {post.category}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-6 flex-grow flex flex-col w-full h-auto">
-                        <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#A10550] transition-colors">
-                          {post.title}
-                        </h3>
-                        <p className="text-gray-600 mb-6 line-clamp-3 flex-grow">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex items-center mt-auto">
+                {currentPosts.map(
+                  (post, index) =>
+                    index > 0 && (
+                      <Link
+                        key={post.id}
+                        to={`/blog/${post.id}`}
+                        className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full w-full"
+                      >
+                        <div className="relative h-48 w-full overflow-hidden">
                           <img
-                            src={post.authorImage || "/placeholder.svg"}
-                            alt={post.author}
-                            className="w-8 h-8 rounded-full mr-3"
+                            src={post.image || "/placeholder.svg"}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                           />
-                          <div>
-                            <p className="font-medium text-gray-900 text-sm">{post.author}</p>
-                            <div className="flex items-center text-xs text-gray-500">
-                              <Calendar size={12} className="mr-1" />
-                              <span>{post.date}</span>
+                          <div className="absolute top-4 left-4">
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm text-[#A10550]">
+                              {post.category}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-6 flex-grow flex flex-col w-full h-auto">
+                          <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#A10550] transition-colors">
+                            {post.title}
+                          </h3>
+                          <p className="text-gray-600 mb-6 line-clamp-3 flex-grow">
+                            {post.excerpt}
+                          </p>
+                          <div className="flex items-center mt-auto">
+                            <img
+                              src={post.authorImage || "/placeholder.svg"}
+                              alt={post.author}
+                              className="w-8 h-8 rounded-full mr-3"
+                            />
+                            <div>
+                              <p className="font-medium text-gray-900 text-sm">
+                                {post.author}
+                              </p>
+                              <div className="flex items-center text-xs text-gray-500">
+                                <Calendar size={12} className="mr-1" />
+                                <span>{post.date}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
-                  )
+                      </Link>
+                    )
                 )}
               </div>
             </div>
@@ -350,44 +399,50 @@ const BlogPage = () => {
                     <ChevronLeft size={20} />
                   </button>
                   <div className="flex space-x-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => {
-                      if (
-                        number === 1 ||
-                        number === totalPages ||
-                        (number >= currentPage - 1 && number <= currentPage + 1)
-                      ) {
-                        return (
-                          <button
-                            key={number}
-                            onClick={() => paginate(number)}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                              currentPage === number
-                                ? "bg-[#A10550] text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                            }`}
-                          >
-                            {number}
-                          </button>
-                        );
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (number) => {
+                        if (
+                          number === 1 ||
+                          number === totalPages ||
+                          (number >= currentPage - 1 &&
+                            number <= currentPage + 1)
+                        ) {
+                          return (
+                            <button
+                              key={number}
+                              onClick={() => paginate(number)}
+                              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                                currentPage === number
+                                  ? "bg-[#A10550] text-white"
+                                  : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                              }`}
+                            >
+                              {number}
+                            </button>
+                          );
+                        }
+                        if (
+                          (number === 2 && currentPage > 3) ||
+                          (number === totalPages - 1 &&
+                            currentPage < totalPages - 2)
+                        ) {
+                          return (
+                            <span
+                              key={number}
+                              className="w-10 h-10 flex items-center justify-center text-gray-500"
+                            >
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
                       }
-                      if (
-                        (number === 2 && currentPage > 3) ||
-                        (number === totalPages - 1 && currentPage < totalPages - 2)
-                      ) {
-                        return (
-                          <span
-                            key={number}
-                            className="w-10 h-10 flex items-center justify-center text-gray-500"
-                          >
-                            ...
-                          </span>
-                        );
-                      }
-                      return null;
-                    })}
+                    )}
                   </div>
                   <button
-                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                    onClick={() =>
+                      paginate(Math.min(totalPages, currentPage + 1))
+                    }
                     disabled={currentPage === totalPages}
                     className="p-2 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -405,7 +460,8 @@ const BlogPage = () => {
         <div className="max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
           <p className="text-pink-100 mb-8 max-w-2xl mx-auto">
-            Subscribe to our newsletter for exclusive skincare tips, special offers, and the latest beauty trends
+            Subscribe to our newsletter for exclusive skincare tips, special
+            offers, and the latest beauty trends
           </p>
           <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input

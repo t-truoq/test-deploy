@@ -1,21 +1,53 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import EditServiceModal from "./EditService";
+import axios from "axios"; // Dùng axios trực tiếp thay vì api.js
+
+const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/services";
 
 const ServiceRow = ({ service, onEditService, onDeleteService }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleDelete = async () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found. Please login again.");
+        }
+
+        await axios.delete(`${BASE_URL}/${service.serviceId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+        });
+
+        onDeleteService(service.serviceId);
+      } catch (err) {
+        setError("Không thể xóa dịch vụ. Vui lòng kiểm tra lại.");
+        console.error(err);
+        if (err.response) {
+          console.error("Response error:", err.response.data);
+        }
+      }
+    }
+  };
 
   return (
     <tr>
       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-        {service.id}
+        {service.serviceId}
       </td>
       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
         {service.name}
       </td>
       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
         <img
-          src={service.imageUrl || "/placeholder.svg"}
+          src={
+            service.images?.[0]?.url || service.imageUrl || "/placeholder.svg"
+          } // Sửa để dùng imageUrl nếu không có images
           alt={service.name}
           className="h-10 w-10 rounded-full object-cover"
         />
@@ -26,17 +58,6 @@ const ServiceRow = ({ service, onEditService, onDeleteService }) => {
       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
         {service.duration} min
       </td>
-      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-        <span
-          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-            service.status === "Active"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {service.status}
-        </span>
-      </td>
       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
         <button
           onClick={() => setIsEditModalOpen(true)}
@@ -45,11 +66,12 @@ const ServiceRow = ({ service, onEditService, onDeleteService }) => {
           Edit
         </button>
         <button
-          onClick={() => onDeleteService(service.id)}
+          onClick={handleDelete}
           className="text-red-600 hover:text-red-800"
         >
           Delete
         </button>
+        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
       </td>
 
       {isEditModalOpen && (
@@ -65,12 +87,14 @@ const ServiceRow = ({ service, onEditService, onDeleteService }) => {
 
 ServiceRow.propTypes = {
   service: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    serviceId: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    price: PropTypes.string.isRequired,
-    duration: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired,
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    duration: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    images: PropTypes.arrayOf(PropTypes.shape({ url: PropTypes.string })),
+    imageUrl: PropTypes.string, // Thêm propTypes cho imageUrl
+    recommendedSkinTypes: PropTypes.arrayOf(PropTypes.string), // Thêm cho đồng bộ
   }).isRequired,
   onEditService: PropTypes.func.isRequired,
   onDeleteService: PropTypes.func.isRequired,

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Thêm useNavigate
 import {
   Bell,
   ChevronDown,
@@ -17,23 +18,41 @@ import {
 export function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const navigate = useNavigate(); // Hook để điều hướng
 
-  const closeDropdowns = (e) => {
-    if (!e.target.closest(".dropdown-toggle")) {
-      setIsDropdownOpen(false);
-      setIsNotificationOpen(false);
+  // Xử lý click ngoài để đóng dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".dropdown-toggle")) {
+        setIsDropdownOpen(false);
+        setIsNotificationOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Hàm xử lý logout
+  const handleLogout = () => {
+    // Xóa token và thông tin người dùng khỏi localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Điều hướng về trang home chưa đăng nhập
+    navigate("/");
+  };
+
+  // Hàm điều hướng
+  const handleNavigation = (path) => {
+    if (path === "/logout") {
+      handleLogout(); // Gọi hàm logout nếu path là /logout
+    } else {
+      navigate(path); // Điều hướng bằng react-router-dom cho các path khác
     }
   };
 
-  const handleNavigation = (path) => {
-    window.location.href = path;
-  };
-
   return (
-    <header
-      className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2"
-      onClick={closeDropdowns}
-    >
+    <header className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2">
       {/* Notifications and Profile */}
       <div className="flex items-center gap-6">
         <div className="relative">
@@ -149,11 +168,17 @@ export function Header() {
                 <KeyRound className="h-4 w-4 text-blue-500" />
                 Change Password
               </button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <button
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                onClick={() => handleNavigation("/activity-log")}
+              >
                 <History className="h-4 w-4 text-blue-500" />
                 Activity Log
               </button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <button
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                onClick={() => handleNavigation("/logout")} // Gọi hàm điều hướng với /logout
+              >
                 <LogOut className="h-4 w-4 text-blue-500" />
                 Log out
               </button>

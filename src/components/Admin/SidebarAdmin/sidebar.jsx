@@ -1,3 +1,5 @@
+"use client";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -34,7 +36,11 @@ export default function Sidebar() {
   const pages = [
     { name: "Calendar", icon: Calendar, path: "/admin/calendar" },
     { name: "Contact", icon: Contact, path: "/admin/contact" },
-    { name: "Invoice", icon: FileText, path: "/admin/invoice" },
+    {
+      name: "Payment Management",
+      icon: FileText,
+      path: "/admin/paymentmanagement",
+    },
     { name: "Logout", icon: LogOut, onClick: handleLogout },
   ];
 
@@ -86,11 +92,9 @@ export default function Sidebar() {
               <button
                 key={item.name}
                 onClick={item.onClick}
-                className={`sidebar-link w-full text-left ${
-                  location.pathname === item.path ? "active" : ""
-                }`}
+                className={`flex items-center w-full p-2 text-sm rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-pink-100 hover:text-pink-700 hover:scale-105 group`}
               >
-                <Icon className="sidebar-icon" />
+                <Icon className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out group-hover:rotate-10" />
                 {item.name}
               </button>
             ) : (
@@ -103,7 +107,7 @@ export default function Sidebar() {
                     : "text-gray-600"
                 }`}
               >
-                <Icon className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out group-hover:rotate-10" />
+                <Icon className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out hover:rotate-10" />
                 {item.name}
               </Link>
             );

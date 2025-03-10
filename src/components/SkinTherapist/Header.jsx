@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Thêm useNavigate
+import { useNavigate } from "react-router-dom";
 import {
   Bell,
   ChevronDown,
@@ -18,7 +18,7 @@ import {
 export function SKHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const navigate = useNavigate(); // Hook để điều hướng
+  const navigate = useNavigate();
 
   // Xử lý click ngoài để đóng dropdown
   useEffect(() => {
@@ -32,9 +32,23 @@ export function SKHeader() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  // Hàm điều hướng
+  // Hàm xử lý logout
+  const handleLogout = () => {
+    // Xóa token và thông tin người dùng khỏi localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Điều hướng về trang home chưa đăng nhập (ví dụ: "/")
+    navigate("/");
+  };
+
+  // Hàm điều hướng cho các mục khác
   const handleNavigation = (path) => {
-    navigate(path); // Điều hướng bằng react-router-dom
+    if (path === "/logout") {
+      handleLogout(); // Gọi hàm logout nếu path là /logout
+    } else {
+      navigate(path); // Điều hướng bình thường cho các path khác
+    }
   };
 
   return (

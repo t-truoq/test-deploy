@@ -1,91 +1,167 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/bookings";
 
 export default function OrderlistAdmin() {
-  const [orders] = useState([
-    {
-      id: "00001",
-      name: "Christine Brooks",
-      therapist: "Kutch Green Apt",
-      date: "04 Sep 2019",
-      detail: "clear start back treatment",
-      status: "Completed",
-    },
-    {
-      id: "00002",
-      name: "Rosie Pearson",
-      therapist: "Immanuel Ferry",
-      date: "28 May 2019",
-      detail: "clear start back treatment",
-      status: "Processing",
-    },
-    {
-      id: "00003",
-      name: "Darrell Caldwell",
-      therapist: "Frida Ports",
-      date: "23 Nov 2019",
-      detail: "clear start back treatment",
-      status: "Rejected",
-    },
-    {
-      id: "00004",
-      name: "Gilbert Johnston",
-      therapist: "Destiny Lake Suite",
-      date: "05 Feb 2019",
-      detail: "clear start back treatment",
-      status: "Completed",
-    },
-    {
-      id: "00005",
-      name: "Alan Cain",
-      therapist: "Mylene Throughway",
-      date: "29 Jul 2019",
-      detail: "clear start back treatment",
-      status: "Processing",
-    },
-    {
-      id: "00006",
-      name: "Alfred Murray",
-      therapist: "Weimann Mountain",
-      date: "15 Aug 2019",
-      detail: "clear start back treatment",
-      status: "Completed",
-    },
-    {
-      id: "00007",
-      name: "Maggie Sullivan",
-      therapist: "New Scottsberg",
-      date: "21 Dec 2019",
-      detail: "pro clear skin treatment",
-      status: "Processing",
-    },
-    {
-      id: "00008",
-      name: "Rosie Todd",
-      therapist: "New Jon",
-      date: "30 Apr 2019",
-      detail: "pro clear skin treatment",
-      status: "On Hold",
-    },
-    {
-      id: "00009",
-      name: "Dollie Hines",
-      therapist: "Lyla Forge Suite",
-      date: "09 Jan 2019",
-      detail: "pro clear skin treatment",
-      status: "In Transit",
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [hasFetched, setHasFetched] = useState(false);
+
+  // State cho các bộ lọc
+  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [therapistFilter, setTherapistFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+
+  useEffect(() => {
+    if (hasFetched) return;
+
+    const fetchAllBookings = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found. Please login again.");
+        }
+
+        const response = await axios.get(BASE_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          maxRedirects: 5,
+        });
+
+        console.log("API Response:", response.data);
+
+        if (Array.isArray(response.data)) {
+          const formattedData = response.data.map((booking) => ({
+            id: booking.bookingId.toString(),
+            name: `Customer ${booking.customerId}`,
+            therapist: `Specialist ${booking.specialistId}`,
+            date: booking.bookingDate,
+            detail: booking.serviceNames
+              ? booking.serviceNames.join(", ")
+              : "N/A",
+            status: booking.status
+              .replace("_", " ")
+              .toLowerCase()
+              .replace(/\b\w/g, (c) => c.toUpperCase()), // Chuẩn hóa: "in_progress" -> "In Progress", "check_in" -> "Check In"
+          }));
+          setOrders(formattedData);
+          setFilteredOrders(formattedData);
+          console.log("Formatted Orders:", formattedData); // Kiểm tra trạng thái sau khi chuẩn hóa
+        } else {
+          throw new Error("Bookings data is not an array");
+        }
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        if (error.response) {
+          if (error.response.status === 302) {
+            setError(
+              "Redirect detected. Please check authentication or server configuration."
+            );
+          } else if (error.response.status === 401) {
+            setError("Unauthorized: Please login again.");
+          } else if (error.response.status === 404) {
+            setError("No bookings found.");
+          } else {
+            setError(error.response.data.message || "Failed to load bookings.");
+          }
+        } else if (error.request) {
+          setError("Unable to connect to server. Please try again.");
+        } else {
+          setError(error.message || "Failed to load bookings.");
+        }
+      } finally {
+        setLoading(false);
+        setHasFetched(true);
+      }
+    };
+
+    fetchAllBookings();
+  }, [hasFetched]);
+
+  // Hàm lọc dữ liệu dựa trên các bộ lọc
+  useEffect(() => {
+    let result = [...orders];
+
+    if (statusFilter && statusFilter !== "All Status") {
+      result = result.filter(
+        (order) => order.status.toLowerCase() === statusFilter.toLowerCase()
+      );
+    }
+
+    if (therapistFilter) {
+      result = result.filter((order) =>
+        order.therapist.toLowerCase().includes(therapistFilter.toLowerCase())
+      );
+    }
+
+    if (dateFilter) {
+      result = result.filter((order) => order.date.includes(dateFilter));
+    }
+
+    setFilteredOrders(result);
+  }, [statusFilter, therapistFilter, dateFilter, orders]);
 
   const getStatusColor = (status) => {
     const colors = {
-      Completed: "bg-emerald-100 text-emerald-800",
-      Processing: "bg-purple-100 text-purple-800",
-      Rejected: "bg-red-100 text-red-800",
-      "On Hold": "bg-orange-100 text-orange-800",
-      "In Transit": "bg-pink-100 text-pink-800",
+      Pending: "bg-yellow-100 border border-yellow-500 text-yellow-900", // Màu vàng nhạt với viền vàng
+      Confirm: "bg-green-100 border border-green-500 text-green-900", // Màu xanh lá nhạt với viền xanh lá
+      "In Progress": "bg-blue-100 border border-blue-500 text-blue-900", // Màu xanh dương nhạt với viền xanh dương
+      Completed: "bg-purple-100 border border-purple-500 text-purple-900", // Màu tím nhạt với viền tím
+      Cancel: "bg-red-100 border border-red-500 text-red-900", // Màu đỏ nhạt với viền đỏ
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-gray-100 border border-gray-300 text-gray-800"; // Mặc định nếu không khớp
   };
+
+  // Reset bộ lọc
+  const resetFilters = () => {
+    setStatusFilter("All Status");
+    setTherapistFilter("");
+    setDateFilter("");
+    setFilteredOrders(orders);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Loading bookings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-200">
+          <div className="w-20 h-20 mx-auto mb-6 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-3-3v6m-9 3h18a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <p className="text-gray-600 mb-8 text-lg">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -106,25 +182,41 @@ export default function OrderlistAdmin() {
               Filter By
             </button>
 
-            <select className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500">
-              <option>Newest</option>
-              <option>Oldest</option>
+            {/* Bộ lọc Status */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+            >
+              <option value="All Status">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirm">Confirm</option>
+              <option value="In Progress">In progress</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancel">Cancel</option>
             </select>
 
-            <select className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500">
-              <option>Clear Start</option>
-              <option>Pro Clear</option>
-            </select>
+            {/* Bộ lọc Skin Therapist */}
+            <input
+              type="text"
+              placeholder="Filter by Skin Therapist"
+              value={therapistFilter}
+              onChange={(e) => setTherapistFilter(e.target.value)}
+              className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
 
-            <select className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500">
-              <option>Completed</option>
-              <option>Processing</option>
-              <option>Rejected</option>
-              <option>On Hold</option>
-              <option>In Transit</option>
-            </select>
+            {/* Bộ lọc Date */}
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
 
-            <button className="px-3 py-2 text-sm text-rose-600 hover:text-rose-700">
+            <button
+              onClick={resetFilters}
+              className="px-3 py-2 text-sm text-rose-600 hover:text-rose-700"
+            >
               Reset Filter
             </button>
           </div>
@@ -156,7 +248,7 @@ export default function OrderlistAdmin() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {order.id}
@@ -180,6 +272,8 @@ export default function OrderlistAdmin() {
                       )}`}
                     >
                       {order.status}
+                      {console.log("Status:", order.status)}{" "}
+                      {/* Kiểm tra giá trị status */}
                     </span>
                   </td>
                 </tr>

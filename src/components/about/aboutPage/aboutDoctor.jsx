@@ -51,10 +51,15 @@ const AboutDoctor = () => {
   // Hàm bổ sung dữ liệu thiếu
   const fillMissingData = (specialist) => ({
     name: specialist.name || "Unnamed Specialist",
-    role: specialist.role === "ADMIN" ? "Skincare Expert" : specialist.role || "Specialist",
+    role:
+      specialist.role === "ADMIN"
+        ? "Skincare Expert"
+        : specialist.role || "Specialist",
     image: specialist.image || "/placeholder.svg", // Giả định ảnh nếu API không cung cấp
-    description: specialist.description || "Expert in skincare and beauty treatments.",
-    experience: specialist.experience || `${Math.floor(Math.random() * 10) + 5} years`, // Giả định kinh nghiệm
+    description:
+      specialist.description || "Expert in skincare and beauty treatments.",
+    experience:
+      specialist.experience || `${Math.floor(Math.random() * 10) + 5} years`, // Giả định kinh nghiệm
     quote: specialist.quote || "Committed to enhancing your natural beauty.",
   });
 
@@ -62,7 +67,7 @@ const AboutDoctor = () => {
     const fetchSpecialists = async () => {
       try {
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               "ngrok-skip-browser-warning": "true", // Bỏ qua cảnh báo trình duyệt của ngrok
@@ -78,12 +83,16 @@ const AboutDoctor = () => {
             .slice(0, 4); // Giới hạn 4 bác sĩ
           setSpecialists(filledData);
         } else {
-          throw new Error("Invalid response format: Expected an array of specialists");
+          throw new Error(
+            "Invalid response format: Expected an array of specialists"
+          );
         }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching specialists:", error);
-        setError(error.message || "Failed to load specialists. Please try again.");
+        setError(
+          error.message || "Failed to load specialists. Please try again."
+        );
         setSpecialists([]);
         setLoading(false);
       }
@@ -108,7 +117,8 @@ const AboutDoctor = () => {
             Meet Beautya's Skincare Experts
           </h2>
           <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto">
-            Beautiful skin doesn't just require good products; it also needs expert hands with extensive experience.
+            Beautiful skin doesn't just require good products; it also needs
+            expert hands with extensive experience.
           </p>
         </div>
 
@@ -130,12 +140,20 @@ const AboutDoctor = () => {
                   <h3 className="text-xl md:text-2xl lg:text-3xl font-medium text-gray-800">
                     {doctor.name}
                   </h3>
-                  <p className="text-gray-600 text-base md:text-lg">{doctor.role}</p>
+                  <p className="text-gray-600 text-base md:text-lg">
+                    {doctor.role}
+                  </p>
                 </div>
               </div>
-              <p className="text-gray-600 text-base md:text-lg">{doctor.description}</p>
-              <p className="text-sm md:text-base text-gray-500">Experience: {doctor.experience}</p>
-              <p className="italic text-gray-600 text-base md:text-lg">"{doctor.quote}"</p>
+              <p className="text-gray-600 text-base md:text-lg">
+                {doctor.description}
+              </p>
+              <p className="text-sm md:text-base text-gray-500">
+                Experience: {doctor.experience}
+              </p>
+              <p className="italic text-gray-600 text-base md:text-lg">
+                "{doctor.quote}"
+              </p>
             </div>
           ))}
         </div>

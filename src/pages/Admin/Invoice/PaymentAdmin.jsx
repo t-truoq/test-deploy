@@ -1,8 +1,8 @@
-import Invoice from "../../../components/Admin/InvoiceAdmin/Invoice";
 import Header from "../../../components/Admin/HeaderAdmin/Header";
+import Payment from "../../../components/Admin/PaymentManagement/PaymentManagement";
 import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
 
-const InvoiceAdmin = () => {
+const PaymentManagement = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="sticky top-0 h-screen">
@@ -18,13 +18,15 @@ const InvoiceAdmin = () => {
 
         <main className="p-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-900">Invoice</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Payment Management
+            </h1>
           </div>
-          <Invoice />
+          <Payment />
         </main>
       </div>
     </div>
   );
 };
 
-export default InvoiceAdmin;
+export default PaymentManagement;

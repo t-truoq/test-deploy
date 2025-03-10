@@ -193,7 +193,7 @@ export default function SignUp() {
 
       // Gửi yêu cầu POST tới API để đăng ký
       const response = await axios.post(
-        "https://af95-118-69-182-149.ngrok-free.app/api/users",
+        "https://f23c-118-69-182-149.ngrok-free.app/api/users",
         signupData,
         {
           headers: {
