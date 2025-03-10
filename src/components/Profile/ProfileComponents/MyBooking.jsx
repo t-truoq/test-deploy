@@ -71,7 +71,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
+//           "https://af95-118-69-182-149.ngrok-free.app/api/bookings/user",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -132,7 +132,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+//           "https://af95-118-69-182-149.ngrok-free.app/api/users/specialists/active",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -247,7 +247,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+//         "https://af95-118-69-182-149.ngrok-free.app/api/bookings",
 //         bookingData,
 //         {
 //           headers: {
@@ -350,7 +350,7 @@
 //       }
 
 //       await axios.post(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
 //         {},
 //         {
 //           headers: {
@@ -397,7 +397,7 @@
 //       }
 
 //       await axios.post(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
 //         {},
 //         {
 //           headers: {
@@ -444,7 +444,7 @@
 //       }
 
 //       await axios.post(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
 //         {},
 //         {
 //           headers: {
@@ -484,13 +484,13 @@
 //         setTimeout(() => navigate("/login"), 2000);
 //         return null;
 //       }
-  
+
 //       const booking = bookings.find((b) => b.bookingId === bookingId);
 //       if (!booking) {
 //         setErrorPopup("Booking not found.");
 //         return null;
 //       }
-  
+
 //       // Mock data for default booking
 //       if (bookingId === 1) {
 //         return {
@@ -501,10 +501,10 @@
 //           totalPrice: 50.0,
 //         };
 //       }
-  
+
 //       // Fetch details from API
 //       const response = await axios.get(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+//         `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
 //         {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
@@ -513,17 +513,17 @@
 //           },
 //         }
 //       );
-  
+
 //       const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
 //       console.log("Full booking data from API:", JSON.stringify(bookingData, null, 2));
-  
+
 //       // Fallback duration map for known services
 //       const serviceDurationMap = {
 //         "Lấy Nhân Mụn Chuẩn Y Khoa": 45, // Assuming 45 minutes
 //         "Exo Booster": 30, // Assuming 30 minutes
 //         // Add more services as needed
 //       };
-  
+
 //       // Map services data with enhanced duration handling
 //       let services = [];
 //       if (bookingData.services && Array.isArray(bookingData.services)) {
@@ -560,32 +560,32 @@
 //         console.warn("No services or serviceNames found in bookingData:", JSON.stringify(bookingData, null, 2));
 //         services = [];
 //       }
-  
+
 //       // Log services array for debugging
 //       console.log("Mapped services array:", services);
-  
+
 //       // Find specialist based on specialistId from fetched specialists list
 //       const specialistId = bookingData.specialistId || booking.specialistId || null;
 //       const specialistFromList = specialists.find((spec) => spec.userId === specialistId);
-  
+
 //       const specialist = specialistFromList || {
 //         name: bookingData.specialistName || "Not assigned",
 //         userId: specialistId || 0,
 //         specialization: bookingData.specialization || "Skin Therapist",
 //       };
-  
+
 //       console.log("Specialist ID from booking:", specialistId);
 //       console.log("Found specialist from list:", specialistFromList);
-  
+
 //       // Calculate totalDuration with validation
 //       const totalDuration = services.reduce((sum, service) => {
 //         const duration = Number.isFinite(Number(service.duration)) ? Number(service.duration) : 0;
 //         console.log(`Adding duration: ${duration} (from service ${service.name})`);
 //         return sum + duration;
 //       }, 0);
-  
+
 //       console.log("Calculated totalDuration:", totalDuration);
-  
+
 //       return {
 //         ...booking,
 //         services,
@@ -645,7 +645,7 @@
 //       console.log("Payment data to be sent:", paymentData);
 
 //       const response = await axios.post(
-//         "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+//         "https://af95-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
 //         paymentData,
 //         {
 //           headers: {
@@ -1239,7 +1239,6 @@
 
 // export default MyBooking;
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -1313,7 +1312,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
+          "https://af95-118-69-182-149.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1374,7 +1373,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+          "https://af95-118-69-182-149.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1457,39 +1456,39 @@ const MyBooking = () => {
       setErrorPopup("Please select a booking date and start time.");
       return;
     }
-
+  
     if (isBooking) {
       setErrorPopup("Booking in progress... Please wait.");
       return;
     }
-
+  
     const token = localStorage.getItem("token");
     if (!token) {
       setErrorPopup("No token found. Please login again.");
       setTimeout(() => navigate("/login"), 2000);
       return;
     }
-
+  
     if (checkBookingConflict(bookingDate, startTime, selectedServices)) {
       setErrorPopup("You already have a booking at this time.");
       return;
     }
-
+  
     const bookingData = {
       specialistId: selectedSpecialist ? Number(selectedSpecialist) : null,
       bookingDate,
       startTime,
       serviceIds: selectedServices.map((service) => Number(service.serviceId)),
     };
-
+  
     console.log("Booking data to be sent:", bookingData);
-
+  
     setIsBooking(true);
     setErrorPopup("");
-
+  
     try {
       const response = await axios.post(
-        "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+        "https://af95-118-69-182-149.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -1499,18 +1498,29 @@ const MyBooking = () => {
           },
         }
       );
-
+  
       console.log("Booking response:", response.data);
-
+      const newBookingId = response.data.bookingId; // Đảm bảo API trả về bookingId
+  
+      // Log và lưu selectedServices vào localStorage
+      console.log("Saving selectedServices to localStorage:", selectedServices);
+      const storedServicesKey = `selectedServicesForBooking_${newBookingId}`;
+      localStorage.setItem(storedServicesKey, JSON.stringify(selectedServices));
+      console.log(`Saved to localStorage with key ${storedServicesKey}`);
+  
+      // Xác nhận dữ liệu đã lưu
+      const savedData = localStorage.getItem(storedServicesKey);
+      console.log(`Verified saved data: ${savedData}`);
+  
       setConfirmedBooking({
         services: [...selectedServices],
         bookingDate,
         startTime,
         totalPrice: selectedServices.reduce((sum, service) => sum + service.price, 0),
       });
-
+  
       setSelectedServices([]);
-      localStorage.removeItem("selectedServicesForBooking");
+      localStorage.removeItem("selectedServicesForBooking"); // Xóa key cũ
       setBookingDate("");
       setStartTime("");
       setSelectedSpecialist("");
@@ -1520,7 +1530,7 @@ const MyBooking = () => {
       console.error("Error creating booking:", error);
       const errorMessage = error.response?.data.message || "Failed to create booking. Please try again.";
       const errorCode = error.response?.data.errorCode;
-
+  
       switch (errorCode) {
         case "UNAUTHENTICATED":
           setErrorPopup("Unauthorized: Please login again.");
@@ -1561,69 +1571,6 @@ const MyBooking = () => {
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setErrorPopup("No token found. Please login again.");
-        setTimeout(() => navigate("/login"), 2000);
-        return;
-      }
-
-      const booking = bookings.find((b) => b.bookingId === bookingId);
-      if (!booking) {
-        setErrorPopup("Booking not found.");
-        return;
-      }
-
-      if (bookingId === 1) {
-        setErrorPopup("Cannot cancel the default booking.");
-        return;
-      }
-
-      const [startTime] = booking.timeSlot.split("-");
-      const bookingStartDateTime = new Date(`${booking.bookingDate}T${startTime}:00`);
-      const currentDateTime = new Date();
-      const timeDifference = (bookingStartDateTime - currentDateTime) / (1000 * 60 * 60);
-
-      if (timeDifference < 24) {
-        setErrorPopup("Cannot cancel booking less than 24 hours before start time.");
-        return;
-      }
-
-      await axios.post(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      setBookings((prevBookings) =>
-        prevBookings.map((b) => (b.bookingId === bookingId ? { ...b, status: "CANCELLED" } : b))
-      );
-      setRefresh((prev) => !prev);
-    } catch (error) {
-      console.error("Error canceling booking:", error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          setErrorPopup("Unauthorized: Please login again.");
-          setTimeout(() => navigate("/login"), 2000);
-        } else if (error.response.status === 403) {
-          setErrorPopup("You do not have permission to cancel this booking.");
-        } else {
-          setErrorPopup(error.response.data.message || "Failed to cancel booking. Please try again.");
-        }
-      } else {
-        setErrorPopup("Failed to cancel booking. Please try again.");
-      }
-    }
-  };
-
   const handleCheckIn = async (bookingId) => {
     try {
       const token = localStorage.getItem("token");
@@ -1639,7 +1586,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -1686,7 +1633,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -1746,7 +1693,7 @@ const MyBooking = () => {
   
       // Fetch details from API
       const response = await axios.get(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1759,61 +1706,106 @@ const MyBooking = () => {
       const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
       console.log("Full booking data from API:", JSON.stringify(bookingData, null, 2));
   
-      // Get stored services from localStorage to match duration
-      const storedServices = localStorage.getItem("selectedServicesForBooking");
+      // Get stored services from localStorage specific to this bookingId
+      const storedServicesKey = `selectedServicesForBooking_${bookingId}`;
+      const storedServices = localStorage.getItem(storedServicesKey);
+      console.log(`Stored services for booking ${bookingId} (key: ${storedServicesKey}):`, storedServices);
+  
       let storedServicesMap = new Map();
       if (storedServices) {
         try {
           const parsedServices = JSON.parse(storedServices);
           if (Array.isArray(parsedServices)) {
             parsedServices.forEach((service) => {
-              storedServicesMap.set(service.name, service.duration);
+              // Sử dụng tên dịch vụ mặc định
+              const serviceName = service.name;
+              storedServicesMap.set(serviceName, {
+                duration: Number(service.duration) || 0,
+                price: Number(service.price) || 0,
+              });
+              console.log(`Stored service: name=${serviceName}, duration=${service.duration}, price=${service.price}`);
             });
+          } else {
+            console.error("Parsed services is not an array:", parsedServices);
           }
         } catch (error) {
           console.error("Error parsing stored services:", error);
         }
+      } else {
+        console.warn(`No stored services found in localStorage for key: ${storedServicesKey}`);
       }
   
-      // Map services data with duration from API or stored services
+      // Map services data with duration and price from localStorage or API
       let services = [];
       if (bookingData.services && Array.isArray(bookingData.services)) {
         services = bookingData.services.map((service, index) => {
-          const durationFromAPI = service.duration != null ? Number(service.duration) : null;
-          const durationFromStored = storedServicesMap.get(service.name);
-          const duration = durationFromAPI ?? durationFromStored ?? 0; // Prioritize API, then stored, then default to 0
-          const price = service.price != null ? Number(service.price) : 0;
-          console.log(`Service ${index + 1}: name=${service.name}, duration=${duration}, price=${price}`);
+          const serviceName = service.name;
+          const storedService = storedServicesMap.get(serviceName);
+          const duration = storedService?.duration ?? (Number(service.duration) || 0);
+          const price = storedService?.price ?? (Number(service.price) || 0);
+          console.log(
+            `Service ${index + 1}: name=${serviceName}, duration=${duration}, price=${price}, storedService=${JSON.stringify(storedService)}`
+          );
           return {
             id: service.id || index + 1,
-            name: service.name || `Service #${index + 1}`,
+            name: serviceName || `Service #${index + 1}`,
             duration,
             price,
           };
         });
       } else if (bookingData.serviceNames && Array.isArray(bookingData.serviceNames)) {
         services = bookingData.serviceNames.map((name, index) => {
+          const serviceName = name;
+          const storedService = storedServicesMap.get(serviceName);
           const durationFromAPI =
-            bookingData.durations && Array.isArray(bookingData.durations) && bookingData.durations[index] != null
+            bookingData.durations &&
+            Array.isArray(bookingData.durations) &&
+            bookingData.durations[index] != null
               ? Number(bookingData.durations[index])
               : null;
-          const durationFromStored = storedServicesMap.get(name);
-          const duration = durationFromAPI ?? durationFromStored ?? 0; // Prioritize API, then stored, then default to 0
-          const price =
-            bookingData.servicePrices && Array.isArray(bookingData.servicePrices) && bookingData.servicePrices[index] != null
+          const duration = storedService?.duration ?? durationFromAPI ?? 0;
+          const priceFromAPI =
+            bookingData.servicePrices &&
+            Array.isArray(bookingData.servicePrices) &&
+            bookingData.servicePrices[index] != null
               ? Number(bookingData.servicePrices[index])
-              : (bookingData.totalPrice / (bookingData.serviceNames.length || 1) || 0);
-          console.log(`Service ${index + 1} (fallback): name=${name}, duration=${duration}, price=${price}`);
+              : null;
+          const price = storedService?.price ?? priceFromAPI ?? (bookingData.totalPrice / (bookingData.serviceNames.length || 1) || 0);
+          console.log(
+            `Service ${index + 1} (fallback): name=${serviceName}, duration=${duration}, price=${price}, storedService=${JSON.stringify(storedService)}`
+          );
           return {
             id: index + 1,
-            name,
+            name: serviceName,
             duration,
             price,
           };
         });
       } else {
-        console.warn("No services or serviceNames found in bookingData:", JSON.stringify(bookingData, null, 2));
-        services = [];
+        // Fallback to localStorage if API data is missing
+        if (storedServices) {
+          try {
+            const parsedServices = JSON.parse(storedServices);
+            if (Array.isArray(parsedServices)) {
+              services = parsedServices.map((service, index) => ({
+                id: index + 1,
+                name: service.name,
+                duration: Number(service.duration) || 0,
+                price: Number(service.price) || 0,
+              }));
+              console.log("Fallback services from localStorage:", services);
+            } else {
+              console.warn("Parsed services is not an array, falling back to empty array");
+              services = [];
+            }
+          } catch (error) {
+            console.error("Error parsing fallback stored services:", error);
+            services = [];
+          }
+        } else {
+          console.warn("No services or serviceNames found in bookingData, and no stored services:", JSON.stringify(bookingData, null, 2));
+          services = [];
+        }
       }
   
       // Log services array for debugging
@@ -1900,7 +1892,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://af95-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -1957,7 +1949,10 @@ const MyBooking = () => {
     }
   };
 
-  const formatDate = (dateString) => (dateString ? new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "N/A");
+  const formatDate = (dateString) =>
+    dateString
+      ? new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+      : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
   if (loading) {
@@ -2371,7 +2366,7 @@ const MyBooking = () => {
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="font-semibold text-rose-600">${service.price ? service.price.toFixed(2) : "0.00"}</p>
+                              <p className="font-semibold text-rose-600">${service.price ? service.price.toFixed(0) : "0.00"}</p>
                             </div>
                           </div>
                         </li>
@@ -2379,7 +2374,7 @@ const MyBooking = () => {
                     </ul>
                     <div className="bg-gray-50 p-4 flex justify-between items-center border-t border-gray-200">
                       <p className="font-medium text-gray-800">Total</p>
-                      <p className="font-bold text-rose-600 text-lg">${selectedBooking.totalPrice.toFixed(2)}</p>
+                      <p className="font-bold text-rose-600 text-lg">${selectedBooking.totalPrice.toFixed(0)}</p>
                     </div>
                   </div>
                 </div>

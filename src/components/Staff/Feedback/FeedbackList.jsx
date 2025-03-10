@@ -30,7 +30,7 @@ export default function FeedbackList({ filter }) {
 
         // Gọi API feedbacks
         const feedbackResponse = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/feedbacks",
+          "https://af95-118-69-182-149.ngrok-free.app/api/feedbacks",
           { headers }
         );
 
