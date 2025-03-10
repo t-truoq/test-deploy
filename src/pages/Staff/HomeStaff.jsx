@@ -61,7 +61,7 @@
 //         setLoading(true);
 //         const token = getToken();
 //         const response = await axios.get(
-//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+//           "https://af95-118-69-182-149.ngrok-free.app/api/bookings",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -228,7 +228,7 @@ export default function HomeStaff() {
         setLoading(true);
         const token = getToken();
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+          "https://af95-118-69-182-149.ngrok-free.app/api/bookings",
           {
             headers: {
               Authorization: `Bearer ${token}`,

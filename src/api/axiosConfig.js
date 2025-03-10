@@ -3,10 +3,10 @@ import axios from "axios";
 const axiosInstance = axios.create({
 
   baseURL:
-    "https://f23c-118-69-182-149.ngrok-free.app/api",
+    "https://af95-118-69-182-149.ngrok-free.app/api",
 
-  baseURL: "https://f23c-118-69-182-149.ngrok-free.app/api",
-  baseURL: 'https://f23c-118-69-182-149.ngrok-free.app/api',
+  baseURL: "https://af95-118-69-182-149.ngrok-free.app/api",
+  baseURL: 'https://af95-118-69-182-149.ngrok-free.app/api',
 
   timeout: 10000,
   headers: {

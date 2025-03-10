@@ -29,7 +29,7 @@
 //         }
 
 //         const response = await axios.get(
-//           `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+//           `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@
 
 //       const response = await axios({
 //         method: "POST",
-//         url: `https://f23c-118-69-182-149.ngrok-free.app${endpoint}`,
+//         url: `https://af95-118-69-182-149.ngrok-free.app${endpoint}`,
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //           "Content-Type": "application/json",
@@ -419,7 +419,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         }
 
         const response = await axios.get(
-          `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+          `https://af95-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -479,7 +479,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         case "CANCELLED":
           endpoint = `/api/bookings/${bookingId}/cancel`;
           break;
-        case "COMPLETED":
+        case "T":
           endpoint = `/api/bookings/${bookingId}/checkout`;
           break;
         case "CONFIRMED":
@@ -495,7 +495,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://f23c-118-69-182-149.ngrok-free.app${endpoint}`,
+        url: `https://af95-118-69-182-149.ngrok-free.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

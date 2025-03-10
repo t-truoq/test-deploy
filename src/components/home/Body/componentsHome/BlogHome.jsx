@@ -15,7 +15,7 @@ export default function BlogHome() {
     const fetchBlogs = async () => {
       try {
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/blogs",
+          "https://af95-118-69-182-149.ngrok-free.app/api/blogs",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
