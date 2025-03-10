@@ -63,12 +63,14 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [errorNotifications, setErrorNotifications] = useState(null);
+  const [showLanguages, setShowLanguages] = useState(false);
   const [user, setUser] = useLocalStorage("user", {
-    name: "User",
+    name: "Nguyen", // Đặt tên mặc định là "Nguyen" theo hình ảnh
     email: "user@example.com",
   });
-  const [language, setLanguage] = useState("en"); // Initialize language state
+  const [language, setLanguage] = useState(localStorage.getItem("selectedLanguage") || "en");
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
+  const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const baseUrl = "https://f23c-118-69-182-149.ngrok-free.app";
 
   // Check login status and fetch user profile
@@ -95,7 +97,7 @@ const Navbar = () => {
         const userData = {
           userId: response.data.userId || null,
           email: response.data.email || "user@example.com",
-          name: response.data.name || "User",
+          name: response.data.name || "Nguyen",
           phone: response.data.phone || "",
           address: response.data.address || "",
           role: response.data.role || "",
@@ -309,6 +311,11 @@ const Navbar = () => {
       const script = document.createElement("script");
       script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
       script.async = true;
+      script.onload = () => console.log("Google Translate script loaded successfully");
+      script.onerror = () => {
+        console.error("Failed to load Google Translate script");
+        alert("Failed to load Google Translate. Please check your network and try again.");
+      };
       document.body.appendChild(script);
 
       window.googleTranslateElementInit = () => {
@@ -320,6 +327,21 @@ const Navbar = () => {
           },
           "google_translate_element"
         );
+
+        // Đợi cho đến khi Google Translate sẵn sàng
+        const waitForGoogleTranslate = setInterval(() => {
+          const translateElement = document.querySelector(".goog-te-combo");
+          if (translateElement) {
+            setGoogleTranslateReady(true);
+            clearInterval(waitForGoogleTranslate);
+
+            // Khôi phục ngôn ngữ đã lưu (nếu có)
+            const savedLanguage = localStorage.getItem("selectedLanguage");
+            if (savedLanguage) {
+              changeLanguage(savedLanguage);
+            }
+          }
+        }, 100);
       };
     };
 
@@ -327,13 +349,22 @@ const Navbar = () => {
       addGoogleTranslateScript();
     }
 
+    // Ẩn các thành phần không mong muốn của Google Translate
     const styleElement = document.createElement("style");
     styleElement.innerHTML = `
-      .goog-te-banner-frame,
-      .goog-te-gadget,
-      .goog-te-menu-frame,
-      #google_translate_element {
+      .goog-te-banner-frame {
         display: none !important;
+      }
+      .goog-te-gadget {
+        display: none !important;
+      }
+      .goog-te-menu-frame {
+        display: none !important;
+      }
+      #google_translate_element {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
       }
       .skiptranslate {
         display: none !important;
@@ -347,12 +378,21 @@ const Navbar = () => {
   }, []);
 
   const changeLanguage = (lang) => {
+    if (!googleTranslateReady) {
+      console.warn("Google Translate API is not ready yet.");
+      return;
+    }
+
     const translateElement = document.querySelector(".goog-te-combo");
     if (translateElement) {
       translateElement.value = lang;
       translateElement.dispatchEvent(new Event("change"));
+      setLanguage(lang);
+      localStorage.setItem("selectedLanguage", lang);
+      console.log(`Language changed to: ${lang}`);
+    } else {
+      console.error("Google Translate dropdown not found.");
     }
-    setLanguage(lang);
   };
 
   const toggleSidebar = () => setShowSidebar(!showSidebar);
@@ -360,7 +400,7 @@ const Navbar = () => {
   const confirmLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setUser({ name: "User", email: "user@example.com" });
+    setUser({ name: "Nguyen", email: "user@example.com" });
     setIsLoggedIn(false);
     setShowLogoutPopup(false);
     setShowSidebar(false);
@@ -372,10 +412,13 @@ const Navbar = () => {
       if (showNotifications && !event.target.closest(".notifications-container")) {
         setShowNotifications(false);
       }
+      if (showLanguages && !event.target.closest(".language-dropdown")) {
+        setShowLanguages(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNotifications]);
+  }, [showNotifications, showLanguages]);
 
   return (
     <div>
@@ -386,236 +429,195 @@ const Navbar = () => {
         }`}
         style={{ zIndex: 1000 }}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full">
-          <div className="flex justify-between items-center h-full w-full transition-all duration-300">
-            <Link to="/" className="flex items-center space-x-2 h-auto">
-              <img
-                src="home/logo/logo.webp"
-                alt="Beauty Logo"
-                className={`transition-all duration-300 ${scrolled ? "h-10" : "h-12"} w-auto`}
-              />
-              <span
-                className={`text-pink-600 font-bold tracking-tight transition-all duration-300 ${
-                  scrolled ? "text-xl" : "text-2xl"
-                }`}
-              >
-                BEAUTYA
-              </span>
-            </Link>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2">
+            <img
+              src="home/logo/logo.webp"
+              alt="Beauty Logo"
+              onError={(e) => {
+                console.error("Image failed to load:", e);
+                e.target.style.display = "none"; // Ẩn hình ảnh nếu lỗi
+              }}
+              className={`transition-all duration-300 ${scrolled ? "h-10" : "h-12"} w-auto`}
+            />
+            <span
+              className={`text-pink-600 font-bold tracking-tight transition-all duration-300 ${
+                scrolled ? "text-xl" : "text-2xl"
+              }`}
+            >
+              BEAUTYA
+            </span>
+          </Link>
 
-            <div className="hidden lg:flex lg:items-center lg:space-x-10 h-full">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Home
-              </NavLink>
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                About
-              </NavLink>
-              <NavLink
-                to="/blog"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Blog
-              </NavLink>
-              <NavLink
-                to="/specialist"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Specialist
-              </NavLink>
-              <NavLink
-                to="/services"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Services
-              </NavLink>
-            </div>
+          <div className="hidden lg:flex lg:items-center lg:space-x-10">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Home
+            </NavLink>
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              About
+            </NavLink>
+            <NavLink
+              to="/blog"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Blog
+            </NavLink>
+            <NavLink
+              to="/specialist"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Specialist
+            </NavLink>
+            <NavLink
+              to="/services"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Services
+            </NavLink>
+          </div>
 
-            <div className="hidden lg:flex lg:items-center lg:space-x-8 h-full">
-              <div className="relative h-auto">
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto relative"
-                >
-                  <Bell
-                    className={`w-5 h-5 transition-all duration-300 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`}
-                  />
-                  {notifications.some((n) => n.status === "unread") && (
+          <div className="hidden lg:flex lg:items-center lg:space-x-8">
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="flex items-center text-gray-700 hover:text-pink-600"
+              >
+                <Bell className={`w-5 h-5 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`} />
+                {notifications.some((n) => n.status === "unread") && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 notifications-container">
+                  {loadingNotifications && (
+                    <div className="px-4 py-2 text-sm text-gray-500">Loading notifications...</div>
+                  )}
+                  {errorNotifications && <div className="px-4 py-2 text-sm text-red-500">{errorNotifications}</div>}
+                  {!loadingNotifications && !errorNotifications && notifications.length === 0 && (
+                    <div className="px-4 py-2 text-sm text-gray-500">No notifications available</div>
+                  )}
+                  {!loadingNotifications && !errorNotifications && notifications.length > 0 && (
                     <>
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
-                      {showNotificationMessage && (
-                        <div className="absolute top-6 right-0 bg-pink-600 text-white text-xs py-1 px-2 rounded shadow-md whitespace-nowrap animate-fadeIn">
-                          <div className="absolute top-0 right-3 transform -translate-y-1/2 w-2 h-2 bg-pink-600 rotate-45"></div>
-                          You have a new notification!
-                        </div>
-                      )}
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            onClick={() => markNotificationAsRead(notification)}
+                            className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
+                              notification.status === "unread" ? "bg-pink-50" : ""
+                            }`}
+                          >
+                            <p
+                              className={`text-sm text-gray-900 ${
+                                notification.status === "unread" ? "font-medium" : "font-normal"
+                              }`}
+                            >
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="px-4 py-2 border-t border-gray-100">
+                        <button className="text-sm text-pink-600 hover:text-pink-700 font-medium">
+                          View all notifications
+                        </button>
+                      </div>
                     </>
                   )}
-                </button>
-
-                {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 notifications-container">
-                    {loadingNotifications && (
-                      <div className="px-4 py-2 text-sm text-gray-500">Loading notifications...</div>
-                    )}
-                    {errorNotifications && <div className="px-4 py-2 text-sm text-red-500">{errorNotifications}</div>}
-                    {!loadingNotifications &&
-                      !errorNotifications &&
-                      notifications.length === 0 && (
-                        <div className="px-4 py-2 text-sm text-gray-500">No notifications available</div>
-                      )}
-                    {!loadingNotifications &&
-                      !errorNotifications &&
-                      notifications.length > 0 && (
-                        <>
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
-                          </div>
-                          <div className="max-h-96 overflow-y-auto">
-                            {notifications.map((notification) => (
-                              <div
-                                key={notification.id}
-                                onClick={() => markNotificationAsRead(notification)}
-                                className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
-                                  notification.status === "unread" ? "bg-pink-50" : ""
-                                }`}
-                              >
-                                <p
-                                  className={`text-sm text-gray-900 ${
-                                    notification.status === "unread" ? "font-medium" : "font-normal"
-                                  }`}
-                                >
-                                  {notification.message}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="px-4 py-2 border-t border-gray-100">
-                            <button className="text-sm text-pink-600 hover:text-pink-700 font-medium">
-                              View all notifications
-                            </button>
-                          </div>
-                        </>
-                      )}
-                  </div>
-                )}
-              </div>
-
-              <div className="relative h-auto">
-                <button
-                  onClick={() => {
-                    // Toggle dropdown logic can be added here if needed
-                  }}
-                  className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto"
-                >
-                  <Globe
-                    className={`w-5 h-5 mr-2 transition-all duration-300 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`}
-                  />
-                  {language === "en" ? "English" : "Tiếng Việt"}
-                  <ChevronDown
-                    className={`ml-1 transition-all duration-300 ${scrolled ? "w-3 h-3" : "w-4 h-4"}`}
-                  />
-                </button>
-
-                {/* Language Dropdown */}
-                {/* This can be added back if you want a dropdown */}
-                {/* {false && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
-                    <button
-                      onClick={() => changeLanguage("en")}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
-                    >
-                      English
-                    </button>
-                    <button
-                      onClick={() => changeLanguage("vi")}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
-                    >
-                      Tiếng Việt
-                    </button>
-                  </div>
-                )} */}
-              </div>
-
-              <div id="google_translate_element" className="hidden"></div>
-
-              {isLoggedIn ? (
-                <button
-                  onClick={toggleSidebar}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 text-base font-medium h-auto"
-                >
-                  <UserCircle
-                    className={`transition-all duration-300 ${scrolled ? "w-5 h-5" : "w-6 h-6"}`}
-                  />
-                  <span>{user?.name?.split(" ")[0] || "User"}</span>
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className={`bg-pink-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-pink-700 transition-all duration-300 shadow-sm h-auto ${
-                    scrolled ? "text-sm px-4 py-2" : "text-base px-5 py-2.5"
-                  }`}
-                >
-                  Login
-                </Link>
+                </div>
               )}
             </div>
 
-            <div className="lg:hidden h-auto">
+            <div className="relative">
               <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 focus:outline-none"
+                onClick={() => setShowLanguages(!showLanguages)}
+                className="flex items-center text-gray-700 hover:text-pink-600"
               >
-                <span className="sr-only">Open main menu</span>
-                {showMobileMenu ? (
-                  <X
-                    className={`block transition-all duration-300 ${scrolled ? "h-6 w-6" : "h-7 w-7"}`}
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <Menu
-                    className={`block transition-all duration-300 ${scrolled ? "h-6 w-6" : "h-7 w-7"}`}
-                    aria-hidden="true"
-                  />
-                )}
+                <Globe className={`w-5 h-5 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`} />
+                {language === "en" ? "English" : "Tiếng Việt"}
+                <ChevronDown className={`ml-1 w-4 h-4 ${scrolled ? "w-3 h-3" : "w-4 h-4"}`} />
               </button>
+
+              {showLanguages && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 language-dropdown">
+                  <button
+                    onClick={() => {
+                      changeLanguage("en");
+                      setShowLanguages(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => {
+                      changeLanguage("vi");
+                      setShowLanguages(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+                  >
+                    Tiếng Việt
+                  </button>
+                </div>
+              )}
             </div>
+
+            {isLoggedIn ? (
+              <button onClick={toggleSidebar} className="flex items-center space-x-2 text-gray-700 hover:text-pink-600">
+                <UserCircle className={`w-6 h-6 ${scrolled ? "w-5 h-5" : "w-6 h-6"}`} />
+                <span>{user?.name?.split(" ")[0] || "Nguyen"}</span>
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className={`bg-pink-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-pink-700 transition-all duration-300 shadow-sm ${
+                  scrolled ? "text-sm px-4 py-2" : "text-base px-5 py-2.5"
+                }`}
+              >
+                Login
+              </Link>
+            )}
+          </div>
+
+          <div className="lg:hidden">
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 focus:outline-none"
+            >
+              <span className="sr-only">Open main menu</span>
+              {showMobileMenu ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+            </button>
           </div>
         </div>
       </nav>
@@ -627,11 +629,11 @@ const Navbar = () => {
         className={`lg:hidden ${showMobileMenu ? "block" : "hidden"} w-full absolute bg-white shadow-lg transition-all duration-300 ease-in-out`}
         style={{ zIndex: 999 }}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 w-full">
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium ${
                 isActive ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
               }`
             }
@@ -642,7 +644,7 @@ const Navbar = () => {
           <NavLink
             to="/about"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium ${
                 isActive ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
               }`
             }
@@ -653,7 +655,7 @@ const Navbar = () => {
           <NavLink
             to="/blog"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium ${
                 isActive ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
               }`
             }
@@ -664,7 +666,7 @@ const Navbar = () => {
           <NavLink
             to="/specialist"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium ${
                 isActive ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
               }`
             }
@@ -675,7 +677,7 @@ const Navbar = () => {
           <NavLink
             to="/services"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium ${
                 isActive ? "text-pink-600 bg-pink-50" : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
               }`
             }
@@ -683,69 +685,70 @@ const Navbar = () => {
           >
             Services
           </NavLink>
-          <div className="px-3 py-3 w-full h-auto">
-            <div className="flex flex-col space-y-2 w-full">
-              <span className="text-sm font-medium text-gray-500">Language</span>
-              <div className="flex space-x-2 w-full">
+          <div className="px-3 py-3">
+            <button
+              onClick={() => setShowLanguages(!showLanguages)}
+              className="flex items-center text-gray-700 hover:text-pink-600"
+            >
+              <Globe className="w-5 h-5 mr-2" />
+              {language === "en" ? "English" : "Tiếng Việt"}
+              <ChevronDown className="ml-1 w-4 h-4" />
+            </button>
+            {showLanguages && (
+              <div className="mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 language-dropdown">
                 <button
-                  onClick={() => changeLanguage("en")}
-                  className={`px-3 py-1.5 text-sm rounded-full h-auto ${
-                    language === "en" ? "bg-pink-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  onClick={() => {
+                    changeLanguage("en");
+                    setShowLanguages(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
                 >
                   English
                 </button>
                 <button
-                  onClick={() => changeLanguage("vi")}
-                  className={`px-3 py-1.5 text-sm rounded-full h-auto ${
-                    language === "vi" ? "bg-pink-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  onClick={() => {
+                    changeLanguage("vi");
+                    setShowLanguages(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
                 >
                   Tiếng Việt
                 </button>
               </div>
-            </div>
+            )}
           </div>
-          <div className="px-3 py-3 w-full h-auto">
+          <div className="px-3 py-3">
             <button
               onClick={() => {
                 setShowMobileMenu(false);
                 setShowNotifications(!showNotifications);
               }}
-              className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto relative"
+              className="flex items-center text-gray-700 hover:text-pink-600 relative"
             >
-              <Bell className={`w-5 h-5 transition-all duration-300 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`} />
+              <Bell className="w-5 h-5" />
               {notifications.some((n) => n.status === "unread") && (
-                <>
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
-                  {showNotificationMessage && (
-                    <div className="absolute top-6 right-0 bg-pink-600 text-white text-xs py-1 px-2 rounded shadow-md whitespace-nowrap animate-fadeIn">
-                      <div className="absolute top-0 right-3 transform -translate-y-1/2 w-2 h-2 bg-pink-600 rotate-45"></div>
-                      You have a new notification!
-                    </div>
-                  )}
-                </>
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
               )}
             </button>
           </div>
           {isLoggedIn ? (
-            <div className="px-3 py-3 w-full h-auto">
+            <div className="px-3 py-3">
               <button
                 onClick={() => {
                   toggleSidebar();
                   setShowMobileMenu(false);
                 }}
-                className="flex items-center space-x-2 text-pink-600 font-medium w-full h-auto py-2"
+                className="flex items-center space-x-2 text-pink-600 font-medium w-full py-2"
               >
                 <UserCircle className="w-5 h-5" />
                 <span>My Profile</span>
               </button>
             </div>
           ) : (
-            <div className="px-3 py-3 w-full h-auto">
+            <div className="px-3 py-3">
               <Link
                 to="/login"
-                className="block w-full text-center bg-pink-600 text-white px-4 py-3 rounded-md text-base font-medium hover:bg-pink-700 h-auto"
+                className="block w-full text-center bg-pink-600 text-white px-4 py-3 rounded-md text-base font-medium hover:bg-pink-700"
                 onClick={() => setShowMobileMenu(false)}
               >
                 Login
@@ -760,7 +763,7 @@ const Navbar = () => {
         <>
           {showSidebar && (
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40 w-full h-full"
+              className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40"
               onClick={toggleSidebar}
             ></div>
           )}
@@ -770,30 +773,30 @@ const Navbar = () => {
               showSidebar ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="p-6 w-full h-auto">
-              <div className="flex items-center justify-between mb-6 w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">My Account</h2>
-                <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700">
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
-              <div className="mb-6 pb-6 border-b border-gray-200 w-full h-auto">
-                <div className="flex items-center space-x-4 w-full">
-                  <div className="bg-gradient-to-r from-pink-500 to-pink-600 p-3 rounded-full h-auto">
+              <div className="mb-6 pb-6 border-b border-gray-200">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-gradient-to-r from-pink-500 to-pink-600 p-3 rounded-full">
                     <UserCircle className="h-8 w-8 text-white" />
                   </div>
-                  <div className="w-auto h-auto">
-                    <h3 className="text-lg font-medium text-gray-900">{user?.name || "User"}</h3>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">{user?.name || "Nguyen"}</h3>
                     <p className="text-sm text-gray-500">{user?.email || "user@example.com"}</p>
                   </div>
                 </div>
               </div>
 
-              <nav className="space-y-1 w-full h-auto">
+              <nav className="space-y-1">
                 <Link
                   to="/profile"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                   onClick={() => setShowSidebar(false)}
                 >
                   <User className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -801,7 +804,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/mybooking"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                   onClick={() => setShowSidebar(false)}
                 >
                   <ShoppingBag className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -809,7 +812,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/wishlist"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                   onClick={() => setShowSidebar(false)}
                 >
                   <Heart className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -817,7 +820,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/myskintype"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                   onClick={() => setShowSidebar(false)}
                 >
                   <Settings className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -825,7 +828,7 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full h-auto group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+                  className="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                 >
                   <LogOut className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
                   Logout
@@ -860,6 +863,9 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* Google Translate Element */}
+      <div id="google_translate_element"></div>
     </div>
   );
 };
