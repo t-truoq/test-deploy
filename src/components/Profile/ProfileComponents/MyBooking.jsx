@@ -1884,7 +1884,7 @@ const MyBooking = () => {
   };
 
   const handleViewDetails = async (booking) => {
-    setSelectedBooking(booking);
+    setSelectedBooking(booking);  
     const details = await fetchBookingDetails(booking.bookingId);
     if (details) {
       setBookingDetails(details);
