@@ -485,7 +485,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         case "CONFIRMED":
           endpoint = `/api/bookings/${bookingId}/confirm`;
           break;
-        case "IN_PROCESS":
+        case "IN_PROGRESS":
           endpoint = `/api/bookings/${bookingId}/checkin`; // Dùng endpoint /checkin
           break;
         default:
@@ -736,10 +736,10 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
                   </button>
                   <button
                     className="px-4 py-2 border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 flex items-center justify-center"
-                    onClick={() => handleStatusUpdate("IN_PROCESS")}
+                    onClick={() => handleStatusUpdate("IN_PROGRESS")}
                   >
                     <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
-                    In Process
+                    In Progress
                   </button>
                   <button
                     className="px-4 py-2 border border-purple-500 text-purple-600 rounded-md hover:bg-purple-50 flex items-center justify-center"
