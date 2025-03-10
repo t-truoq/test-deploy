@@ -5,7 +5,7 @@ import { Search, MoreHorizontal } from "lucide-react";
 import { EditClientModal } from "./EditClientModal";
 
 
-const API_URL = "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users";
+const API_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/users";
 
 
 export function StaffClients() {

@@ -71,7 +71,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/user",
+//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -132,7 +132,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users/specialists/active",
+//           "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -247,7 +247,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings",
+//         "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
 //         bookingData,
 //         {
 //           headers: {
@@ -350,7 +350,7 @@
 //       }
 
 //       await axios.post(
-//         `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
 //         {},
 //         {
 //           headers: {
@@ -397,7 +397,7 @@
 //       }
 
 //       await axios.post(
-//         `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
 //         {},
 //         {
 //           headers: {
@@ -444,7 +444,7 @@
 //       }
 
 //       await axios.post(
-//         `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
 //         {},
 //         {
 //           headers: {
@@ -572,7 +572,7 @@
 //       console.log("Payment data to be sent:", paymentData);
 
 //       const response = await axios.post(
-//         "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/v1/vnpay/create-payment",
+//         "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
 //         paymentData,
 //         {
 //           headers: {
@@ -1239,7 +1239,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/user",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1300,7 +1300,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users/specialists/active",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1415,7 +1415,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings",
+        "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -1518,7 +1518,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -1565,7 +1565,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -1612,7 +1612,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -1672,7 +1672,7 @@ const MyBooking = () => {
   
       // Fetch details from API
       const response = await axios.get(
-        `https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1685,29 +1685,37 @@ const MyBooking = () => {
       const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
       console.log("Full booking data from API:", JSON.stringify(bookingData, null, 2));
   
-      // Map services data with enhanced debugging
+      // Fallback duration map for known services
+      const serviceDurationMap = {
+        "Lấy Nhân Mụn Chuẩn Y Khoa": 45, // Assuming 45 minutes
+        "Exo Booster": 30, // Assuming 30 minutes
+        // Add more services as needed
+      };
+  
+      // Map services data with enhanced duration handling
       let services = [];
       if (bookingData.services && Array.isArray(bookingData.services)) {
-        // If bookingData.services exists, use it directly
         services = bookingData.services.map((service, index) => {
-          const duration = service.duration != null ? Number(service.duration) : 0; // Ensure conversion to number
-          console.log(`Service ${index + 1}: name=${service.name}, duration=${duration}, price=${service.price}`);
+          const duration = service.duration != null ? Number(service.duration) : (service.durationMinutes || serviceDurationMap[service.name] || 0);
+          const price = service.price != null ? Number(service.price) : 0;
+          console.log(`Service ${index + 1}: name=${service.name}, duration=${duration}, price=${price}`);
           return {
             id: service.id || index + 1,
             name: service.name || `Service #${index + 1}`,
             duration: duration,
-            price: service.price != null ? Number(service.price) : 0,
+            price: price,
           };
         });
       } else if (bookingData.serviceNames && Array.isArray(bookingData.serviceNames)) {
-        // Fallback to serviceNames if services is not provided
         services = bookingData.serviceNames.map((name, index) => {
           const duration = bookingData.durations && Array.isArray(bookingData.durations) && bookingData.durations[index] != null
             ? Number(bookingData.durations[index])
-            : 0;
+            : (bookingData.serviceDurations && Array.isArray(bookingData.serviceDurations) && bookingData.serviceDurations[index] != null
+              ? Number(bookingData.serviceDurations[index])
+              : (serviceDurationMap[name] || 0)); // Use the duration map as a fallback
           const price = bookingData.servicePrices && Array.isArray(bookingData.servicePrices) && bookingData.servicePrices[index] != null
             ? Number(bookingData.servicePrices[index])
-            : bookingData.totalPrice / (bookingData.serviceNames.length || 1) || 0;
+            : (bookingData.totalPrice / (bookingData.serviceNames.length || 1) || 0);
           console.log(`Service ${index + 1} (fallback): name=${name}, duration=${duration}, price=${price}`);
           return {
             id: index + 1,
@@ -1805,7 +1813,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {

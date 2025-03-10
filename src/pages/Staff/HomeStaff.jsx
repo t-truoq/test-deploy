@@ -1,7 +1,10 @@
 // "use client";
 
-// import React from "react";
-// import { useLocation } from "react-router-dom";
+// import React, { useState, useEffect } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import axios from "axios";
+// import { parseISO } from "date-fns";
+// import { jwtDecode } from "jwt-decode";
 // import { StaffClients } from "../../components/Staff/Client/StaffClient";
 // import { StaffList } from "../../components/Staff/Employee/StaffList";
 // import { StaffSchedule } from "../../components/Staff/StaffSchedule";
@@ -10,9 +13,102 @@
 // import { BookingCalendar } from "../../components/Staff/Booking/BookingCalendar";
 // import { BookingDetails } from "../../components/Staff/Booking/BookingDetails";
 
+// const getToken = () => {
+//   return localStorage.getItem("token");
+// };
+
 // export default function HomeStaff() {
-//   const [selectedAppointment, setSelectedAppointment] = React.useState(null);
+//   const [appointments, setAppointments] = useState([]);
+//   const [selectedAppointment, setSelectedAppointment] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
 //   const location = useLocation();
+//   const navigate = useNavigate();
+
+//   const isStaff = () => {
+//     try {
+//       const token = getToken();
+//       if (!token) {
+//         return false;
+//       }
+//       const parts = token.split(".");
+//       if (parts.length !== 3) {
+//         throw new Error("Invalid token format: Token must have 3 parts separated by dots.");
+//       }
+//       const decodedToken = jwtDecode(token);
+//       return decodedToken.role === "STAFF" || decodedToken.isStaff === true;
+//     } catch (error) {
+//       console.error("Error decoding token:", error);
+//       return false;
+//     }
+//   };
+
+//   useEffect(() => {
+//     const fetchBookings = async () => {
+//       const staff = isStaff();
+//       if (!staff) {
+//         const token = getToken();
+//         if (!token) {
+//           navigate("/login");
+//           return;
+//         }
+//         setError("Access denied. Only staff can view bookings.");
+//         setLoading(false);
+//         return;
+//       }
+
+//       try {
+//         setLoading(true);
+//         const token = getToken();
+//         const response = await axios.get(
+//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+//           {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               "ngrok-skip-browser-warning": "true",
+//             },
+//           }
+//         );
+//         console.log("API response data:", response.data); // Log dữ liệu API
+//         const data = response.data;
+//         const fetchedBookings = Array.isArray(data)
+//           ? data.filter((booking) => booking && typeof booking === "object")
+//           : [data].filter((booking) => booking && typeof booking === "object");
+//         console.log("Fetched bookings:", fetchedBookings); // Log mảng sau khi lọc
+
+//         const mappedAppointments = fetchedBookings.map((booking) => ({
+//           id: booking.bookingId ? booking.bookingId.toString() : "unknown",
+//           clientName: booking.clientName || booking.bookingId || "Unknown",
+//           service: booking.serviceNames ? booking.serviceNames.join(", ") : "Unknown Service",
+//           duration: booking.totalDuration || 60,
+//           time: booking.timeSlot || "N/A",
+//           date: booking.bookingDate ? parseISO(booking.bookingDate) : new Date(),
+//           therapist: booking.specialistId || "Unknown",
+//           status: booking.status ? booking.status.toUpperCase() : "UNKNOWN",
+//         }));
+
+//         setAppointments(mappedAppointments);
+//       } catch (error) {
+//         console.error("Error fetching bookings:", error);
+//         setError(
+//           error.response?.data?.message || "Failed to fetch bookings. Please try again later."
+//         );
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchBookings();
+//   }, [navigate]);
+
+//   // Hàm xử lý cập nhật trạng thái
+//   const handleStatusUpdate = (bookingId, newStatus) => {
+//     setAppointments((prevAppointments) =>
+//       prevAppointments.map((apt) =>
+//         apt.id === bookingId ? { ...apt, status: newStatus } : apt
+//       )
+//     );
+//   };
 
 //   const renderContent = () => {
 //     switch (location.pathname) {
@@ -21,14 +117,24 @@
 //         return (
 //           <div className="flex flex-col md:flex-row gap-4">
 //             <div className="flex-1 min-w-0">
-//               <BookingCalendar
-//                 onAppointmentSelect={setSelectedAppointment}
-//                 selectedAppointmentId={selectedAppointment}
-//               />
+//               {loading ? (
+//                 <div className="text-center py-8 text-gray-500">Loading...</div>
+//               ) : error ? (
+//                 <div className="text-center py-8 text-red-500">{error}</div>
+//               ) : (
+//                 <BookingCalendar
+//                   appointments={appointments}
+//                   onAppointmentSelect={setSelectedAppointment}
+//                   selectedAppointmentId={selectedAppointment}
+//                 />
+//               )}
 //             </div>
 //             <div className="w-full md:w-96 border rounded-lg bg-white shadow">
 //               {selectedAppointment ? (
-//                 <BookingDetails bookingId={selectedAppointment} />
+//                 <BookingDetails
+//                   bookingId={selectedAppointment}
+//                   onStatusUpdate={handleStatusUpdate} // Truyền callback
+//                 />
 //               ) : (
 //                 <div className="p-6 text-center text-gray-500">
 //                   Select an appointment to view details
@@ -58,6 +164,7 @@
 //     </div>
 //   );
 // }
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -121,7 +228,7 @@ export default function HomeStaff() {
         setLoading(true);
         const token = getToken();
         const response = await axios.get(
-          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/bookings",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -129,23 +236,27 @@ export default function HomeStaff() {
             },
           }
         );
-        console.log("API response data:", response.data); // Log dữ liệu API
+        console.log("API response data:", response.data);
         const data = response.data;
         const fetchedBookings = Array.isArray(data)
           ? data.filter((booking) => booking && typeof booking === "object")
           : [data].filter((booking) => booking && typeof booking === "object");
-        console.log("Fetched bookings:", fetchedBookings); // Log mảng sau khi lọc
+        console.log("Fetched bookings:", fetchedBookings);
 
-        const mappedAppointments = fetchedBookings.map((booking) => ({
-          id: booking.bookingId ? booking.bookingId.toString() : "unknown",
-          clientName: booking.bookingId,
-          service: booking.serviceNames ? booking.serviceNames.join(", ") : "Unknown Service",
-          duration: 60,
-          time: booking.timeSlot || "N/A",
-          date: booking.bookingDate ? parseISO(booking.bookingDate) : new Date(),
-          therapist: "Unknown",
-          status: booking.status ? booking.status.toLowerCase() : "unknown",
-        }));
+        const mappedAppointments = fetchedBookings.map((booking) => {
+          // Chuẩn hóa trạng thái từ BE
+          const status = booking.status.toUpperCase();
+          return {
+            id: booking.bookingId ? booking.bookingId.toString() : "unknown",
+            clientName: booking.clientName || booking.bookingId || "Unknown",
+            service: booking.serviceNames ? booking.serviceNames.join(", ") : "Unknown Service",
+            duration: booking.totalDuration || 60,
+            time: booking.timeSlot || "N/A",
+            date: booking.bookingDate ? parseISO(booking.bookingDate) : new Date(),
+            therapist: booking.specialistId || "Unknown",
+            status: status,
+          };
+        });
 
         setAppointments(mappedAppointments);
       } catch (error) {
@@ -160,6 +271,15 @@ export default function HomeStaff() {
 
     fetchBookings();
   }, [navigate]);
+
+  const handleStatusUpdate = (bookingId, newStatus) => {
+    console.log("Updating status for bookingId:", bookingId, "to:", newStatus);
+    setAppointments((prevAppointments) =>
+      prevAppointments.map((apt) =>
+        apt.id === bookingId ? { ...apt, status: newStatus } : apt
+      )
+    );
+  };
 
   const renderContent = () => {
     switch (location.pathname) {
@@ -182,7 +302,10 @@ export default function HomeStaff() {
             </div>
             <div className="w-full md:w-96 border rounded-lg bg-white shadow">
               {selectedAppointment ? (
-                <BookingDetails bookingId={selectedAppointment} />
+                <BookingDetails
+                  bookingId={selectedAppointment}
+                  onStatusUpdate={handleStatusUpdate}
+                />
               ) : (
                 <div className="p-6 text-center text-gray-500">
                   Select an appointment to view details

@@ -10,7 +10,7 @@ export default function SpecialistShowcase() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedSpecialist, setSelectedSpecialist] = useState(null) // State để quản lý popup
-  const baseUrl = "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app"
+  const baseUrl = "https://f23c-118-69-182-149.ngrok-free.app"
 
   useEffect(() => {
     const fetchSpecialists = async () => {

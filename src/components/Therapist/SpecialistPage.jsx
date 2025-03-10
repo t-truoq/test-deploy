@@ -234,7 +234,7 @@
 //         //   throw new Error("No token found. Please login again.");
 //         // }
 
-//         const response = await axios.get("https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users/specialists/active", {
+//         const response = await axios.get("https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active", {
 //           headers: {
 //             // Authorization: `Bearer ${token}`,
 //             "ngrok-skip-browser-warning": "true",
@@ -594,7 +594,7 @@ const SpecialistPage = () => {
         // }
 
         const response = await axios.get(
-          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/users/specialists/active",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               // Authorization: `Bearer ${token}`,

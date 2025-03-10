@@ -14,7 +14,7 @@ export default function ServiceHome() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app/api/services",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",

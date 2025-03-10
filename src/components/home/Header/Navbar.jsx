@@ -69,7 +69,7 @@ const Navbar = () => {
   });
   const [language, setLanguage] = useState("en"); // Initialize language state
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
-  const baseUrl = "https://9358-2405-4802-8132-b860-515c-16f5-676c-488e.ngrok-free.app";
+  const baseUrl = "https://f23c-118-69-182-149.ngrok-free.app";
 
   // Check login status and fetch user profile
   useEffect(() => {
