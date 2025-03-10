@@ -25,7 +25,7 @@
 //       }
 
 //       // Gọi API login với email và password
-//       const response = await axios.post('https://af95-118-69-182-149.ngrok-free.app/api/auth/login', {
+//       const response = await axios.post('https://f23c-118-69-182-149.ngrok-free.app/api/auth/login', {
 //         email,
 //         password
 //       })
@@ -243,10 +243,9 @@ export default function SignIn() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-
         `/login/oauth2/code/google?code=${code}`,
 
-        `https://af95-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+        `https://f23c-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
 
         { headers: { "Content-Type": "application/json" } }
       );
@@ -276,7 +275,6 @@ export default function SignIn() {
             navigate("/admin/home");
             break;
           case "STAFF":
-
             navigate("/staff/home");
 
             navigate("/staff");
@@ -317,12 +315,11 @@ export default function SignIn() {
 
       console.log("Request data:", { email, password });
       const response = await axios.post(
-        "https://af95-118-69-182-149.ngrok-free.app/auth/token",
-
+        "https://f23c-118-69-182-149.ngrok-free.app/auth/token",
 
         { email, password },
 
-        { email, password },  
+        { email, password },
 
         { headers: { "Content-Type": "application/json" } }
       );
@@ -352,10 +349,9 @@ export default function SignIn() {
             navigate("/staff/home");
             break;
           case "SPECIALIST":
-
             navigate("/skintherapist/home");
 
-            // navigate("/specialist");            
+            // navigate("/specialist");
 
             break;
           case "CUSTOMER":
@@ -390,12 +386,10 @@ export default function SignIn() {
   };
 
   const handleGoogleLogin = () => {
-
     window.location.href = "/oauth2/authorization/google";
 
     window.location.href =
-      "https://af95-118-69-182-149.ngrok-free.app/oauth2/authorization/google";
-
+      "https://f23c-118-69-182-149.ngrok-free.app/oauth2/authorization/google";
   };
 
   return (

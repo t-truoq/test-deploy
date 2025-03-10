@@ -15,7 +15,7 @@ export default function BlogHome() {
     const fetchBlogs = async () => {
       try {
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/blogs",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/blogs",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -49,7 +49,9 @@ export default function BlogHome() {
           }));
           setBlogs(formattedBlogs);
         } else {
-          throw new Error("Invalid response format: Expected an array of blogs");
+          throw new Error(
+            "Invalid response format: Expected an array of blogs"
+          );
         }
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -120,8 +122,8 @@ export default function BlogHome() {
           Our Blog
         </h2>
         <p className="text-lg md:text-xl text-gray-600 text-center max-w-3xl mx-auto mb-12">
-          Discover the latest skincare tips, trends, and insights from our beauty
-          experts
+          Discover the latest skincare tips, trends, and insights from our
+          beauty experts
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">

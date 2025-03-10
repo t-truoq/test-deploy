@@ -20,7 +20,6 @@ import HomeAdmin from "./pages/Admin/Home/HomeAdmin";
 import OrderListAdmin from "./pages/Admin/Orderlists/OrderlistAdmin";
 import CalendarAdmin from "./pages/Admin/Calendar/CalendarAdmin";
 import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
-import InvoiceAdmin from "./pages/Admin/Invoice/InvocieAdmin";
 import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
 import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
 import HomeStaff from "./pages/Staff/HomeStaff";
@@ -33,7 +32,7 @@ import HomeSkinTheorapist from "./pages/SkinTherapist/Home";
 import FeedbackSK from "./pages/SkinTherapist/Feedback";
 import ProfilePage from "./pages/SkinTherapist/Profile";
 import Specialist from "./components/Therapist/SpecialistPage";
-
+import PaymentManagement from "./pages/Admin/Invoice/PaymentAdmin";
 
 function App() {
   const location = useLocation();
@@ -46,7 +45,7 @@ function App() {
     "/admin/orderlists",
     "/admin/calendar",
     "/admin/contact",
-    "/admin/invoice",
+    "/admin/paymentmanagement",
     "/admin/feedback",
     "/staff/home",
     "/staff/appointments",
@@ -86,7 +85,10 @@ function App() {
             <Route path="/admin/orderlists" element={<OrderListAdmin />} />
             <Route path="/admin/calendar" element={<CalendarAdmin />} />
             <Route path="/admin/contact" element={<ContactAdmin />} />
-            <Route path="/admin/invoice" element={<InvoiceAdmin />} />
+            <Route
+              path="/admin/paymentmanagement"
+              element={<PaymentManagement />}
+            />
             <Route path="/admin/feedback" element={<FeedbackManagement />} />
             {/* Staff router*/}
             <Route path="/staff/home" element={<HomeStaff />} />
@@ -96,13 +98,11 @@ function App() {
             <Route path="/staff/schedule" element={<HomeStaff />} />
             <Route path="/staff/feedback" element={<FeedbackStaff />} />
             {/* Skin theorapist router*/}
-
             <Route
               path="/skintherapist/home"
               element={<HomeSkinTheorapist />}
             />
             <Route path="/skintherapist/feedback" element={<FeedbackSK />} />
-
             <Route path="/skintherapist/profile" element={<ProfilePage />} />
           </Routes>
         </main>

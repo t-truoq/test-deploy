@@ -46,7 +46,6 @@ export default function Contact() {
   const [dateFilter, setDateFilter] = useState("All Time");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const statusOptions = ["All Status", "New", "Read", "Responded"];
   const dateOptions = [
@@ -59,8 +58,6 @@ export default function Contact() {
   ];
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-
     const handleClickOutside = (event) => {
       if (
         !event.target.closest(".filter-dropdown") &&
@@ -74,7 +71,6 @@ export default function Contact() {
 
     document.addEventListener("click", handleClickOutside);
     return () => {
-      clearTimeout(timer);
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
@@ -92,12 +88,6 @@ export default function Contact() {
     console.log(`${action} for contact ${contactId}`);
     setActiveDropdown(null);
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">Loading...</div>
-    );
-  }
 
   return (
     <div className="space-y-6">

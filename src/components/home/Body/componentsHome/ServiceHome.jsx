@@ -14,7 +14,7 @@ export default function ServiceHome() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/services",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -36,7 +36,9 @@ export default function ServiceHome() {
         if (err.response?.status === 404) {
           setError("Không tìm thấy dịch vụ.");
         } else {
-          setError(err.response?.data?.message || "Không thể tải danh sách dịch vụ");
+          setError(
+            err.response?.data?.message || "Không thể tải danh sách dịch vụ"
+          );
         }
         setLoading(false);
       }
@@ -58,7 +60,9 @@ export default function ServiceHome() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-xl text-red-600">{error}</div>;
+    return (
+      <div className="text-center py-12 text-xl text-red-600">{error}</div>
+    );
   }
 
   return (

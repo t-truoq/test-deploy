@@ -43,7 +43,7 @@ const BlogDetail = () => {
         };
 
         const response = await axios.get(
-          `https://af95-118-69-182-149.ngrok-free.app/api/blogs/${id}`,
+          `https://f23c-118-69-182-149.ngrok-free.app/api/blogs/${id}`,
           { headers }
         );
 
@@ -64,10 +64,17 @@ const BlogDetail = () => {
             blogData.images && blogData.images.length > 0
               ? blogData.images[0].url
               : "/placeholder.svg?height=600&width=1200",
-          category: ["Skincare", "Beauty Tips", "Wellness", "Treatments", "Lifestyle"][
-            Math.floor(Math.random() * 5)
-          ],
-          readTime: `${Math.max(Math.ceil(blogData.content.length / 1000), 1)} min read`,
+          category: [
+            "Skincare",
+            "Beauty Tips",
+            "Wellness",
+            "Treatments",
+            "Lifestyle",
+          ][Math.floor(Math.random() * 5)],
+          readTime: `${Math.max(
+            Math.ceil(blogData.content.length / 1000),
+            1
+          )} min read`,
         };
 
         setBlog(formattedBlog);
@@ -87,7 +94,8 @@ const BlogDetail = () => {
             setError("Blog post not found.");
           } else {
             setError(
-              error.response.data.message || "Failed to load blog post. Please try again."
+              error.response.data.message ||
+                "Failed to load blog post. Please try again."
             );
           }
         } else if (error.request) {
@@ -96,7 +104,9 @@ const BlogDetail = () => {
             "Unable to connect to server. CORS issue or server error. Please try again."
           );
         } else {
-          setError(error.message || "Failed to load blog post. Please try again.");
+          setError(
+            error.message || "Failed to load blog post. Please try again."
+          );
         }
       } finally {
         setLoading(false);
@@ -113,7 +123,7 @@ const BlogDetail = () => {
         };
 
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/blogs",
+          "https://f23c-118-69-182-149.ngrok-free.app/api/blogs",
           { headers }
         );
 
@@ -124,7 +134,10 @@ const BlogDetail = () => {
           const formattedPosts = otherPosts.map((post) => ({
             id: post.blogId,
             title: post.title,
-            excerpt: post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content,
+            excerpt:
+              post.content.length > 100
+                ? post.content.substring(0, 100) + "..."
+                : post.content,
             author: post.author.name,
             date: new Date(post.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
@@ -135,9 +148,13 @@ const BlogDetail = () => {
               post.images && post.images.length > 0
                 ? post.images[0].url
                 : "/placeholder.svg?height=200&width=300",
-            category: ["Skincare", "Beauty Tips", "Wellness", "Treatments", "Lifestyle"][
-              Math.floor(Math.random() * 5)
-            ],
+            category: [
+              "Skincare",
+              "Beauty Tips",
+              "Wellness",
+              "Treatments",
+              "Lifestyle",
+            ][Math.floor(Math.random() * 5)],
           }));
           setRelatedPosts(formattedPosts);
         }
@@ -169,13 +186,19 @@ const BlogDetail = () => {
 
     switch (platform) {
       case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          url
+        )}`;
         break;
       case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+          url
+        )}&text=${encodeURIComponent(title)}`;
         break;
       case "linkedin":
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+          url
+        )}`;
         break;
       case "copy":
         navigator.clipboard.writeText(url);
@@ -315,15 +338,23 @@ const BlogDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Article Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-md p-8 md:p-12 w-full h-auto" ref={contentRef}>
+            <div
+              className="bg-white rounded-2xl shadow-md p-8 md:p-12 w-full h-auto"
+              ref={contentRef}
+            >
               {/* Social Sharing */}
               <div className="flex justify-between items-center mb-8 pb-8 border-b border-gray-100 w-full">
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={handleLike}
-                    className={`flex items-center space-x-1 ${liked ? "text-[#A10550]" : "text-gray-500"} hover:text-[#A10550] transition-colors`}
+                    className={`flex items-center space-x-1 ${
+                      liked ? "text-[#A10550]" : "text-gray-500"
+                    } hover:text-[#A10550] transition-colors`}
                   >
-                    <Heart className={liked ? "fill-[#A10550]" : ""} size={20} />
+                    <Heart
+                      className={liked ? "fill-[#A10550]" : ""}
+                      size={20}
+                    />
                     <span>{likeCount}</span>
                   </button>
                   <button className="flex items-center space-x-1 text-gray-500 hover:text-[#A10550] transition-colors">
@@ -381,13 +412,19 @@ const BlogDetail = () => {
                 {formattedContent.map((item, index) => {
                   if (item.type === "heading") {
                     return (
-                      <h2 key={index} className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+                      <h2
+                        key={index}
+                        className="text-2xl font-bold text-gray-800 mt-8 mb-4"
+                      >
                         {item.content}
                       </h2>
                     );
                   } else {
                     return (
-                      <p key={index} className="mb-6 text-gray-700 leading-relaxed">
+                      <p
+                        key={index}
+                        className="mb-6 text-gray-700 leading-relaxed"
+                      >
                         {item.content}
                       </p>
                     );
@@ -419,11 +456,15 @@ const BlogDetail = () => {
                     className="w-16 h-16 rounded-full mr-6"
                   />
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-1">{blog.author}</h3>
+                    <h3 className="text-xl font-bold text-gray-800 mb-1">
+                      {blog.author}
+                    </h3>
                     <p className="text-gray-600 mb-4">{blog.authorRole}</p>
                     <p className="text-gray-700">
-                      A passionate beauty expert with years of experience in the skincare industry. Dedicated to helping
-                      clients achieve their best skin through personalized treatments and advice.
+                      A passionate beauty expert with years of experience in the
+                      skincare industry. Dedicated to helping clients achieve
+                      their best skin through personalized treatments and
+                      advice.
                     </p>
                   </div>
                 </div>
@@ -432,7 +473,9 @@ const BlogDetail = () => {
 
             {/* Comments Section */}
             <div className="bg-white rounded-2xl shadow-md p-8 md:p-12 mt-8 w-full h-auto">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">Comments</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">
+                Comments
+              </h3>
 
               {/* Comment Form */}
               <div className="mb-8 w-full h-auto">
@@ -457,15 +500,22 @@ const BlogDetail = () => {
                     />
                     <div>
                       <div className="flex items-center mb-1">
-                        <h4 className="font-bold text-gray-800 mr-2">Jane Doe</h4>
-                        <span className="text-sm text-gray-500">2 days ago</span>
+                        <h4 className="font-bold text-gray-800 mr-2">
+                          Jane Doe
+                        </h4>
+                        <span className="text-sm text-gray-500">
+                          2 days ago
+                        </span>
                       </div>
                       <p className="text-gray-700">
-                        This article was so helpful! I've been struggling with my skincare routine and these tips are
-                        exactly what I needed.
+                        This article was so helpful! I've been struggling with
+                        my skincare routine and these tips are exactly what I
+                        needed.
                       </p>
                       <div className="mt-2 flex items-center space-x-4">
-                        <button className="text-sm text-gray-500 hover:text-[#A10550]">Reply</button>
+                        <button className="text-sm text-gray-500 hover:text-[#A10550]">
+                          Reply
+                        </button>
                         <button className="text-sm text-gray-500 hover:text-[#A10550] flex items-center">
                           <Heart size={14} className="mr-1" /> 3
                         </button>
@@ -483,15 +533,21 @@ const BlogDetail = () => {
                     />
                     <div>
                       <div className="flex items-center mb-1">
-                        <h4 className="font-bold text-gray-800 mr-2">John Smith</h4>
-                        <span className="text-sm text-gray-500">1 week ago</span>
+                        <h4 className="font-bold text-gray-800 mr-2">
+                          John Smith
+                        </h4>
+                        <span className="text-sm text-gray-500">
+                          1 week ago
+                        </span>
                       </div>
                       <p className="text-gray-700">
-                        I've been using these products for a month now and have seen amazing results. Would recommend to
-                        anyone!
+                        I've been using these products for a month now and have
+                        seen amazing results. Would recommend to anyone!
                       </p>
                       <div className="mt-2 flex items-center space-x-4">
-                        <button className="text-sm text-gray-500 hover:text-[#A10550]">Reply</button>
+                        <button className="text-sm text-gray-500 hover:text-[#A10550]">
+                          Reply
+                        </button>
                         <button className="text-sm text-gray-500 hover:text-[#A10550] flex items-center">
                           <Heart size={14} className="mr-1" /> 5
                         </button>
@@ -515,17 +571,28 @@ const BlogDetail = () => {
                   color: bookmarked ? "white" : "#A10550",
                 }}
               >
-                <Bookmark className={bookmarked ? "fill-white" : ""} size={18} />
-                <span>{bookmarked ? "Bookmarked" : "Bookmark This Article"}</span>
+                <Bookmark
+                  className={bookmarked ? "fill-white" : ""}
+                  size={18}
+                />
+                <span>
+                  {bookmarked ? "Bookmarked" : "Bookmark This Article"}
+                </span>
               </button>
             </div>
 
             {/* Related Posts */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-8 w-full h-auto">
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Related Articles</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Related Articles
+              </h3>
               <div className="space-y-6">
                 {relatedPosts.map((post) => (
-                  <Link key={post.id} to={`/blog/${post.id}`} className="block group">
+                  <Link
+                    key={post.id}
+                    to={`/blog/${post.id}`}
+                    className="block group"
+                  >
                     <div className="flex items-start">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 mr-4">
                         <img
@@ -538,7 +605,9 @@ const BlogDetail = () => {
                         <h4 className="font-medium text-gray-800 group-hover:text-[#A10550] transition-colors line-clamp-2">
                           {post.title}
                         </h4>
-                        <p className="text-sm text-gray-500 mt-1">{post.date}</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {post.date}
+                        </p>
                       </div>
                     </div>
                   </Link>
@@ -548,21 +617,38 @@ const BlogDetail = () => {
 
             {/* Categories */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-8 w-full h-auto">
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Categories</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Categories
+              </h3>
               <div className="space-y-2">
-                <Link to="/blog?category=Skincare" className="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                <Link
+                  to="/blog?category=Skincare"
+                  className="block py-2 px-4 hover:bg-gray-50 rounded-lg"
+                >
                   Skincare
                 </Link>
-                <Link to="/blog?category=Beauty Tips" className="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                <Link
+                  to="/blog?category=Beauty Tips"
+                  className="block py-2 px-4 hover:bg-gray-50 rounded-lg"
+                >
                   Beauty Tips
                 </Link>
-                <Link to="/blog?category=Wellness" className="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                <Link
+                  to="/blog?category=Wellness"
+                  className="block py-2 px-4 hover:bg-gray-50 rounded-lg"
+                >
                   Wellness
                 </Link>
-                <Link to="/blog?category=Treatments" className="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                <Link
+                  to="/blog?category=Treatments"
+                  className="block py-2 px-4 hover:bg-gray-50 rounded-lg"
+                >
                   Treatments
                 </Link>
-                <Link to="/blog?category=Lifestyle" className="block py-2 px-4 hover:bg-gray-50 rounded-lg">
+                <Link
+                  to="/blog?category=Lifestyle"
+                  className="block py-2 px-4 hover:bg-gray-50 rounded-lg"
+                >
                   Lifestyle
                 </Link>
               </div>
@@ -570,9 +656,12 @@ const BlogDetail = () => {
 
             {/* Newsletter */}
             <div className="bg-gradient-to-r from-[#3D021E] to-[#A10550] text-white rounded-xl shadow-md p-6 w-full h-auto">
-              <h3 className="text-xl font-bold mb-4">Subscribe to Our Newsletter</h3>
+              <h3 className="text-xl font-bold mb-4">
+                Subscribe to Our Newsletter
+              </h3>
               <p className="text-white/90 mb-6">
-                Get the latest beauty tips and exclusive offers delivered to your inbox
+                Get the latest beauty tips and exclusive offers delivered to
+                your inbox
               </p>
               <form>
                 <input

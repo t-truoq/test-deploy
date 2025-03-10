@@ -1,38 +1,87 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { Printer, Send, Filter, ChevronDown } from "lucide-react";
+import axios from "axios";
 
-const treatments = [
-  {
-    id: 1,
-    service: "clear start prevent & glow",
-    time: "30 min",
-    cost: 20,
-    date: "2024-02-25",
-  },
-  {
-    id: 2,
-    service: "pro clear skin treatment",
-    time: "1 hour",
-    cost: 50,
-    date: "2024-02-24",
-  },
-  {
-    id: 3,
-    service: "clear start back treatment",
-    time: "50 min",
-    cost: 100,
-    date: "2024-02-23",
-  },
-];
+const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/bookings";
 
-export default function Invoice() {
+export default function Payment() {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [hasFetched, setHasFetched] = useState(false);
   const [dateFilter, setDateFilter] = useState("all");
   const [costFilter, setCostFilter] = useState("all");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showCostDropdown, setShowCostDropdown] = useState(false);
 
+  useEffect(() => {
+    if (hasFetched) return;
+
+    const fetchCompletedBookings = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found. Please login again.");
+        }
+
+        const response = await axios.get(BASE_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          maxRedirects: 5,
+        });
+
+        console.log("API Response:", response.data); // Debug the API response
+
+        if (Array.isArray(response.data)) {
+          const completedBookings = response.data
+            .filter((booking) => booking.status === "COMPLETED")
+            .map((booking) => ({
+              id: booking.bookingId,
+              service: booking.serviceNames
+                ? booking.serviceNames.join(", ")
+                : "N/A",
+              time: booking.timeSlot, // Assuming timeSlot can represent duration
+              cost: booking.totalPrice != null ? booking.totalPrice : 0, // Fallback to 0 if null
+              date: booking.bookingDate,
+            }));
+          setBookings(completedBookings);
+        } else {
+          throw new Error("Bookings data is not an array");
+        }
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        if (error.response) {
+          if (error.response.status === 302) {
+            setError(
+              "Redirect detected. Please check authentication or server configuration."
+            );
+          } else if (error.response.status === 401) {
+            setError("Unauthorized: Please login again.");
+          } else if (error.response.status === 404) {
+            setError("No completed bookings found.");
+          } else {
+            setError(error.response.data.message || "Failed to load bookings.");
+          }
+        } else if (error.request) {
+          setError("Unable to connect to server. Please try again.");
+        } else {
+          setError(error.message || "Failed to load bookings.");
+        }
+      } finally {
+        setLoading(false);
+        setHasFetched(true);
+      }
+    };
+
+    fetchCompletedBookings();
+  }, [hasFetched]);
+
   // Filter treatments based on selected filters
-  const filteredTreatments = treatments.sort((a, b) => {
+  const filteredTreatments = bookings.sort((a, b) => {
     // Date sorting
     if (dateFilter === "newest") return new Date(b.date) - new Date(a.date);
     if (dateFilter === "oldest") return new Date(a.date) - new Date(b.date);
@@ -53,6 +102,42 @@ export default function Invoice() {
     setDateFilter("all");
     setCostFilter("all");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Loading bookings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-200">
+          <div className="w-20 h-20 mx-auto mb-6 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-3-3v6m-9 3h18a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <p className="text-gray-600 mb-8 text-lg">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -236,7 +321,7 @@ export default function Invoice() {
         </button>
         <div className="text-sm">
           <span className="font-medium">Total = </span>
-          <span className="font-semibold">${totalAmount}</span>
+          <span className="font-semibold">${totalAmount.toFixed(2)}</span>
         </div>
         <button className="flex items-center gap-2 px-6 py-2 bg-[#3D021E] text-white rounded-md hover:bg-[#3D021E]/90">
           Send

@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, MoreHorizontal } from "lucide-react";
 import { EditClientModal } from "./EditClientModal";
 
-
-const API_URL = "https://af95-118-69-182-149.ngrok-free.app/api/users";
-
+const API_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/users";
 
 export function StaffClients() {
   const [clients, setClients] = useState([]);
@@ -95,8 +93,6 @@ export function StaffClients() {
     }
   };
 
-
-
   const handleAddClient = (newClient) => {
     const client = {
       ...newClient,
@@ -107,7 +103,6 @@ export function StaffClients() {
     };
     setClients([...clients, client]);
   };
-
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">

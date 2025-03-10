@@ -64,7 +64,7 @@ const ChangePassword = () => {
       console.log("Sending change password data:", updateData);
 
       const response = await axios.put(
-        `https://af95-118-69-182-149.ngrok-free.app/api/users/profile`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/users/profile`,
         updateData,
         {
           headers: {
@@ -162,9 +162,7 @@ const ChangePassword = () => {
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-pink-600 to-pink-700 px-6 py-4">
           <h1 className="text-white text-xl font-bold">Change Password</h1>
-          <p className="text-pink-100 text-sm">
-            Update your password securely
-          </p>
+          <p className="text-pink-100 text-sm">Update your password securely</p>
         </div>
 
         {notification.show && (
@@ -239,11 +237,7 @@ const ChangePassword = () => {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
-                    {showNewPassword ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
+                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">

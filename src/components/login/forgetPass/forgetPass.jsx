@@ -43,7 +43,7 @@
 
 //         `/forgotPassword/verifyMail/${email}`,
 
-//         `https://af95-118-69-182-149.ngrok-free.app/forgotPassword/verifyMail/${email}`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/forgotPassword/verifyMail/${email}`,
 
 //         {}, // Backend có thể không yêu cầu body, gửi body rỗng
 //         {
@@ -99,7 +99,7 @@
 
 //         `/forgotPassword/verifyOtp/${otp}/${email}`,
 
-//         `https://af95-118-69-182-149.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
 
 //         {},
 //         {
@@ -166,7 +166,7 @@
 
 //         `/forgotPassword/changePassword/${email}`,
 
-//         `https://af95-118-69-182-149.ngrok-free.app/forgotPassword/changePassword/${email}`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/forgotPassword/changePassword/${email}`,
 
 //         {
 //           password: newPassword,
@@ -593,10 +593,9 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-
         `/forgotPassword/verifyMail/${email}`,
 
-        `https://af95-118-69-182-149.ngrok-free.app/forgotPassword/verifyMail/${email}`,
+        `https://f23c-118-69-182-149.ngrok-free.app/forgotPassword/verifyMail/${email}`,
 
         {}, // Backend có thể không yêu cầu body, gửi body rỗng
         {
@@ -658,10 +657,9 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-
         `/forgotPassword/verifyOtp/${otp}/${email}`,
 
-        `https://af95-118-69-182-149.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
+        `https://f23c-118-69-182-149.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
 
         {},
         {
@@ -738,10 +736,9 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-
         `/forgotPassword/changePassword/${email}`,
 
-        `https://af95-118-69-182-149.ngrok-free.app/forgotPassword/changePassword/${email}`,
+        `https://f23c-118-69-182-149.ngrok-free.app/forgotPassword/changePassword/${email}`,
 
         {
           password: newPassword,

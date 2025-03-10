@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react"; // Thêm useRef
 
 import { Check, AlertCircle, Eye, EyeOff, Save } from "lucide-react";
@@ -58,7 +57,7 @@ const EditProfile = () => {
         }
 
         const response = await axios.get(
-          `https://af95-118-69-182-149.ngrok-free.app/api/users/profile`,
+          `https://f23c-118-69-182-149.ngrok-free.app/api/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -169,7 +168,9 @@ const EditProfile = () => {
           throw new Error("Please enter your current password");
         }
         if (!newPassword || !confirmPassword) {
-          throw new Error("Please enter both new password and confirm password");
+          throw new Error(
+            "Please enter both new password and confirm password"
+          );
         }
         if (newPassword !== confirmPassword) {
           throw new Error("New passwords don't match");
@@ -185,7 +186,9 @@ const EditProfile = () => {
 
       // Nếu không có trường nào thay đổi, thông báo lỗi
       if (Object.keys(updateData).length === 0) {
-        throw new Error("No changes detected. Please modify at least one field.");
+        throw new Error(
+          "No changes detected. Please modify at least one field."
+        );
       }
 
       const token = localStorage.getItem("token");
@@ -196,7 +199,7 @@ const EditProfile = () => {
       console.log("Sending update data:", updateData);
 
       const response = await axios.put(
-        `https://af95-118-69-182-149.ngrok-free.app/api/users/profile`,
+        `https://f23c-118-69-182-149.ngrok-free.app/api/users/profile`,
         updateData,
         {
           headers: {
@@ -629,8 +632,6 @@ const EditProfile = () => {
 
 export default EditProfile;
 
-
-
 // import { useState } from "react";
 // import { Check, AlertCircle, Eye, EyeOff, Save } from "lucide-react";
 // import axios from "axios";
@@ -697,7 +698,7 @@ export default EditProfile;
 //       console.log("Sending change password data:", updateData);
 
 //       const response = await axios.put(
-//         `https://af95-118-69-182-149.ngrok-free.app/api/users/profile`,
+//         `https://f23c-118-69-182-149.ngrok-free.app/api/users/profile`,
 //         updateData,
 //         {
 //           headers: {
@@ -961,4 +962,3 @@ export default EditProfile;
 // };
 
 // export default ChangePassword;
-
