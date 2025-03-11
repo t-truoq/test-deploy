@@ -25,7 +25,7 @@
 //       }
 
 //       // Gọi API login với email và password
-//       const response = await axios.post('https://af95-118-69-182-149.ngrok-free.app/api/auth/login', {
+//       const response = await axios.post('https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/auth/login', {
 //         email,
 //         password
 //       })
@@ -246,7 +246,7 @@ export default function SignIn() {
 
         `/login/oauth2/code/google?code=${code}`,
 
-        `https://af95-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+        `https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/login/oauth2/code/google?code=${code}`,
 
         { headers: { "Content-Type": "application/json" } }
       );
@@ -317,7 +317,7 @@ export default function SignIn() {
 
       console.log("Request data:", { email, password });
       const response = await axios.post(
-        "https://af95-118-69-182-149.ngrok-free.app/auth/token",
+        "https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/auth/token",
 
 
         { email, password },
@@ -394,7 +394,7 @@ export default function SignIn() {
     window.location.href = "/oauth2/authorization/google";
 
     window.location.href =
-      "https://af95-118-69-182-149.ngrok-free.app/oauth2/authorization/google";
+      "https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/oauth2/authorization/google";
 
   };
 

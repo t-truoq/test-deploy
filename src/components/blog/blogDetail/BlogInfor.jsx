@@ -35,15 +35,15 @@ const BlogDetail = () => {
     const fetchBlogDetail = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
         const headers = {
           "ngrok-skip-browser-warning": "true",
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : undefined,
+          // Authorization: token ? `Bearer ${token}` : undefined,
         };
 
         const response = await axios.get(
-          `https://af95-118-69-182-149.ngrok-free.app/api/blogs/${id}`,
+          `https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/blogs/${id}`,
           { headers }
         );
 
@@ -113,7 +113,7 @@ const BlogDetail = () => {
         };
 
         const response = await axios.get(
-          "https://af95-118-69-182-149.ngrok-free.app/api/blogs",
+          "https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/blogs",
           { headers }
         );
 

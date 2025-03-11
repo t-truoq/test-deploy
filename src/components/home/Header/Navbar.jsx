@@ -65,13 +65,13 @@ const Navbar = () => {
   const [errorNotifications, setErrorNotifications] = useState(null);
   const [showLanguages, setShowLanguages] = useState(false);
   const [user, setUser] = useLocalStorage("user", {
-    name: "Nguyen", // Đặt tên mặc định là "Nguyen" theo hình ảnh
+    name: "Nguyen",
     email: "user@example.com",
   });
   const [language, setLanguage] = useState(localStorage.getItem("selectedLanguage") || "en");
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
-  const baseUrl = "https://af95-118-69-182-149.ngrok-free.app";
+  const baseUrl = "https://c12e-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app";
 
   // Check login status and fetch user profile
   useEffect(() => {
@@ -328,14 +328,14 @@ const Navbar = () => {
           "google_translate_element"
         );
 
-        // Đợi cho đến khi Google Translate sẵn sàng
+        // Wait until Google Translate is ready
         const waitForGoogleTranslate = setInterval(() => {
           const translateElement = document.querySelector(".goog-te-combo");
           if (translateElement) {
             setGoogleTranslateReady(true);
             clearInterval(waitForGoogleTranslate);
 
-            // Khôi phục ngôn ngữ đã lưu (nếu có)
+            // Restore saved language (if any)
             const savedLanguage = localStorage.getItem("selectedLanguage");
             if (savedLanguage) {
               changeLanguage(savedLanguage);
@@ -349,7 +349,7 @@ const Navbar = () => {
       addGoogleTranslateScript();
     }
 
-    // Ẩn các thành phần không mong muốn của Google Translate
+    // Hide unwanted Google Translate elements
     const styleElement = document.createElement("style");
     styleElement.innerHTML = `
       .goog-te-banner-frame {
@@ -436,7 +436,7 @@ const Navbar = () => {
               alt="Beauty Logo"
               onError={(e) => {
                 console.error("Image failed to load:", e);
-                e.target.style.display = "none"; // Ẩn hình ảnh nếu lỗi
+                e.target.style.display = "none"; // Hide image if it fails to load
               }}
               className={`transition-all duration-300 ${scrolled ? "h-10" : "h-12"} w-auto`}
             />
@@ -763,13 +763,13 @@ const Navbar = () => {
         <>
           {showSidebar && (
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40"
+              className="fixed top-20 bottom-0 left-0 right-0 bg-black bg-opacity-50 transition-opacity z-40"
               onClick={toggleSidebar}
             ></div>
           )}
 
           <div
-            className={`fixed inset-y-0 right-0 max-w-xs w-full h-full bg-white shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out ${
+            className={`fixed top-20 bottom-0 right-0 max-w-xs w-full bg-white shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out ${
               showSidebar ? "translate-x-0" : "translate-x-full"
             }`}
           >
