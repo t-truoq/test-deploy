@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Printer, Send, Filter, ChevronDown } from "lucide-react";
 import axios from "axios";
 
-const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/bookings";
+const BASE_URL =
+  "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings";
 
 export default function Payment() {
   const [bookings, setBookings] = useState([]);

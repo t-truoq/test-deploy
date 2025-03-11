@@ -26,7 +26,7 @@
 //       try {
 //         setLoading(true);
 //         const response = await axios.get(
-//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+//           "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@
 //       try {
 //         setLoading(true);
 //         const response = await axios.get(
-//           `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/status`,
+//           `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/status`,
 //           {
 //             headers: {
 //               // Add authorization header if required
@@ -224,7 +224,7 @@
 
 //       const response = await axios({
 //         method,
-//         url: `https://f23c-118-69-182-149.ngrok-free.app${endpoint}`,
+//         url: `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/${endpoint}`,
 //         headers: {
 //           "Content-Type": "application/json",
 //           // Authorization: `Bearer ${yourToken}`, // Add if required

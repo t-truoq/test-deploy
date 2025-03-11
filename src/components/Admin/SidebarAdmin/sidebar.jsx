@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   ListChecks,
   ClipboardList,
-  Calendar,
   Contact,
   FileText,
   LogOut,
@@ -34,8 +33,21 @@ export default function Sidebar() {
   ];
 
   const pages = [
-    { name: "Calendar", icon: Calendar, path: "/admin/calendar" },
-    { name: "Contact", icon: Contact, path: "/admin/contact" },
+    {
+      name: "Customers Management",
+      icon: Contact,
+      path: "/admin/customersmanagement",
+    },
+    {
+      name: "Staff Management",
+      icon: Contact,
+      path: "/admin/staffsmanagement",
+    },
+    {
+      name: "Skin Therapist Management",
+      icon: Contact,
+      path: "/admin/skintherapisttmanagement",
+    },
     {
       name: "Payment Management",
       icon: FileText,

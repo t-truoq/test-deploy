@@ -9,16 +9,19 @@ import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
 import AddServiceModal from "../../../components/Admin/ServiceAdmin/AddService";
 import EditServiceModal from "../../../components/Admin/ServiceAdmin/EditService";
 
-const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/services";
+const BASE_URL =
+  "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/services";
 
 const ServicesAdmin = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]); // State for filtered services
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   useEffect(() => {
     if (hasFetched) return;
@@ -38,16 +41,16 @@ const ServicesAdmin = () => {
           maxRedirects: 5,
         });
 
-        console.log("API Response:", response.data); // Debug the API response
+        console.log("API Response:", response.data);
 
         if (Array.isArray(response.data)) {
           const formattedData = response.data.map((service) => ({
             id: service.serviceId,
             serviceId: service.serviceId,
             name: service.name,
-            price: service.price != null ? service.price.toString() : "0", // Null check with fallback
+            price: service.price != null ? service.price.toString() : "0",
             duration:
-              service.duration != null ? service.duration.toString() : "0", // Null check with fallback
+              service.duration != null ? service.duration.toString() : "0",
             imageUrl:
               service.images && service.images.length > 0
                 ? service.images[0].url
@@ -57,6 +60,7 @@ const ServicesAdmin = () => {
             recommendedSkinTypes: service.recommendedSkinTypes || [],
           }));
           setServices(formattedData);
+          setFilteredServices(formattedData); // Initialize filteredServices with all services
         } else {
           throw new Error("All services data is not an array");
         }
@@ -88,14 +92,25 @@ const ServicesAdmin = () => {
     fetchAllServices();
   }, [hasFetched]);
 
+  // Handle search input change
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    const filtered = services.filter((service) =>
+      service.name.toLowerCase().includes(term)
+    );
+    setFilteredServices(filtered);
+  };
+
   const handleAddService = (newService) => {
     const formattedService = {
       id: newService.serviceId,
       serviceId: newService.serviceId,
       name: newService.name,
-      price: newService.price != null ? newService.price.toString() : "0", // Null check with fallback
+      price: newService.price != null ? newService.price.toString() : "0",
       duration:
-        newService.duration != null ? newService.duration.toString() : "0", // Null check with fallback
+        newService.duration != null ? newService.duration.toString() : "0",
       imageUrl:
         newService.images && newService.images.length > 0
           ? newService.images[0].url
@@ -105,6 +120,7 @@ const ServicesAdmin = () => {
       recommendedSkinTypes: newService.recommendedSkinTypes || [],
     };
     setServices((prev) => [...prev, formattedService]);
+    setFilteredServices((prev) => [...prev, formattedService]); // Update filtered list
   };
 
   const handleEditService = (serviceId, updatedService) => {
@@ -113,11 +129,11 @@ const ServicesAdmin = () => {
       serviceId: updatedService.serviceId,
       name: updatedService.name,
       price:
-        updatedService.price != null ? updatedService.price.toString() : "0", // Null check with fallback
+        updatedService.price != null ? updatedService.price.toString() : "0",
       duration:
         updatedService.duration != null
           ? updatedService.duration.toString()
-          : "0", // Null check with fallback
+          : "0",
       imageUrl:
         updatedService.images && updatedService.images.length > 0
           ? updatedService.images[0].url
@@ -131,10 +147,18 @@ const ServicesAdmin = () => {
         service.id === serviceId ? formattedService : service
       )
     );
+    setFilteredServices((prev) =>
+      prev.map((service) =>
+        service.id === serviceId ? formattedService : service
+      )
+    );
   };
 
   const handleDeleteService = (serviceId) => {
     setServices((prev) => prev.filter((service) => service.id !== serviceId));
+    setFilteredServices((prev) =>
+      prev.filter((service) => service.id !== serviceId)
+    );
   };
 
   const openEditModal = (service) => {
@@ -207,8 +231,9 @@ const ServicesAdmin = () => {
             <input
               type="text"
               placeholder="Search services by name..."
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-              disabled
+              value={searchTerm}
+              onChange={handleSearch}
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
             />
             <button
               onClick={() => setIsAddModalOpen(true)}
@@ -237,14 +262,13 @@ const ServicesAdmin = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     Duration
                   </th>
-
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {services.map((service) => (
+                {filteredServices.map((service) => (
                   <ServiceRow
                     key={service.id}
                     service={service}

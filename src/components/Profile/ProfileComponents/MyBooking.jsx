@@ -71,7 +71,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
+//           "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings/user",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -132,7 +132,7 @@
 //         if (!token) throw new Error("No token found. Please login again.");
 
 //         const response = await axios.get(
-//           "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+//           "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/users/specialists/active",
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -247,7 +247,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+//         "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings",
 //         bookingData,
 //         {
 //           headers: {
@@ -350,7 +350,7 @@
 //       }
 
 //       await axios.post(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+//         `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/cancel`,
 //         {},
 //         {
 //           headers: {
@@ -397,7 +397,7 @@
 //       }
 
 //       await axios.post(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+//         `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/checkin`,
 //         {},
 //         {
 //           headers: {
@@ -444,7 +444,7 @@
 //       }
 
 //       await axios.post(
-//         `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+//         `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/checkout`,
 //         {},
 //         {
 //           headers: {
@@ -572,7 +572,7 @@
 //       console.log("Payment data to be sent:", paymentData);
 
 //       const response = await axios.post(
-//         "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+//         "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/v1/vnpay/create-payment",
 //         paymentData,
 //         {
 //           headers: {
@@ -1255,7 +1255,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/bookings/user",
+          "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1331,7 +1331,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+          "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1460,7 +1460,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://f23c-118-69-182-149.ngrok-free.app/api/bookings",
+        "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -1575,7 +1575,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -1627,7 +1627,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkin`,
+        `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/checkin`,
         {},
         {
           headers: {
@@ -1683,7 +1683,7 @@ const MyBooking = () => {
       }
 
       await axios.post(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}/checkout`,
+        `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}/checkout`,
         {},
         {
           headers: {
@@ -1758,7 +1758,7 @@ const MyBooking = () => {
 
       // Fetch details from API
       const response = await axios.get(
-        `https://f23c-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+        `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1928,7 +1928,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://f23c-118-69-182-149.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Mail,
   Phone,
@@ -11,42 +11,93 @@ import {
   Save,
   X,
 } from "lucide-react";
+import axios from "axios";
 
-// Mock data for the therapist profile
-const therapistData = {
-  personalInfo: {
-    name: "Thanh Tam chim be",
-    email: "thanhtam@beautya.com",
-    phone: "+84 123 456 789",
-    address: "123 Beauty Street, Ho Chi Minh City",
-    joinDate: "2022-05-15",
-  },
-  professionalInfo: {
-    position: "Senior Skin Therapist",
-    specialization: "Facial Treatments, Anti-aging",
-    certification: "International Beauty Therapy Certificate",
-    experience: "5 years",
-    workingHours: "Mon-Fri: 9:00 AM - 6:00 PM",
-  },
-  skills: [
-    { name: "Facial Treatments", level: 95 },
-    { name: "Skin Analysis", level: 90 },
-    { name: "Anti-aging Treatments", level: 85 },
-    { name: "Acne Treatments", level: 80 },
-    { name: "Customer Service", level: 90 },
-  ],
-  statistics: {
-    totalClients: 120,
-    totalAppointments: 450,
-    completedAppointments: 430,
-    satisfactionRate: 98,
-  },
+const BASE_URL =
+  "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/users/profile";
+
+// Dữ liệu mặc định cho các trường không có trong API
+const defaultProfessionalInfo = {
+  position: "Senior Skin Therapist",
+  specialization: "Facial Treatments, Anti-aging",
+  certification: "International Beauty Therapy Certificate",
+  experience: "5 years",
+  workingHours: "Mon-Fri: 9:00 AM - 6:00 PM",
+};
+
+const defaultSkills = [
+  { name: "Facial Treatments", level: 95 },
+  { name: "Skin Analysis", level: 90 },
+  { name: "Anti-aging Treatments", level: 85 },
+  { name: "Acne Treatments", level: 80 },
+  { name: "Customer Service", level: 90 },
+];
+
+const defaultStatistics = {
+  totalClients: 120,
+  totalAppointments: 450,
+  completedAppointments: 430,
+  satisfactionRate: 98,
 };
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState(therapistData);
-  const [tempProfile, setTempProfile] = useState(therapistData);
+  const [profile, setProfile] = useState(null);
+  const [tempProfile, setTempProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found. Please login again.");
+        }
+
+        const response = await axios.get(BASE_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+        });
+
+        const apiData = response.data;
+        const initialProfile = {
+          personalInfo: {
+            name: apiData.name,
+            email: apiData.email,
+            phone: apiData.phone,
+            address: apiData.address,
+            joinDate: apiData.createdAt.split("T")[0], // Lấy phần ngày từ createdAt
+          },
+          professionalInfo: defaultProfessionalInfo,
+          skills: defaultSkills,
+          statistics: defaultStatistics,
+        };
+
+        setProfile(initialProfile);
+        setTempProfile(initialProfile);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        if (err.response) {
+          if (err.response.status === 401) {
+            setError("Unauthorized: Please login again.");
+          } else {
+            setError(err.response.data.message || "Failed to load profile.");
+          }
+        } else if (err.request) {
+          setError("Unable to connect to server.");
+        } else {
+          setError(err.message || "Failed to load profile.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleEdit = () => {
     setTempProfile(profile);
@@ -57,9 +108,48 @@ function Profile() {
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    setProfile(tempProfile);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found. Please login again.");
+      }
+
+      const payload = {
+        name: tempProfile.personalInfo.name,
+        email: tempProfile.personalInfo.email,
+        phone: tempProfile.personalInfo.phone,
+        address: tempProfile.personalInfo.address,
+      };
+
+      const response = await axios.put(BASE_URL, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+      });
+
+      const updatedProfile = {
+        ...tempProfile,
+        personalInfo: {
+          ...tempProfile.personalInfo,
+          name: response.data.name,
+          email: response.data.email,
+          phone: response.data.phone,
+          address: response.data.address,
+        },
+      };
+
+      setProfile(updatedProfile);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      if (err.response) {
+        setError(err.response.data.message || "Failed to update profile.");
+      } else {
+        setError("Unable to update profile. Please try again.");
+      }
+    }
   };
 
   const handleChange = (section, field, value) => {
@@ -74,7 +164,6 @@ function Profile() {
 
   const handleSkillChange = (index, value) => {
     const updatedSkills = [...tempProfile.skills];
-    // Ensure value is between 0 and 100
     const newValue = Math.min(Math.max(Number.parseInt(value) || 0, 0), 100);
     updatedSkills[index] = {
       ...updatedSkills[index],
@@ -85,6 +174,27 @@ function Profile() {
       skills: updatedSkills,
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-200">
+          <p className="text-gray-600 mb-8 text-lg">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -173,6 +283,80 @@ function Profile() {
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={tempProfile.personalInfo.name}
+                      onChange={(e) =>
+                        handleChange("personalInfo", "name", e.target.value)
+                      }
+                    />
+                  ) : (
+                    <p className="text-gray-900">{profile.personalInfo.name}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={tempProfile.personalInfo.email}
+                      onChange={(e) =>
+                        handleChange("personalInfo", "email", e.target.value)
+                      }
+                    />
+                  ) : (
+                    <p className="text-gray-900">
+                      {profile.personalInfo.email}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={tempProfile.personalInfo.phone}
+                      onChange={(e) =>
+                        handleChange("personalInfo", "phone", e.target.value)
+                      }
+                    />
+                  ) : (
+                    <p className="text-gray-900">
+                      {profile.personalInfo.phone}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={tempProfile.personalInfo.address}
+                      onChange={(e) =>
+                        handleChange("personalInfo", "address", e.target.value)
+                      }
+                    />
+                  ) : (
+                    <p className="text-gray-900">
+                      {profile.personalInfo.address}
+                    </p>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Position
