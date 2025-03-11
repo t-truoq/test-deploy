@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Search, MoreHorizontal } from "lucide-react";
-import { EditClientModal } from "./EditClientModal";
+import { Edit } from "./Edit";
 
 const API_URL =
   "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/users";
 
-export function StaffClients() {
+export function Customers() {
   const [clients, setClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(null);
@@ -49,6 +49,7 @@ export function StaffClients() {
         phone: user.phone || "N/A",
         address: user.address || "N/A",
         role: user.role,
+        status: user.status || "active", // Add status field, default to "active"
         createdAt: new Date(user.createdAt).toLocaleDateString(),
         updatedAt: new Date(user.updatedAt).toLocaleDateString(),
         visits: 0,
@@ -94,36 +95,14 @@ export function StaffClients() {
     }
   };
 
-  const handleAddClient = (newClient) => {
-    const client = {
-      ...newClient,
-      id: (Math.max(...clients.map((c) => parseInt(c.id))) + 1).toString(),
-      visits: 0,
-      createdAt: new Date().toLocaleDateString(),
-      updatedAt: new Date().toLocaleDateString(),
-    };
-    setClients([...clients, client]);
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">Clients</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage your client database
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="p-6">
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search clients by name, email, or phone..."
+            placeholder="Search clients by name"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -257,7 +236,7 @@ export function StaffClients() {
         )}
       </div>
 
-      <EditClientModal
+      <Edit
         isOpen={!!editingClient}
         onClose={() => setEditingClient(null)}
         client={editingClient}

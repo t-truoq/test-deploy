@@ -43,7 +43,7 @@ const BlogDetail = () => {
         };
 
         const response = await axios.get(
-          `https://f23c-118-69-182-149.ngrok-free.app/api/blogs/${id}`,
+          `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/blogs/${id}`,
           { headers }
         );
 
@@ -123,7 +123,7 @@ const BlogDetail = () => {
         };
 
         const response = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/blogs",
+          "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/blogs",
           { headers }
         );
 

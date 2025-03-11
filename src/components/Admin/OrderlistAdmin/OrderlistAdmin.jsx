@@ -3,23 +3,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/bookings";
+const BASE_URL =
+  "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings"; // Replace with valid ngrok URL
 
 export default function OrderlistAdmin() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [hasFetched, setHasFetched] = useState(false);
 
-  // State cho các bộ lọc
+  // State for filters
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [therapistFilter, setTherapistFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
 
   useEffect(() => {
-    if (hasFetched) return;
-
     const fetchAllBookings = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -33,6 +31,7 @@ export default function OrderlistAdmin() {
             "ngrok-skip-browser-warning": "true",
           },
           maxRedirects: 5,
+          timeout: 10000, // Add timeout to avoid hanging requests
         });
 
         console.log("API Response:", response.data);
@@ -40,8 +39,9 @@ export default function OrderlistAdmin() {
         if (Array.isArray(response.data)) {
           const formattedData = response.data.map((booking) => ({
             id: booking.bookingId.toString(),
-            name: `Customer ${booking.customerId}`,
-            therapist: `Specialist ${booking.specialistId}`,
+            name: booking.customerName || `Customer ${booking.customerId}`,
+            therapist:
+              booking.specialistName || `Specialist ${booking.specialistId}`,
             date: booking.bookingDate,
             detail: booking.serviceNames
               ? booking.serviceNames.join(", ")
@@ -49,43 +49,38 @@ export default function OrderlistAdmin() {
             status: booking.status
               .replace("_", " ")
               .toLowerCase()
-              .replace(/\b\w/g, (c) => c.toUpperCase()), // Chuẩn hóa: "in_progress" -> "In Progress", "check_in" -> "Check In"
+              .replace(/\b\w/g, (c) => c.toUpperCase()),
           }));
           setOrders(formattedData);
           setFilteredOrders(formattedData);
-          console.log("Formatted Orders:", formattedData); // Kiểm tra trạng thái sau khi chuẩn hóa
+          console.log("Formatted Orders:", formattedData);
         } else {
           throw new Error("Bookings data is not an array");
         }
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error("Detailed Error:", error);
         if (error.response) {
-          if (error.response.status === 302) {
-            setError(
-              "Redirect detected. Please check authentication or server configuration."
-            );
-          } else if (error.response.status === 401) {
-            setError("Unauthorized: Please login again.");
-          } else if (error.response.status === 404) {
-            setError("No bookings found.");
-          } else {
-            setError(error.response.data.message || "Failed to load bookings.");
-          }
+          setError(
+            `Server Error: ${error.response.status} - ${
+              error.response.data?.message || "Failed to load bookings"
+            }`
+          );
         } else if (error.request) {
-          setError("Unable to connect to server. Please try again.");
+          setError(
+            "Network Error: Unable to connect to the server. Check your ngrok URL or internet connection."
+          );
         } else {
-          setError(error.message || "Failed to load bookings.");
+          setError(`Error: ${error.message}`);
         }
       } finally {
         setLoading(false);
-        setHasFetched(true);
       }
     };
 
     fetchAllBookings();
-  }, [hasFetched]);
+  }, []); // Empty dependency array to run once on mount
 
-  // Hàm lọc dữ liệu dựa trên các bộ lọc
+  // Filter data based on filters
   useEffect(() => {
     let result = [...orders];
 
@@ -110,16 +105,15 @@ export default function OrderlistAdmin() {
 
   const getStatusColor = (status) => {
     const colors = {
-      Pending: "bg-yellow-100 border border-yellow-500 text-yellow-900", // Màu vàng nhạt với viền vàng
-      Confirm: "bg-green-100 border border-green-500 text-green-900", // Màu xanh lá nhạt với viền xanh lá
-      "In Progress": "bg-blue-100 border border-blue-500 text-blue-900", // Màu xanh dương nhạt với viền xanh dương
-      Completed: "bg-purple-100 border border-purple-500 text-purple-900", // Màu tím nhạt với viền tím
-      Cancel: "bg-red-100 border border-red-500 text-red-900", // Màu đỏ nhạt với viền đỏ
+      Pending: "bg-yellow-100 border border-yellow-500 text-yellow-900",
+      Confirm: "bg-green-100 border border-green-500 text-green-900",
+      "In Progress": "bg-blue-100 border border-blue-500 text-blue-900",
+      Completed: "bg-purple-100 border border-purple-500 text-purple-900",
+      Cancelled: "bg-red-100 border border-red-500 text-red-900",
     };
-    return colors[status] || "bg-gray-100 border border-gray-300 text-gray-800"; // Mặc định nếu không khớp
+    return colors[status] || "bg-gray-100 border border-gray-300 text-gray-800";
   };
 
-  // Reset bộ lọc
   const resetFilters = () => {
     setStatusFilter("All Status");
     setTherapistFilter("");
@@ -158,6 +152,12 @@ export default function OrderlistAdmin() {
             </svg>
           </div>
           <p className="text-gray-600 mb-8 text-lg">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -182,7 +182,7 @@ export default function OrderlistAdmin() {
               Filter By
             </button>
 
-            {/* Bộ lọc Status */}
+            {/* Status Filter */}
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -191,12 +191,12 @@ export default function OrderlistAdmin() {
               <option value="All Status">All Status</option>
               <option value="Pending">Pending</option>
               <option value="Confirm">Confirm</option>
-              <option value="In Progress">In progress</option>
+              <option value="In Progress">In Progress</option>
               <option value="Completed">Completed</option>
-              <option value="Cancel">Cancel</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
 
-            {/* Bộ lọc Skin Therapist */}
+            {/* Therapist Filter */}
             <input
               type="text"
               placeholder="Filter by Skin Therapist"
@@ -205,7 +205,7 @@ export default function OrderlistAdmin() {
               className="px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
             />
 
-            {/* Bộ lọc Date */}
+            {/* Date Filter */}
             <input
               type="date"
               value={dateFilter}
@@ -272,8 +272,6 @@ export default function OrderlistAdmin() {
                       )}`}
                     >
                       {order.status}
-                      {console.log("Status:", order.status)}{" "}
-                      {/* Kiểm tra giá trị status */}
                     </span>
                   </td>
                 </tr>

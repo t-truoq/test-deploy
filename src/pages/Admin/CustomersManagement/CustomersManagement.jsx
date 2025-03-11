@@ -1,11 +1,10 @@
-import CalendarDemo from "../../../components/Admin/CalendarAdmin/Calendar";
+import { Customers } from "../../../components/Admin/Customers/Customers";
 import Header from "../../../components/Admin/HeaderAdmin/Header";
 import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
 
-const CalendarAdmin = () => {
+const CustomersManagement = () => {
   return (
-    <div className="flex  bg-gray-100">
-      {/* Sidebar giữ nguyên và luôn cố định khi cuộn */}
+    <div className="flex min-h-screen bg-gray-100">
       <div className="sticky top-0 h-screen">
         <Sidebar />
       </div>
@@ -16,13 +15,18 @@ const CalendarAdmin = () => {
             <Header />
           </div>
         </div>
-        <main className="p-7">
-          <h1 className="mb-3 text-2xl font-semibold text-gray-900"></h1>
-          <CalendarDemo />
+
+        <main className="p-6">
+          <div className="mb-6">
+            <h1 className="mb text-2xl font-semibold text-gray-900">
+              Customers
+            </h1>
+          </div>
+          <Customers />
         </main>
       </div>
     </div>
   );
 };
 
-export default CalendarAdmin;
+export default CustomersManagement;

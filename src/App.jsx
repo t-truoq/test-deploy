@@ -18,8 +18,6 @@ import Wishlist from "./components/Profile/ProfileComponents/Wishlist";
 
 import HomeAdmin from "./pages/Admin/Home/HomeAdmin";
 import OrderListAdmin from "./pages/Admin/Orderlists/OrderlistAdmin";
-import CalendarAdmin from "./pages/Admin/Calendar/CalendarAdmin";
-import ContactAdmin from "./pages/Admin/Contact/ContactAdmin";
 import FeedbackManagement from "./pages/Admin/Feedback/FeedbackAdmin";
 import ServicesAdmin from "./pages/Admin/Services/ServicesAdmin";
 import HomeStaff from "./pages/Staff/HomeStaff";
@@ -33,6 +31,9 @@ import FeedbackSK from "./pages/SkinTherapist/Feedback";
 import ProfilePage from "./pages/SkinTherapist/Profile";
 import Specialist from "./components/Therapist/SpecialistPage";
 import PaymentManagement from "./pages/Admin/Invoice/PaymentAdmin";
+import CustomersManagement from "./pages/Admin/CustomersManagement/CustomersManagement";
+import StaffsManagement from "./pages/Admin/StaffsManagment/StaffsManagement";
+import SkinTherapistsManagement from "./pages/Admin/SkinTherapistsManagement/SkinTherapistsManagement";
 
 function App() {
   const location = useLocation();
@@ -44,7 +45,9 @@ function App() {
     "/admin/services",
     "/admin/orderlists",
     "/admin/calendar",
-    "/admin/contact",
+    "/admin/customersmanagement",
+    "/admin/staffsmanagement",
+    "/admin/skintherapisttmanagement",
     "/admin/paymentmanagement",
     "/admin/feedback",
     "/staff/home",
@@ -83,8 +86,18 @@ function App() {
             <Route path="/admin/home" element={<HomeAdmin />} />
             <Route path="/admin/services" element={<ServicesAdmin />} />
             <Route path="/admin/orderlists" element={<OrderListAdmin />} />
-            <Route path="/admin/calendar" element={<CalendarAdmin />} />
-            <Route path="/admin/contact" element={<ContactAdmin />} />
+            <Route
+              path="/admin/customersmanagement"
+              element={<CustomersManagement />}
+            />
+            <Route
+              path="/admin/staffsmanagement"
+              element={<StaffsManagement />}
+            />
+            <Route
+              path="/admin/skintherapisttmanagement"
+              element={<SkinTherapistsManagement />}
+            />
             <Route
               path="/admin/paymentmanagement"
               element={<PaymentManagement />}

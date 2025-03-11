@@ -1,63 +1,95 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import BookingCard from "./BookingCard";
 import BookingDialog from "./BookingDialog";
 
-// Mock data for appointments
-const appointments = [
-  {
-    id: "1",
-    clientName: "Nguyen Van A",
-    service: "Facial Treatment",
-    date: "2025-03-09",
-    time: "10:00 AM",
-    duration: "60 min",
-    status: "pending",
-  },
-  {
-    id: "2",
-    clientName: "Tran Thi B",
-    service: "Skin Consultation",
-    date: "2025-03-09",
-    time: "1:30 PM",
-    duration: "45 min",
-    status: "pending",
-  },
-  {
-    id: "3",
-    clientName: "Le Van C",
-    service: "Acne Treatment",
-    date: "2025-03-10",
-    time: "9:15 AM",
-    duration: "90 min",
-    status: "confirmed",
-  },
-  {
-    id: "4",
-    clientName: "Pham Thi D",
-    service: "Anti-aging Treatment",
-    date: "2025-03-10",
-    time: "2:00 PM",
-    duration: "75 min",
-    status: "pending",
-  },
-  {
-    id: "5",
-    clientName: "Hoang Van E",
-    service: "Skin Brightening",
-    date: "2025-03-11",
-    time: "11:30 AM",
-    duration: "60 min",
-    status: "confirmed",
-  },
-];
+const BASE_URL =
+  "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/bookings/specialist";
 
 function Booking() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("upcoming");
-  const [localAppointments, setLocalAppointments] = useState(appointments);
+  const [localAppointments, setLocalAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [hasFetched, setHasFetched] = useState(false);
+
+  useEffect(() => {
+    if (hasFetched) return;
+
+    const fetchBookings = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found. Please login again.");
+        }
+
+        const decodedToken = jwtDecode(token);
+        console.log("Decoded Token:", decodedToken);
+
+        const response = await axios.get(BASE_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          maxRedirects: 5,
+        });
+
+        console.log("Bookings API Response:", response.data);
+
+        if (Array.isArray(response.data)) {
+          const specialistBookings = response.data.map((booking) => ({
+            id: booking.bookingId.toString(),
+            clientName: booking.customerName || "Unknown Customer", // Sử dụng customerName từ API, fallback nếu null
+            service: booking.serviceNames
+              ? booking.serviceNames.join(", ")
+              : "N/A",
+            date: booking.bookingDate,
+            time: booking.timeSlot.split("-")[0],
+            duration: calculateDuration(booking.timeSlot),
+            status: booking.status.toLowerCase().replace("_", " "),
+          }));
+          setLocalAppointments(specialistBookings);
+        } else {
+          throw new Error("Bookings data is not an array");
+        }
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        if (error.response) {
+          if (error.response.status === 401) {
+            setError("Unauthorized: Please login again.");
+          } else if (error.response.status === 404) {
+            setError("No bookings found for this specialist.");
+          } else {
+            setError(error.response.data.message || "Failed to load bookings.");
+          }
+        } else if (error.request) {
+          setError("Unable to connect to server. Please try again.");
+        } else {
+          setError(error.message || "Failed to load bookings.");
+        }
+      } finally {
+        setLoading(false);
+        setHasFetched(true);
+      }
+    };
+
+    fetchBookings();
+  }, [hasFetched]);
+
+  const calculateDuration = (timeSlot) => {
+    if (!timeSlot || !timeSlot.includes("-")) return "N/A";
+    const [start, end] = timeSlot.split("-");
+    const startDate = new Date(`1970-01-01T${start}:00`);
+    const endDate = new Date(`1970-01-01T${end}:00`);
+    const diffMs = endDate - startDate;
+    const minutes = Math.round(diffMs / 60000);
+    return `${minutes} min`;
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -69,48 +101,69 @@ function Booking() {
     }).format(date);
   };
 
-  // Group appointments by date
-  const appointmentsByDate = localAppointments.reduce((acc, appointment) => {
-    if (!acc[appointment.date]) {
-      acc[appointment.date] = [];
+  const filteredAppointmentsByDate = Object.keys(
+    localAppointments.reduce((acc, appointment) => {
+      if (!acc[appointment.date]) {
+        acc[appointment.date] = [];
+      }
+      acc[appointment.date].push(appointment);
+      return acc;
+    }, {})
+  ).reduce((acc, date) => {
+    if (activeTab === "upcoming") {
+      acc[date] = localAppointments.filter(
+        (a) => a.date === date && a.status === "pending"
+      );
+    } else if (activeTab === "confirmed") {
+      acc[date] = localAppointments.filter(
+        (a) => a.date === date && a.status === "confirmed"
+      );
+    } else {
+      acc[date] = localAppointments.filter((a) => a.date === date);
     }
-    acc[appointment.date].push(appointment);
     return acc;
   }, {});
-
-  const confirmAppointment = (id) => {
-    setLocalAppointments(
-      localAppointments.map((appointment) =>
-        appointment.id === id
-          ? { ...appointment, status: "confirmed" }
-          : appointment
-      )
-    );
-    setIsDialogOpen(false);
-  };
-
-  const filteredAppointmentsByDate = Object.keys(appointmentsByDate).reduce(
-    (acc, date) => {
-      if (activeTab === "upcoming") {
-        acc[date] = appointmentsByDate[date].filter(
-          (a) => a.status === "pending"
-        );
-      } else if (activeTab === "confirmed") {
-        acc[date] = appointmentsByDate[date].filter(
-          (a) => a.status === "confirmed"
-        );
-      } else {
-        acc[date] = appointmentsByDate[date];
-      }
-      return acc;
-    },
-    {}
-  );
 
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);
     setIsDialogOpen(true);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Loading bookings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-200">
+          <div className="w-20 h-20 mx-auto mb-6 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-3-3v6m-9 3h18a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <p className="text-gray-600 mb-8 text-lg">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -118,7 +171,6 @@ function Booking() {
         <h1 className="text-2xl font-bold">My Schedule</h1>
       </div>
 
-      {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">
         <nav className="flex -mb-px">
           <button
@@ -154,7 +206,6 @@ function Booking() {
         </nav>
       </div>
 
-      {/* Appointments List */}
       <div className="space-y-8">
         {Object.keys(filteredAppointmentsByDate).map((date) => {
           const dateAppointments = filteredAppointmentsByDate[date];
@@ -182,7 +233,6 @@ function Booking() {
         <BookingDialog
           appointment={selectedAppointment}
           onClose={() => setIsDialogOpen(false)}
-          onConfirm={confirmAppointment}
           formatDate={formatDate}
           isOpen={isDialogOpen}
         />

@@ -25,7 +25,7 @@
 //       }
 
 //       // Gọi API login với email và password
-//       const response = await axios.post('https://f23c-118-69-182-149.ngrok-free.app/api/auth/login', {
+//       const response = await axios.post('"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app//api/auth/login', {
 //         email,
 //         password
 //       })
@@ -245,7 +245,7 @@ export default function SignIn() {
       const response = await axios.get(
         `/login/oauth2/code/google?code=${code}`,
 
-        `https://f23c-118-69-182-149.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+        `"https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/login/oauth2/code/google?code=${code}`,
 
         { headers: { "Content-Type": "application/json" } }
       );
@@ -276,12 +276,9 @@ export default function SignIn() {
             break;
           case "STAFF":
             navigate("/staff/home");
-
-            navigate("/staff");
-
             break;
           case "SPECIALIST":
-            navigate("/specialist");
+            navigate("/skintherapist/home");
             break;
           case "CUSTOMER":
             navigate("/");
@@ -315,7 +312,7 @@ export default function SignIn() {
 
       console.log("Request data:", { email, password });
       const response = await axios.post(
-        "https://f23c-118-69-182-149.ngrok-free.app/auth/token",
+        "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/auth/token",
 
         { email, password },
 
@@ -350,9 +347,7 @@ export default function SignIn() {
             break;
           case "SPECIALIST":
             navigate("/skintherapist/home");
-
             // navigate("/specialist");
-
             break;
           case "CUSTOMER":
             navigate("/");
@@ -389,7 +384,7 @@ export default function SignIn() {
     window.location.href = "/oauth2/authorization/google";
 
     window.location.href =
-      "https://f23c-118-69-182-149.ngrok-free.app/oauth2/authorization/google";
+      "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/oauth2/authorization/google";
   };
 
   return (

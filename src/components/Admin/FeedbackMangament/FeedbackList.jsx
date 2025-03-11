@@ -21,23 +21,19 @@ export default function FeedbackList({ filter }) {
       }
 
       try {
-        // Cấu hình headers với token và ngrok-skip-browser-warning
         const headers = {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
           "Content-Type": "application/json",
         };
 
-        // Gọi API feedbacks
         const feedbackResponse = await axios.get(
-          "https://f23c-118-69-182-149.ngrok-free.app/api/feedbacks",
+          "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/feedbacks",
           { headers }
         );
 
-        // Log dữ liệu để kiểm tra
         console.log("Feedback Response:", feedbackResponse.data);
 
-        // Kiểm tra xem dữ liệu có phải JSON không
         if (
           typeof feedbackResponse.data === "string" &&
           feedbackResponse.data.startsWith("<!DOCTYPE")
@@ -48,16 +44,15 @@ export default function FeedbackList({ filter }) {
           return;
         }
 
-        // Ánh xạ dữ liệu phản hồi (tạm thời không dùng customers và specialists)
         const mappedData = feedbackResponse.data.map((item) => ({
           id: item.feedbackId,
-          customer: `Khách hàng ID: ${item.customerId}`, // Thay vì tên, dùng ID nếu không có API customers
-          email: "Email không khả dụng", // Cần API customers để lấy email
+          customer: `Khách hàng ID: ${item.customerId}`,
+          email: "Email không khả dụng",
           avatar: "/placeholder.svg?height=40&width=40",
-          service: `Dịch vụ ID: ${item.specialistId}`, // Thay vì tên dịch vụ, dùng ID nếu không có API specialists
+          service: `Dịch vụ ID: ${item.specialistId}`,
           message: item.comment,
           rating: item.rating,
-          date: item.createdAt.split("T")[0],
+          date: item.createdAt.split("T")[0], // Định dạng YYYY-MM-DD
           response: item.response || "",
         }));
 
@@ -134,10 +129,16 @@ export default function FeedbackList({ filter }) {
     closeModal();
   };
 
+  // Lọc và sắp xếp theo thời gian mới nhất
   const filteredItems =
     filter === 0
       ? feedbackItems
       : feedbackItems.filter((item) => item.rating === filter);
+
+  // Sắp xếp theo ngày giảm dần (mới nhất trước)
+  const sortedItems = [...filteredItems].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
 
   return (
     <>
@@ -147,14 +148,14 @@ export default function FeedbackList({ filter }) {
         </div>
       )}
       <div className="space-y-4">
-        {filteredItems.length === 0 ? (
+        {sortedItems.length === 0 ? (
           <div className="bg-white rounded-lg shadow border border-gray-200">
             <div className="p-6 text-center text-gray-500">
               Không tìm thấy phản hồi nào phù hợp với bộ lọc đã chọn.
             </div>
           </div>
         ) : (
-          filteredItems.map((item) => (
+          sortedItems.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-lg shadow border border-gray-200 cursor-pointer hover:border-primary/50 transition-colors"

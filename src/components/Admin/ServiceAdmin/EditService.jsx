@@ -3,7 +3,8 @@ import { X } from "lucide-react";
 import PropTypes from "prop-types";
 import axios from "axios"; // Dùng axios trực tiếp
 
-const BASE_URL = "https://f23c-118-69-182-149.ngrok-free.app/api/services"; // Base URL với ngrok
+const BASE_URL =
+  "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/services"; // Base URL với ngrok
 
 const EditServiceModal = ({ service, onEditService, onClose }) => {
   const [formData, setFormData] = useState({
