@@ -485,7 +485,6 @@
 
 // export default BlogPage;
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -511,12 +510,92 @@ const BlogPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const postsPerPage = 7;
 
-  
-
   // Khởi tạo dữ liệu tĩnh
   useEffect(() => {
-    setBlogs(staticBlogs);
-    setFilteredBlogs(staticBlogs);
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/blogs",
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (Array.isArray(response.data)) {
+          // Format blog data
+          const formattedBlogs = response.data.map((blog) => ({
+            id: blog.blogId,
+            title: blog.title,
+            content: blog.content,
+            excerpt:
+              blog.content.length > 150
+                ? blog.content.substring(0, 150) + "..."
+                : blog.content,
+            author: blog.author?.name || "Unknown Author",
+            authorImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              blog.author?.name || "Unknown"
+            )}&background=A10550&color=fff`,
+            date: new Date(blog.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            image:
+              blog.images && blog.images.length > 0
+                ? blog.images[0].url
+                : "/placeholder.svg?height=400&width=600",
+            category:
+              blog.category ||
+              [
+                "Skincare",
+                "Beauty Tips",
+                "Wellness",
+                "Treatments",
+                "Lifestyle",
+              ][Math.floor(Math.random() * 5)],
+            readTime: `${Math.max(
+              Math.ceil(blog.content.length / 1000),
+              1
+            )} min read`,
+          }));
+          setBlogs(formattedBlogs);
+          setFilteredBlogs(formattedBlogs);
+        } else {
+          throw new Error(
+            "Invalid response format: Expected an array of blogs"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+        if (error.response) {
+          console.log("Error response:", error.response.data);
+          console.log("Status:", error.response.status);
+          if (error.response.status === 404) {
+            setError("No blogs found.");
+          } else {
+            setError(
+              error.response.data.message ||
+                "Failed to load blogs. Please try again."
+            );
+          }
+        } else if (error.request) {
+          console.log("No response received:", error.request);
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
+        } else {
+          setError(error.message || "Failed to load blogs. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   // Filter blogs based on search term and category
@@ -539,7 +618,10 @@ const BlogPage = () => {
   }, [searchTerm, selectedCategory]);
 
   // Get unique categories from blogs
-  const categories = ["All", ...new Set(staticBlogs.map((blog) => blog.category))];
+  const categories = [
+    "All",
+    ...new Set(staticBlogs.map((blog) => blog.category)),
+  ];
 
   // Pagination logic
   const indexOfLastPost = currentPage * postsPerPage;
@@ -651,7 +733,7 @@ const BlogPage = () => {
       </div>
 
       <main className="max-w-[1920px] w-full h-auto mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {filteredBlogs.length === 0 ? (
+        {filteredBlogs.length === 0 ? (
           <div className="text-center py-16 w-full h-auto">
             <h2 className="text-2xl font-bold text-gray-700 mb-4">
               No articles found
@@ -801,7 +883,8 @@ const BlogPage = () => {
                         if (
                           number === 1 ||
                           number === totalPages ||
-                          (number >= currentPage - 1 && number <= currentPage + 1)
+                          (number >= currentPage - 1 &&
+                            number <= currentPage + 1)
                         ) {
                           return (
                             <button
@@ -819,7 +902,8 @@ const BlogPage = () => {
                         }
                         if (
                           (number === 2 && currentPage > 3) ||
-                          (number === totalPages - 1 && currentPage < totalPages - 2)
+                          (number === totalPages - 1 &&
+                            currentPage < totalPages - 2)
                         ) {
                           return (
                             <span
@@ -835,7 +919,9 @@ const BlogPage = () => {
                     )}
                   </div>
                   <button
-                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                    onClick={() =>
+                      paginate(Math.min(totalPages, currentPage + 1))
+                    }
                     disabled={currentPage === totalPages}
                     className="p-2 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
@@ -851,7 +937,9 @@ const BlogPage = () => {
       {/* Newsletter Section with Enhanced Design */}
       <section className="bg-gradient-to-r from-[#3D021E] to-[#A10550] text-white py-16 w-full h-auto">
         <div className="max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4 drop-shadow-lg">Stay Updated</h2>
+          <h2 className="text-3xl font-bold mb-4 drop-shadow-lg">
+            Stay Updated
+          </h2>
           <p className="text-pink-100 mb-8 max-w-2xl mx-auto leading-relaxed">
             Subscribe to our newsletter for exclusive spa tips, special offers,
             and the latest wellness trends.

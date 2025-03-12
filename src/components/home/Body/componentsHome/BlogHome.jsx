@@ -184,8 +184,74 @@ export default function BlogHome() {
 
   // Sử dụng dữ liệu tĩnh từ staticBlogs.js
   useEffect(() => {
-    // Đảm bảo dữ liệu từ staticBlogs đã được định dạng sẵn, không cần format lại
-    setBlogs(staticBlogs);
+    const fetchBlogs = async () => {
+      try {
+        const response = await axios.get(
+          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/blogs",
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Fetch blogs response:", response.data);
+
+        if (Array.isArray(response.data)) {
+          // Format data from API to match the UI
+          const formattedBlogs = response.data.map((blog) => ({
+            id: blog.blogId,
+            title: blog.title,
+            excerpt:
+              blog.content.length > 100
+                ? blog.content.substring(0, 100) + "..."
+                : blog.content,
+            author: blog.author?.name || "Unknown Author",
+            date: new Date(blog.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
+            image:
+              blog.images && blog.images.length > 0
+                ? blog.images[0].url
+                : "/placeholder.svg",
+            category: blog.category || "Blog", // Use category from API if available
+          }));
+          setBlogs(formattedBlogs);
+        } else {
+          throw new Error(
+            "Invalid response format: Expected an array of blogs"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+        if (error.response) {
+          console.log("Error response:", error.response.data);
+          console.log("Status:", error.response.status);
+          if (error.response.status === 404) {
+            setError("No blogs found.");
+          } else {
+            setError(
+              error.response.data.message ||
+                "Failed to load blogs. Please try again."
+            );
+          }
+        } else if (error.request) {
+          console.log("No response received:", error.request);
+          setError(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
+        } else {
+          setError(error.message || "Failed to load blogs. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   const handleClick = (blogId) => {

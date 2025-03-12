@@ -1,7 +1,14 @@
 "use client";
 
 import { useLocation } from "react-router-dom";
-import { Calendar, Users, Clock, MessageCircleWarning } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  Clock,
+  MessageCircleWarning,
+  Contact,
+  FileText,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function AppSidebar() {
@@ -13,9 +20,15 @@ export default function AppSidebar() {
   const mainNav = isStaffRoute
     ? [
         { name: "Appointments", icon: Calendar, path: "/staff/home" },
+        { name: "Manager Schedule", icon: Clock, path: "/staff/schedule" },
+        {
+          name: "Payment Management",
+          icon: FileText,
+          path: "/staff/paymentmanagement",
+        },
         { name: "Clients", icon: Users, path: "/staff/clients" },
         { name: "Skin therapist", icon: Users, path: "/staff/skintherapist" },
-        { name: "Manager Schedule", icon: Clock, path: "/staff/schedule" },
+        { name: "Contact", icon: Contact, path: "/staff/contact" },
         {
           name: "Feedback",
           icon: MessageCircleWarning,

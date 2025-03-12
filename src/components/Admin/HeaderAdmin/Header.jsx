@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client"; // Đánh dấu đây là Client Component
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Thêm useNavigate
 import {
   Bell,
   ChevronDown,
@@ -15,18 +18,39 @@ import {
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const navigate = useNavigate(); // Hook để điều hướng
 
-  const closeDropdowns = (e) => {
-    if (!e.target.closest(".dropdown-toggle")) {
-      setIsDropdownOpen(false);
-      setIsNotificationOpen(false);
-    }
+  // Xử lý click ngoài để đóng dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".dropdown-toggle")) {
+        setIsDropdownOpen(false);
+        setIsNotificationOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Hàm xử lý logout
+  const handleLogout = () => {
+    // Xóa token và thông tin người dùng khỏi localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Điều hướng về trang đăng nhập (giả sử là "/signin")
+    navigate("/");
   };
 
   return (
     <header
       className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2"
-      onClick={closeDropdowns}
+      onClick={(e) => {
+        if (!e.target.closest(".dropdown-toggle")) {
+          setIsDropdownOpen(false);
+          setIsNotificationOpen(false);
+        }
+      }}
     >
       <div className="flex items-center gap-6">
         <div className="relative">
@@ -140,7 +164,10 @@ export default function Header() {
                 <History className="h-4 w-4 text-blue-500" />
                 Activity Log
               </button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <button
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                onClick={handleLogout} // Gọi hàm handleLogout khi nhấn nút Log out
+              >
                 <LogOut className="h-4 w-4 text-blue-500" />
                 Log out
               </button>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -34,7 +33,9 @@ export default function HomeStaff() {
       }
       const parts = token.split(".");
       if (parts.length !== 3) {
-        throw new Error("Invalid token format: Token must have 3 parts separated by dots.");
+        throw new Error(
+          "Invalid token format: Token must have 3 parts separated by dots."
+        );
       }
       const decodedToken = jwtDecode(token);
       return decodedToken.role === "STAFF" || decodedToken.isStaff === true;
@@ -83,10 +84,14 @@ export default function HomeStaff() {
           return {
             id: booking.bookingId ? booking.bookingId.toString() : "unknown",
             clientName: booking.clientName || booking.bookingId || "Unknown",
-            service: booking.serviceNames ? booking.serviceNames.join(", ") : "Unknown Service",
+            service: booking.serviceNames
+              ? booking.serviceNames.join(", ")
+              : "Unknown Service",
             duration: booking.totalDuration || 60,
             time: booking.timeSlot || "N/A",
-            date: booking.bookingDate ? parseISO(booking.bookingDate) : new Date(),
+            date: booking.bookingDate
+              ? parseISO(booking.bookingDate)
+              : new Date(),
             therapist: booking.specialistId || "Unknown",
             status: status,
           };
@@ -96,7 +101,8 @@ export default function HomeStaff() {
       } catch (error) {
         console.error("Error fetching bookings:", error);
         setError(
-          error.response?.data?.message || "Failed to fetch bookings. Please try again later."
+          error.response?.data?.message ||
+            "Failed to fetch bookings. Please try again later."
         );
       } finally {
         setLoading(false);

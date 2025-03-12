@@ -1,14 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import axios from "axios"
-import { Link, useNavigate } from "react-router-dom"
-import Cookies from "js-cookie"
-import ServiceCard from "./components/ServiceCard/ServiceCard"
-import ServiceSearch from "./components/ServiceSearch"
-import BookingSummaryPanel from "./components/ServiceCard/BookingSummaryPanel"
-import { motion, AnimatePresence } from "framer-motion"
-import { Filter, ChevronDown, ChevronUp, Home, Sparkles, Package } from "lucide-react"
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import ServiceCard from "./components/ServiceCard/ServiceCard";
+import ServiceSearch from "./components/ServiceSearch";
+import BookingSummaryPanel from "./components/ServiceCard/BookingSummaryPanel";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  Sparkles,
+  Package,
+} from "lucide-react";
 
 // Embedded CSS for custom animations and styles
 const styles = {
@@ -87,24 +94,24 @@ const styles = {
       box-shadow: 0 0 15px rgba(161, 5, 80, 0.5);
     }
   `,
-}
+};
 
 // Login Required Modal Component
 const LoginRequiredModal = ({ isOpen, onClose, onLogin, action }) => {
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const getActionText = () => {
     switch (action) {
       case "booking":
-        return "book services"
+        return "book services";
       case "detail":
-        return "view service details"
+        return "view service details";
       case "wishlist":
-        return "add to wishlist"
+        return "add to wishlist";
       default:
-        return "continue"
+        return "continue";
     }
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -139,9 +146,12 @@ const LoginRequiredModal = ({ isOpen, onClose, onLogin, action }) => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">Login Required</h3>
+              <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">
+                Login Required
+              </h3>
               <p className="text-gray-600 mb-8">
-                You need to be logged in to {getActionText()}. Would you like to login now?
+                You need to be logged in to {getActionText()}. Would you like to
+                login now?
               </p>
               <div className="flex justify-center space-x-4">
                 <motion.button
@@ -166,32 +176,33 @@ const LoginRequiredModal = ({ isOpen, onClose, onLogin, action }) => {
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
 const ServiceList = () => {
-  const navigate = useNavigate()
-  const [selectedServices, setSelectedServices] = useState([])
-  const [recommendedServices, setRecommendedServices] = useState([])
-  const [allServices, setAllServices] = useState([])
-  const [filteredRecommendedServices, setFilteredRecommendedServices] = useState([])
-  const [filteredAllServices, setFilteredAllServices] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [wishlist, setWishlist] = useState([])
-  const [bookingError, setBookingError] = useState("")
-  const [bookingSuccess, setBookingSuccess] = useState("")
-  const [showLoginModal, setShowLoginModal] = useState(false)
-  const [redirectAction, setRedirectAction] = useState("")
-  const [serviceForDetail, setServiceForDetail] = useState(null)
-  const [skinTypeResult, setSkinTypeResult] = useState(null)
-  const [hasFetched, setHasFetched] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
-  const [priceRange, setPriceRange] = useState([0, 100000000])
-  const [durationRange, setDurationRange] = useState([0, 240])
-  const [sortOption, setSortOption] = useState("recommended")
+  const navigate = useNavigate();
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [recommendedServices, setRecommendedServices] = useState([]);
+  const [allServices, setAllServices] = useState([]);
+  const [filteredRecommendedServices, setFilteredRecommendedServices] =
+    useState([]);
+  const [filteredAllServices, setFilteredAllServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [wishlist, setWishlist] = useState([]);
+  const [bookingError, setBookingError] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [redirectAction, setRedirectAction] = useState("");
+  const [serviceForDetail, setServiceForDetail] = useState(null);
+  const [skinTypeResult, setSkinTypeResult] = useState(null);
+  const [hasFetched, setHasFetched] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 100000000]);
+  const [durationRange, setDurationRange] = useState([0, 240]);
+  const [sortOption, setSortOption] = useState("recommended");
 
-  const isLoggedIn = useCallback(() => !!localStorage.getItem("token"), [])
+  const isLoggedIn = useCallback(() => !!localStorage.getItem("token"), []);
 
   const redirectToLogin = () => {
     if (redirectAction === "detail" && serviceForDetail) {
@@ -200,137 +211,152 @@ const ServiceList = () => {
         JSON.stringify({
           action: "detail",
           serviceId: serviceForDetail.serviceId,
-        }),
-      )
+        })
+      );
     } else if (redirectAction === "booking") {
       localStorage.setItem(
         "redirectAfterLogin",
         JSON.stringify({
           action: "booking",
           selectedServices: selectedServices.map((s) => s.serviceId),
-        }),
-      )
+        })
+      );
     }
-    navigate("/login")
-  }
+    navigate("/login");
+  };
 
   const handleLoginRequired = (action, service = null) => {
-    setRedirectAction(action)
-    if (service) setServiceForDetail(service)
-    setShowLoginModal(true)
-  }
+    setRedirectAction(action);
+    if (service) setServiceForDetail(service);
+    setShowLoginModal(true);
+  };
 
   useEffect(() => {
-    const result = localStorage.getItem("skinTypeResult")
-    if (result) setSkinTypeResult(JSON.parse(result))
-  }, [])
+    const result = localStorage.getItem("skinTypeResult");
+    if (result) setSkinTypeResult(JSON.parse(result));
+  }, []);
 
   const handleSelect = (service) => {
     if (!isLoggedIn()) {
-      handleLoginRequired("booking")
-      return
+      handleLoginRequired("booking");
+      return;
     }
-    const serviceWithDuration = { ...service, duration: service.duration }
+    const serviceWithDuration = { ...service, duration: service.duration };
     setSelectedServices((prev) => {
       const updatedServices = prev.some(
         (s) => s.serviceId === service.serviceId
       )
         ? prev.filter((s) => s.serviceId !== service.serviceId)
-        : [...prev, serviceWithDuration]
-      localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices))
-      return updatedServices
-    })
-  }
+        : [...prev, serviceWithDuration];
+      localStorage.setItem(
+        "selectedServicesForBooking",
+        JSON.stringify(updatedServices)
+      );
+      return updatedServices;
+    });
+  };
 
   const handleRemoveService = (serviceId) => {
     setSelectedServices((prev) => {
-      const updatedServices = prev.filter((s) => s.serviceId !== serviceId)
+      const updatedServices = prev.filter((s) => s.serviceId !== serviceId);
       if (updatedServices.length === 0) {
-        localStorage.removeItem("selectedServicesForBooking")
+        localStorage.removeItem("selectedServicesForBooking");
       } else {
-        localStorage.setItem("selectedServicesForBooking", JSON.stringify(updatedServices))
+        localStorage.setItem(
+          "selectedServicesForBooking",
+          JSON.stringify(updatedServices)
+        );
       }
-      return updatedServices
-    })
-  }
+      return updatedServices;
+    });
+  };
 
   const handleClearAllServices = () => {
-    setSelectedServices([])
-    localStorage.removeItem("selectedServicesForBooking")
-  }
+    setSelectedServices([]);
+    localStorage.removeItem("selectedServicesForBooking");
+  };
 
   const handleViewDetails = (service) => {
     if (!isLoggedIn()) {
-      handleLoginRequired("detail", service)
-      return
+      handleLoginRequired("detail", service);
+      return;
     }
-    navigate(`/services/${service.serviceId}`)
-  }
+    navigate(`/services/${service.serviceId}`);
+  };
 
   const handleAddToWishlist = (service) => {
     if (!isLoggedIn()) {
-      handleLoginRequired("wishlist")
-      return
+      handleLoginRequired("wishlist");
+      return;
     }
-    let updatedWishlist = [...wishlist]
-    const isInWishlist = updatedWishlist.some((item) => item.serviceId === service.serviceId)
+    let updatedWishlist = [...wishlist];
+    const isInWishlist = updatedWishlist.some(
+      (item) => item.serviceId === service.serviceId
+    );
     if (isInWishlist) {
-      updatedWishlist = updatedWishlist.filter((item) => item.serviceId !== service.serviceId)
+      updatedWishlist = updatedWishlist.filter(
+        (item) => item.serviceId !== service.serviceId
+      );
     } else {
-      updatedWishlist.push(service)
+      updatedWishlist.push(service);
     }
-    Cookies.set("wishlist", JSON.stringify(updatedWishlist), { expires: 7 })
-    setWishlist(updatedWishlist)
-  }
+    Cookies.set("wishlist", JSON.stringify(updatedWishlist), { expires: 7 });
+    setWishlist(updatedWishlist);
+  };
 
   const handleSearch = (searchTerm) => {
     if (!searchTerm.trim()) {
-      setFilteredRecommendedServices(recommendedServices)
-      setFilteredAllServices(allServices)
-      return
+      setFilteredRecommendedServices(recommendedServices);
+      setFilteredAllServices(allServices);
+      return;
     }
     const filteredRecommended = recommendedServices.filter(
       (service) =>
         service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+        service.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     const filteredAll = allServices.filter(
       (service) =>
         service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    setFilteredRecommendedServices(filteredRecommended)
-    setFilteredAllServices(filteredAll)
-  }
+        service.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredRecommendedServices(filteredRecommended);
+    setFilteredAllServices(filteredAll);
+  };
 
   const handleBookServices = () => {
     if (!isLoggedIn()) {
-      handleLoginRequired("booking")
-      return
+      handleLoginRequired("booking");
+      return;
     }
     if (selectedServices.length === 0) {
-      setBookingError("Please select at least one service to book.")
-      return
+      setBookingError("Please select at least one service to book.");
+      return;
     }
     try {
-      const selectedServiceIds = selectedServices.map((service) => service.serviceId)
-      localStorage.setItem("selectedServiceIdsForBooking", JSON.stringify(selectedServiceIds))
-      setBookingSuccess("Proceeding to booking confirmation...")
-      setBookingError("")
-      navigate("/mybooking")
+      const selectedServiceIds = selectedServices.map(
+        (service) => service.serviceId
+      );
+      localStorage.setItem(
+        "selectedServiceIdsForBooking",
+        JSON.stringify(selectedServiceIds)
+      );
+      setBookingSuccess("Proceeding to booking confirmation...");
+      setBookingError("");
+      navigate("/mybooking");
       setTimeout(() => {
-        setSelectedServices([])
-        localStorage.removeItem("selectedServicesForBooking")
-      }, 1000)
+        setSelectedServices([]);
+        localStorage.removeItem("selectedServicesForBooking");
+      }, 1000);
     } catch (error) {
-      console.error("Error preparing booking:", error)
-      setBookingError("Failed to prepare booking. Please try again.")
+      console.error("Error preparing booking:", error);
+      setBookingError("Failed to prepare booking. Please try again.");
     }
-  }
+  };
 
   // Apply filters and sorting
   useEffect(() => {
-    if (!allServices.length) return
+    if (!allServices.length) return;
 
     // Apply price and duration filters
     const filteredAll = allServices.filter(
@@ -338,58 +364,58 @@ const ServiceList = () => {
         service.price >= priceRange[0] &&
         service.price <= priceRange[1] &&
         service.duration >= durationRange[0] &&
-        service.duration <= durationRange[1],
-    )
+        service.duration <= durationRange[1]
+    );
 
     const filteredRecommended = recommendedServices.filter(
       (service) =>
         service.price >= priceRange[0] &&
         service.price <= priceRange[1] &&
         service.duration >= durationRange[0] &&
-        service.duration <= durationRange[1],
-    )
+        service.duration <= durationRange[1]
+    );
 
     // Apply sorting
     const sortServices = (services) => {
       switch (sortOption) {
         case "price-low":
-          return [...services].sort((a, b) => a.price - b.price)
+          return [...services].sort((a, b) => a.price - b.price);
         case "price-high":
-          return [...services].sort((a, b) => b.price - a.price)
+          return [...services].sort((a, b) => b.price - a.price);
         case "duration-low":
-          return [...services].sort((a, b) => a.duration - b.duration)
+          return [...services].sort((a, b) => a.duration - b.duration);
         case "duration-high":
-          return [...services].sort((a, b) => b.duration - a.duration)
+          return [...services].sort((a, b) => b.duration - a.duration);
         case "name":
-          return [...services].sort((a, b) => a.name.localeCompare(b.name))
+          return [...services].sort((a, b) => a.name.localeCompare(b.name));
         default:
-          return services
+          return services;
       }
-    }
+    };
 
-    setFilteredAllServices(sortServices(filteredAll))
-    setFilteredRecommendedServices(sortServices(filteredRecommended))
-  }, [allServices, recommendedServices, priceRange, durationRange, sortOption])
+    setFilteredAllServices(sortServices(filteredAll));
+    setFilteredRecommendedServices(sortServices(filteredRecommended));
+  }, [allServices, recommendedServices, priceRange, durationRange, sortOption]);
 
   useEffect(() => {
-    if (hasFetched) return
+    if (hasFetched) return;
 
-    const savedWishlist = Cookies.get("wishlist")
+    const savedWishlist = Cookies.get("wishlist");
     if (savedWishlist) {
       try {
-        const parsedWishlist = JSON.parse(savedWishlist)
-        if (Array.isArray(parsedWishlist)) setWishlist(parsedWishlist)
-        else setWishlist([])
+        const parsedWishlist = JSON.parse(savedWishlist);
+        if (Array.isArray(parsedWishlist)) setWishlist(parsedWishlist);
+        else setWishlist([]);
       } catch (error) {
-        console.error("Error parsing wishlist from cookie:", error)
-        setWishlist([])
+        console.error("Error parsing wishlist from cookie:", error);
+        setWishlist([]);
       }
     }
 
     const fetchRecommendedServices = async () => {
       try {
-        const token = localStorage.getItem("token")
-        if (!token) throw new Error("No token found. Please login again.")
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
           "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/quiz/recommended-services",
@@ -399,34 +425,45 @@ const ServiceList = () => {
               "ngrok-skip-browser-warning": "true",
               "Content-Type": "application/json",
             },
-          },
-        )
+          }
+        );
 
-        console.log("Recommended services data:", response.data)
+        console.log("Recommended services data:", response.data);
         if (Array.isArray(response.data)) {
-          setRecommendedServices(response.data)
-          setFilteredRecommendedServices(response.data)
+          setRecommendedServices(response.data);
+          setFilteredRecommendedServices(response.data);
         } else {
-          throw new Error("Recommended services data is not an array")
+          throw new Error("Recommended services data is not an array");
         }
       } catch (error) {
-        console.error("Error fetching recommended services:", error)
+        console.error("Error fetching recommended services:", error);
         if (error.response) {
           if (error.response.status === 401) {
-            setError("Unauthorized: Please login again.")
-            setTimeout(() => navigate("/login"), 2000)
-          } else if (error.response.status === 400 || error.response.status === 404) {
-            setError("No recommended services found. Please complete the skin type quiz.")
+            setError("Unauthorized: Please login again.");
+            setTimeout(() => navigate("/login"), 2000);
+          } else if (
+            error.response.status === 400 ||
+            error.response.status === 404
+          ) {
+            setError(
+              "No recommended services found. Please complete the skin type quiz."
+            );
           } else {
-            setError(error.response.data.message || "Failed to load recommended services.")
+            setError(
+              error.response.data.message ||
+                "Failed to load recommended services."
+            );
           }
         } else if (error.request) {
-          setError("Unable to connect to server. Please try again.")
+          setError("Unable to connect to server. Please try again.");
         } else {
-          setError(error.message || "Failed to load recommended services. Please try again.")
+          setError(
+            error.message ||
+              "Failed to load recommended services. Please try again."
+          );
         }
       }
-    }
+    };
 
     const fetchAllServices = async () => {
       try {
@@ -436,45 +473,52 @@ const ServiceList = () => {
             headers: {
               "ngrok-skip-browser-warning": "true",
             },
-          },
-        )
+          }
+        );
 
-        console.log("All services data:", response.data)
+        console.log("All services data:", response.data);
         if (Array.isArray(response.data)) {
-          setAllServices(response.data)
-          setFilteredAllServices(response.data)
+          setAllServices(response.data);
+          setFilteredAllServices(response.data);
         } else {
-          throw new Error("All services data is not an array")
+          throw new Error("All services data is not an array");
         }
       } catch (error) {
-        console.error("Error fetching all services:", error)
+        console.error("Error fetching all services:", error);
         if (error.response) {
           if (error.response.status === 404) {
-            setError("No services found.")
+            setError("No services found.");
           } else {
-            setError(error.response.data.message || "Failed to load services. Please try again.")
+            setError(
+              error.response.data.message ||
+                "Failed to load services. Please try again."
+            );
           }
         } else if (error.request) {
-          setError("Unable to connect to server. Please try again.")
+          setError("Unable to connect to server. Please try again.");
         } else {
-          setError(error.message || "Failed to load services. Please try again.")
+          setError(
+            error.message || "Failed to load services. Please try again."
+          );
         }
       }
-    }
+    };
 
-    Promise.all([fetchRecommendedServices(), fetchAllServices()]).finally(() => {
-      setLoading(false)
-      setHasFetched(true)
-    })
-  }, [navigate, hasFetched, isLoggedIn])
+    Promise.all([fetchRecommendedServices(), fetchAllServices()]).finally(
+      () => {
+        setLoading(false);
+        setHasFetched(true);
+      }
+    );
+  }, [navigate, hasFetched, isLoggedIn]);
 
   useEffect(() => {
-    if (!skinTypeResult || hasFetched) return
+    if (!skinTypeResult || hasFetched) return;
 
     const fetchRecommendedServices = async () => {
       try {
-        const token = localStorage.getItem("token")
-        if (!token) throw new Error("No token found. Please login again.")
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
           "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/quiz/recommended-services",
@@ -484,86 +528,109 @@ const ServiceList = () => {
               "ngrok-skip-browser-warning": "true",
               "Content-Type": "application/json",
             },
-          },
-        )
+          }
+        );
 
-        console.log("Recommended services data:", response.data)
+        console.log("Recommended services data:", response.data);
         if (Array.isArray(response.data)) {
-          setRecommendedServices(response.data)
-          setFilteredRecommendedServices(response.data)
+          setRecommendedServices(response.data);
+          setFilteredRecommendedServices(response.data);
         } else {
-          throw new Error("Recommended services data is not an array")
+          throw new Error("Recommended services data is not an array");
         }
       } catch (error) {
-        console.error("Error fetching recommended services:", error)
+        console.error("Error fetching recommended services:", error);
         if (error.response) {
           if (error.response.status === 401) {
-            setError("Unauthorized: Please login again.")
-            setTimeout(() => navigate("/login"), 2000)
-          } else if (error.response.status === 400 || error.response.status === 404) {
-            setError("No recommended services found. Please complete the skin type quiz.")
+            setError("Unauthorized: Please login again.");
+            setTimeout(() => navigate("/login"), 2000);
+          } else if (
+            error.response.status === 400 ||
+            error.response.status === 404
+          ) {
+            setError(
+              "No recommended services found. Please complete the skin type quiz."
+            );
           } else {
-            setError(error.response.data.message || "Failed to load recommended services. Please try again.")
+            setError(
+              error.response.data.message ||
+                "Failed to load recommended services. Please try again."
+            );
           }
         } else if (error.request) {
-          setError("Unable to connect to server. Please try again.")
+          setError("Unable to connect to server. Please try again.");
         } else {
-          setError(error.message || "Failed to load recommended services. Please try again.")
+          setError(
+            error.message ||
+              "Failed to load recommended services. Please try again."
+          );
         }
       }
-    }
+    };
 
-    fetchRecommendedServices()
-  }, [skinTypeResult, navigate, hasFetched])
+    fetchRecommendedServices();
+  }, [skinTypeResult, navigate, hasFetched]);
 
   useEffect(() => {
-    const storedServices = localStorage.getItem("selectedServicesForBooking")
+    const storedServices = localStorage.getItem("selectedServicesForBooking");
     if (storedServices) {
       try {
-        const parsedServices = JSON.parse(storedServices)
+        const parsedServices = JSON.parse(storedServices);
         if (Array.isArray(parsedServices) && parsedServices.length > 0) {
-          setSelectedServices(parsedServices)
+          setSelectedServices(parsedServices);
           setTimeout(() => {
-            const bookingPanel = document.getElementById("booking-summary-panel")
-            if (bookingPanel) bookingPanel.scrollIntoView({ behavior: "smooth" })
-          }, 500)
+            const bookingPanel = document.getElementById(
+              "booking-summary-panel"
+            );
+            if (bookingPanel)
+              bookingPanel.scrollIntoView({ behavior: "smooth" });
+          }, 500);
         }
       } catch (error) {
-        console.error("Error parsing stored services:", error)
+        console.error("Error parsing stored services:", error);
       }
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const redirectInfo = localStorage.getItem("redirectAfterLogin")
+    const redirectInfo = localStorage.getItem("redirectAfterLogin");
     if (redirectInfo && isLoggedIn()) {
       try {
-        const { action, serviceId, selectedServices: savedServices } = JSON.parse(redirectInfo)
+        const {
+          action,
+          serviceId,
+          selectedServices: savedServices,
+        } = JSON.parse(redirectInfo);
         if (action === "detail" && serviceId) {
-          navigate(`/services/${serviceId}`)
+          navigate(`/services/${serviceId}`);
         } else if (action === "booking" && savedServices?.length > 0) {
-          const servicesToSelect = allServices.filter((s) => savedServices.includes(s.serviceId))
+          const servicesToSelect = allServices.filter((s) =>
+            savedServices.includes(s.serviceId)
+          );
           if (servicesToSelect.length > 0) {
-            setSelectedServices(servicesToSelect)
-            localStorage.setItem("selectedServicesForBooking", JSON.stringify(servicesToSelect))
+            setSelectedServices(servicesToSelect);
+            localStorage.setItem(
+              "selectedServicesForBooking",
+              JSON.stringify(servicesToSelect)
+            );
           }
         }
-        localStorage.removeItem("redirectAfterLogin")
+        localStorage.removeItem("redirectAfterLogin");
       } catch (error) {
-        console.error("Error processing redirect after login:", error)
+        console.error("Error processing redirect after login:", error);
       }
     }
-  }, [allServices, isLoggedIn, navigate])
+  }, [allServices, isLoggedIn, navigate]);
 
   useEffect(() => {
     if (!isLoggedIn() && selectedServices.length > 0) {
-      handleClearAllServices()
+      handleClearAllServices();
     }
-  }, [isLoggedIn, selectedServices.length])
+  }, [isLoggedIn, selectedServices.length]);
 
   const toggleFilters = () => {
-    setShowFilters(!showFilters)
-  }
+    setShowFilters(!showFilters);
+  };
 
   if (loading) {
     return (
@@ -577,12 +644,16 @@ const ServiceList = () => {
           <motion.div
             className="w-16 h-16 border-4 border-[#A10550] border-t-transparent rounded-full mx-auto mb-4"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            transition={{
+              duration: 1,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
           />
           <p className="text-xl text-gray-600">Loading luxury services...</p>
         </motion.div>
       </div>
-    )
+    );
   }
 
   if (error && !allServices.length) {
@@ -600,7 +671,12 @@ const ServiceList = () => {
             animate={{ scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -620,7 +696,7 @@ const ServiceList = () => {
           </motion.div>
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
@@ -636,8 +712,8 @@ const ServiceList = () => {
           Our <span className="text-[#A10550]">Luxury</span> Services
         </h1>
         <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-3xl mx-auto">
-          Indulge in our premium beauty treatments designed to enhance your natural beauty and provide a truly luxurious
-          experience.
+          Indulge in our premium beauty treatments designed to enhance your
+          natural beauty and provide a truly luxurious experience.
         </p>
       </motion.div>
 
@@ -651,7 +727,10 @@ const ServiceList = () => {
         <nav>
           <ol className="flex items-center space-x-2 text-sm sm:text-base">
             <li>
-              <Link to="/" className="text-gray-600 hover:text-[#A10550] transition-colors flex items-center">
+              <Link
+                to="/"
+                className="text-gray-600 hover:text-[#A10550] transition-colors flex items-center"
+              >
                 <Home className="w-4 h-4 mr-1" /> Home
               </Link>
             </li>
@@ -671,7 +750,11 @@ const ServiceList = () => {
           >
             <Filter className="w-4 h-4" />
             <span className="hidden sm:inline">Filters</span>
-            {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showFilters ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </motion.button>
         </div>
       </motion.div>
@@ -688,7 +771,9 @@ const ServiceList = () => {
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               <div className="w-full">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Price Range</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Price Range
+                </h3>
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
@@ -696,7 +781,12 @@ const ServiceList = () => {
                     max="1000000000"
                     step="10"
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      setPriceRange([
+                        priceRange[0],
+                        Number.parseInt(e.target.value),
+                      ])
+                    }
                     className="w-full accent-[#A10550]"
                   />
                   <span className="text-sm text-gray-700 whitespace-nowrap">
@@ -706,7 +796,9 @@ const ServiceList = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Duration (minutes)</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Duration (minutes)
+                </h3>
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
@@ -714,7 +806,12 @@ const ServiceList = () => {
                     max="240"
                     step="15"
                     value={durationRange[1]}
-                    onChange={(e) => setDurationRange([durationRange[0], Number.parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      setDurationRange([
+                        durationRange[0],
+                        Number.parseInt(e.target.value),
+                      ])
+                    }
                     className="w-full accent-[#A10550]"
                   />
                   <span className="text-sm text-gray-700 whitespace-nowrap">
@@ -724,7 +821,9 @@ const ServiceList = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Sort By</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Sort By
+                </h3>
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value)}
@@ -885,9 +984,13 @@ const ServiceList = () => {
                   service={service}
                   onSelect={handleSelect}
                   onViewDetails={() => handleViewDetails(service)}
-                  isSelected={selectedServices.some((s) => s.serviceId === service.serviceId)}
+                  isSelected={selectedServices.some(
+                    (s) => s.serviceId === service.serviceId
+                  )}
                   onAddToWishlist={handleAddToWishlist}
-                  isInWishlist={wishlist.some((item) => item.serviceId === service.serviceId)}
+                  isInWishlist={wishlist.some(
+                    (item) => item.serviceId === service.serviceId
+                  )}
                   variant="all"
                 />
               ))}
@@ -916,8 +1019,7 @@ const ServiceList = () => {
         action={redirectAction}
       />
     </div>
-  )
-}
+  );
+};
 
-export default ServiceList
-
+export default ServiceList;

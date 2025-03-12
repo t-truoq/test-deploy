@@ -34,6 +34,8 @@ import PaymentManagement from "./pages/Admin/Invoice/PaymentAdmin";
 import CustomersManagement from "./pages/Admin/CustomersManagement/CustomersManagement";
 import StaffsManagement from "./pages/Admin/StaffsManagment/StaffsManagement";
 import SkinTherapistsManagement from "./pages/Admin/SkinTherapistsManagement/SkinTherapistsManagement";
+import ContactManagment from "./pages/Staff/ContactManagment";
+import Payment from "./pages/Staff/Payment";
 
 function App() {
   const location = useLocation();
@@ -55,6 +57,8 @@ function App() {
     "/staff/schedule",
     "/staff/clients",
     "/staff/skintherapist",
+    "/staff/contact",
+    "/staff/paymentmanagement",
     "/staff/feedback",
     "/skintherapist/home",
     "/skintherapist/feedback",
@@ -110,6 +114,8 @@ function App() {
             <Route path="/staff/skintherapist" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
             <Route path="/staff/feedback" element={<FeedbackStaff />} />
+            <Route path="/staff/contact" element={<ContactManagment />} />
+            <Route path="/staff/paymentmanagement" element={<Payment />} />
             {/* Skin theorapist router*/}
             <Route
               path="/skintherapist/home"
