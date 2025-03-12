@@ -106,7 +106,7 @@ export function StaffSchedule() {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              <th className="border p-2">Skin theoripist</th>
+              <th className="border p-2">Skin therapist</th>
               {weekDays.map((day) => (
                 <th key={day.toString()} className="border p-2">
                   {format(day, "EEE dd/MM")}
