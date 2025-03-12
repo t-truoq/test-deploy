@@ -1,3 +1,1145 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { Link, NavLink, useNavigate } from "react-router-dom";
+// import {
+//   User,
+//   ChevronDown,
+//   Menu,
+//   X,
+//   Settings,
+//   LogOut,
+//   Heart,
+//   ShoppingBag,
+//   UserCircle,
+//   Globe,
+//   Bell,
+// } from "lucide-react";
+// import axios from "axios";
+
+// // Custom hook for localStorage
+// const useLocalStorage = (key, initialValue) => {
+//   const [value, setValue] = useState(() => {
+//     try {
+//       const item = localStorage.getItem(key);
+//       return item ? JSON.parse(item) : initialValue;
+//     } catch (error) {
+//       console.error("Error reading localStorage:", error);
+//       return initialValue;
+//     }
+//   });
+
+//   useEffect(() => {
+//     const handleStorageChange = () => {
+//       try {
+//         const item = localStorage.getItem(key);
+//         setValue(item ? JSON.parse(item) : initialValue);
+//       } catch (error) {
+//         console.error("Error reading localStorage:", error);
+//         setValue(initialValue);
+//       }
+//     };
+
+//     window.addEventListener("storage", handleStorageChange);
+//     const interval = setInterval(() => handleStorageChange(), 1000);
+
+//     return () => {
+//       window.removeEventListener("storage", handleStorageChange);
+//       clearInterval(interval);
+//     };
+//   }, [key, initialValue]);
+
+//   return [value, setValue];
+// };
+
+// const Navbar = () => {
+//   const navigate = useNavigate();
+//   const [isLoggedIn, setIsLoggedIn] = useState(false);
+//   const [showSidebar, setShowSidebar] = useState(false);
+//   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+//   const [showMobileMenu, setShowMobileMenu] = useState(false);
+//   const [scrolled, setScrolled] = useState(false);
+//   const [showNotifications, setShowNotifications] = useState(false);
+//   const [notifications, setNotifications] = useState([]);
+//   const [loadingNotifications, setLoadingNotifications] = useState(true);
+//   const [errorNotifications, setErrorNotifications] = useState(null);
+//   const [user, setUser] = useLocalStorage("user", {
+//     name: "Nguyen",
+//     email: "user@example.com",
+//   });
+//   const [language, setLanguage] = useState("en"); // Initialize language state
+//   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
+//   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
+//   const baseUrl = "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
+
+//   // Check login status and fetch user profile
+//   useEffect(() => {
+//     const fetchUserProfile = async () => {
+//       try {
+//         const token = localStorage.getItem("token");
+//         if (!token) {
+//           setIsLoggedIn(false);
+//           return;
+//         }
+
+//         const response = await axios.get(`${baseUrl}/api/users/profile`, {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             "ngrok-skip-browser-warning": "true",
+//             "Content-Type": "application/json",
+//           },
+//           timeout: 10000,
+//         });
+
+//         console.log("Fetch user profile response:", response.data);
+
+//         const userData = {
+//           userId: response.data.userId || null,
+//           email: response.data.email || "user@example.com",
+//           name: response.data.name || "User",
+//           phone: response.data.phone || "",
+//           address: response.data.address || "",
+//           role: response.data.role || "",
+//         };
+
+//         localStorage.setItem("user", JSON.stringify(userData));
+//         setUser(userData);
+//         setIsLoggedIn(true);
+//       } catch (error) {
+//         console.error("Error fetching user profile:", error);
+//         if (error.response && error.response.status === 401) {
+//           localStorage.removeItem("token");
+//           localStorage.removeItem("user");
+//           setIsLoggedIn(false);
+//           navigate("/login");
+//         }
+//       }
+//     };
+
+//     fetchUserProfile();
+//   }, [navigate, setUser, baseUrl]);
+
+//   // Mark notification as read
+//   const markNotificationAsRead = async (notification) => {
+//     if (notification.status === "read") return;
+
+//     const isTempId =
+//       notification.id.toString().includes(".") ||
+//       !Number.isInteger(Number(notification.id));
+//     if (isTempId) {
+//       console.warn(
+//         `Skipping mark as read for temporary ID: ${notification.id}`
+//       );
+//       setNotifications((prevNotifications) =>
+//         prevNotifications.map((n) =>
+//           n.id === notification.id ? { ...n, status: "read" } : n
+//         )
+//       );
+//       return;
+//     }
+
+//     setNotifications((prevNotifications) =>
+//       prevNotifications.map((n) =>
+//         n.id === notification.id ? { ...n, status: "read" } : n
+//       )
+//     );
+
+//     try {
+//       const token = localStorage.getItem("token");
+//       if (!token) {
+//         console.error("No token found");
+//         return;
+//       }
+
+//       await axios.post(
+//         `${baseUrl}/api/notifications/${notification.id}/read`,
+//         { read: true },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             "ngrok-skip-browser-warning": "true",
+//             "Content-Type": "application/json",
+//           },
+//           timeout: 10000,
+//         }
+//       );
+//       console.log(`Notification ${notification.id} marked as read in database`);
+//     } catch (error) {
+//       console.error("Error marking notification as read in database:", error);
+//       alert("Failed to mark notification as read. Please try again.");
+//       setNotifications((prevNotifications) =>
+//         prevNotifications.map((n) =>
+//           n.id === notification.id ? { ...n, status: "unread" } : n
+//         )
+//       );
+//     }
+//   };
+
+//   // Fetch notifications
+//   useEffect(() => {
+//     const fetchNotifications = async (retryCount = 2) => {
+//       try {
+//         setLoadingNotifications(true);
+//         setErrorNotifications(null);
+//         const token = localStorage.getItem("token");
+//         if (!token) {
+//           setErrorNotifications(
+//             "No authentication token found. Please log in."
+//           );
+//           setLoadingNotifications(false);
+//           return;
+//         }
+
+//         const response = await axios.get(`${baseUrl}/api/notifications`, {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             "ngrok-skip-browser-warning": "true",
+//             "Content-Type": "application/json",
+//             Accept: "application/json",
+//           },
+//           timeout: 10000,
+//         });
+
+//         let rawData = response.data;
+//         console.log("Raw response data:", rawData);
+
+//         let parsedData;
+//         if (typeof rawData === "string") {
+//           rawData = rawData.trim();
+//           if (rawData.startsWith("[")) {
+//             try {
+//               parsedData = JSON.parse(rawData);
+//             } catch (parseError) {
+//               console.error("Initial parse error:", parseError);
+//               const jsonMatch = rawData.match(/(\[.*\])/s);
+//               if (jsonMatch && jsonMatch[1]) {
+//                 parsedData = JSON.parse(jsonMatch[1]);
+//               } else {
+//                 throw new Error("No valid JSON array found in response");
+//               }
+//             }
+//           } else {
+//             throw new Error("Response is not a JSON array string");
+//           }
+//         } else if (Array.isArray(rawData)) {
+//           parsedData = rawData;
+//         } else if (typeof rawData === "object" && rawData !== null) {
+//           parsedData = [rawData];
+//         } else {
+//           throw new Error("Unexpected response format");
+//         }
+
+//         const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
+
+//         const processedNotifications = dataArray.map((item) => {
+//           if (!item.id) {
+//             console.warn("Notification missing ID:", item);
+//             const tempId = item.createdAt
+//               ? `temp_${new Date(item.createdAt).getTime()}`
+//               : `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+//             return {
+//               id: tempId,
+//               message: item.message || "New Notification",
+//               time: item.createdAt
+//                 ? new Date(item.createdAt).toLocaleString("en-US", {
+//                     hour: "2-digit",
+//                     minute: "2-digit",
+//                     day: "2-digit",
+//                     month: "2-digit",
+//                     year: "numeric",
+//                   })
+//                 : "Unknown time",
+//               createdAt: item.createdAt,
+//               status: item.read ? "read" : "unread",
+//             };
+//           }
+//           return {
+//             id: item.id,
+//             message: item.message || "New Notification",
+//             time: item.createdAt
+//               ? new Date(item.createdAt).toLocaleString("en-US", {
+//                   hour: "2-digit",
+//                   minute: "2-digit",
+//                   day: "2-digit",
+//                   month: "2-digit",
+//                   year: "numeric",
+//                 })
+//               : "Unknown time",
+//             createdAt: item.createdAt,
+//             status: item.read ? "read" : "unread",
+//           };
+//         });
+
+//         const sortedNotifications = processedNotifications.sort((a, b) => {
+//           const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+//           const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+//           return dateB - dateA;
+//         });
+
+//         setNotifications(sortedNotifications);
+//         console.log("Sorted notifications:", sortedNotifications);
+//       } catch (error) {
+//         console.error("Error fetching notifications:", error);
+//         if (retryCount > 0 && error.code === "ECONNABORTED") {
+//           console.log(`Retrying... Attempts left: ${retryCount}`);
+//           await new Promise((resolve) => setTimeout(resolve, 2000));
+//           return fetchNotifications(retryCount - 1);
+//         }
+//         setErrorNotifications(
+//           error.message ||
+//             "Failed to fetch notifications. Check server or network."
+//         );
+//       } finally {
+//         setLoadingNotifications(false);
+//       }
+//     };
+
+//     if (isLoggedIn) {
+//       fetchNotifications();
+//     }
+//   }, [isLoggedIn, baseUrl]);
+
+//   // Auto-hide notification message
+//   useEffect(() => {
+//     if (notifications.some((n) => n.status === "unread")) {
+//       setShowNotificationMessage(true);
+//       const timer = setTimeout(() => {
+//         setShowNotificationMessage(false);
+//       }, 5000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, [notifications]);
+
+//   // Handle scroll event
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       setScrolled(window.scrollY > 20);
+//     };
+//     window.addEventListener("scroll", handleScroll);
+//     return () => window.removeEventListener("scroll", handleScroll);
+//   }, []);
+
+//   // Google Translate setup
+//   useEffect(() => {
+//     const addGoogleTranslateScript = () => {
+//       const script = document.createElement("script");
+//       script.src =
+//         "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+//       script.async = true;
+//       document.body.appendChild(script);
+
+//       window.googleTranslateElementInit = () => {
+//         new window.google.translate.TranslateElement(
+//           {
+//             pageLanguage: "en",
+//             includedLanguages: "en,vi",
+//             autoDisplay: false,
+//           },
+//           "google_translate_element"
+//         );
+
+//         // Wait until Google Translate is ready
+//         const waitForGoogleTranslate = setInterval(() => {
+//           const translateElement = document.querySelector(".goog-te-combo");
+//           if (translateElement) {
+//             setGoogleTranslateReady(true);
+//             clearInterval(waitForGoogleTranslate);
+
+//             // Restore saved language (if any)
+//             const savedLanguage = localStorage.getItem("selectedLanguage");
+//             if (savedLanguage) {
+//               changeLanguage(savedLanguage);
+//             }
+//           }
+//         }, 100);
+//       };
+//     };
+
+//     if (!window.googleTranslateElementInit) {
+//       addGoogleTranslateScript();
+//     }
+
+//     // Hide unwanted Google Translate elements
+//     const styleElement = document.createElement("style");
+//     styleElement.innerHTML = `
+//       .goog-te-banner-frame,
+//       .goog-te-gadget,
+//       .goog-te-menu-frame,
+//       #google_translate_element {
+//         display: none !important;
+//       }
+//       .skiptranslate {
+//         display: none !important;
+//       }
+//     `;
+//     document.head.appendChild(styleElement);
+
+//     return () => {
+//       document.head.removeChild(styleElement);
+//     };
+//   }, []);
+
+//   const changeLanguage = (lang) => {
+//     const translateElement = document.querySelector(".goog-te-combo");
+//     if (translateElement) {
+//       translateElement.value = lang;
+//       translateElement.dispatchEvent(new Event("change"));
+//     }
+//     setLanguage(lang);
+//   };
+
+//   const toggleSidebar = () => setShowSidebar(!showSidebar);
+//   const handleLogout = () => setShowLogoutPopup(true);
+//   const confirmLogout = () => {
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("user");
+//     setUser({ name: "User", email: "user@example.com" });
+//     setIsLoggedIn(false);
+//     setShowLogoutPopup(false);
+//     setShowSidebar(false);
+//     navigate("/");
+//   };
+
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (
+//         showNotifications &&
+//         !event.target.closest(".notifications-container")
+//       ) {
+//         setShowNotifications(false);
+//       }
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, [showNotifications]);
+
+//   return (
+//     <div>
+//       {/* Navbar */}
+//       <nav
+//         className={`fixed top-0 left-0 right-0 w-full bg-white shadow-sm border-b border-pink-100 transition-all duration-300 ${
+//           scrolled ? "h-16 shadow-md" : "h-20"
+//         }`}
+//         style={{ zIndex: 1000 }}
+//       >
+//         <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center justify-between">
+//           <Link to="/" className="flex items-center space-x-2">
+//             <img
+//               src="home/logo/logo.webp"
+//               alt="Beauty Logo"
+//               onError={(e) => {
+//                 console.error("Image failed to load:", e);
+//                 e.target.style.display = "none"; // Hide image if it fails to load
+//               }}
+//               className={`transition-all duration-300 ${scrolled ? "h-10" : "h-12"} w-auto`}
+//             />
+//             <span
+//               className={`text-pink-600 font-bold tracking-tight transition-all duration-300 ${
+//                 scrolled ? "text-xl" : "text-2xl"
+//               }`}
+//             >
+//               BEAUTYA
+//             </span>
+//           </Link>
+
+//           <div className="hidden lg:flex lg:items-center lg:space-x-10">
+//             <NavLink
+//               to="/"
+//               className={({ isActive }) =>
+//                 `text-base font-medium transition-colors ${
+//                   isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                 }`
+//               }
+//             >
+//               Home
+//             </NavLink>
+//             <NavLink
+//               to="/about"
+//               className={({ isActive }) =>
+//                 `text-base font-medium transition-colors ${
+//                   isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                 }`
+//               }
+//             >
+//               About
+//             </NavLink>
+//             <NavLink
+//               to="/blog"
+//               className={({ isActive }) =>
+//                 `text-base font-medium transition-colors ${
+//                   isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                 }`
+//               }
+//             >
+//               Blog
+//             </NavLink>
+//             <NavLink
+//               to="/specialist"
+//               className={({ isActive }) =>
+//                 `text-base font-medium transition-colors ${
+//                   isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                 }`
+//               }
+//             >
+//               Specialist
+//             </NavLink>
+//             <NavLink
+//               to="/services"
+//               className={({ isActive }) =>
+//                 `text-base font-medium transition-colors ${
+//                   isActive ? "text-pink-600 border-b-2 border-pink-600" : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                 }`
+//               }
+//             >
+//               Services
+//             </NavLink>
+//           </div>
+
+//           <div className="hidden lg:flex lg:items-center lg:space-x-8">
+//             <div className="relative">
+//               <button
+//                 onClick={() => setShowNotifications(!showNotifications)}
+//                 className="flex items-center text-gray-700 hover:text-pink-600"
+//               >
+//                 <Bell className={`w-5 h-5 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`} />
+//                 {notifications.some((n) => n.status === "unread") && (
+//                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
+//                 )}
+//               </button>
+
+//               {showNotifications && (
+//                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 notifications-container">
+//                   {loadingNotifications && (
+//                     <div className="px-4 py-2 text-sm text-gray-500">Loading notifications...</div>
+//                   )}
+//                   {errorNotifications && <div className="px-4 py-2 text-sm text-red-500">{errorNotifications}</div>}
+//                   {!loadingNotifications && !errorNotifications && notifications.length === 0 && (
+//                     <div className="px-4 py-2 text-sm text-gray-500">No notifications available</div>
+//                   )}
+//                   {!loadingNotifications && !errorNotifications && notifications.length > 0 && (
+//                     <>
+//                       <div className="px-4 py-2 border-b border-gray-100">
+//                         <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+//                       </div>
+//                       <div className="max-h-96 overflow-y-auto">
+//                         {notifications.map((notification) => (
+//                           <div
+//                             key={notification.id}
+//                             onClick={() => markNotificationAsRead(notification)}
+//                             className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
+//                               notification.status === "unread" ? "bg-pink-50" : ""
+//                             }`}
+//                           >
+//                             <p
+//                               className={`text-sm text-gray-900 ${
+//                                 notification.status === "unread" ? "font-medium" : "font-normal"
+//                               }`}
+//                             >
+//                               {notification.message}
+//                             </p>
+//                             <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
+//                           </div>
+//                         ))}
+//                       </div>
+//                       <div className="px-4 py-2 border-t border-gray-100">
+//                         <button className="text-sm text-pink-600 hover:text-pink-700 font-medium">
+//                           View all notifications
+//                         </button>
+//                       </div>
+//                     </>
+//                   )}
+//                 </div>
+//               )}
+//             </div>
+
+//             <div className="relative">
+//               <button
+//                 onClick={() => setShowLanguages(!showLanguages)}
+//                 className="flex items-center text-gray-700 hover:text-pink-600"
+//               >
+//                 <Globe className={`w-5 h-5 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`} />
+//                 {language === "en" ? "English" : "Tiếng Việt"}
+//                 <ChevronDown className={`ml-1 w-4 h-4 ${scrolled ? "w-3 h-3" : "w-4 h-4"}`} />
+//               </button>
+
+//               {showLanguages && (
+//                 <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 language-dropdown">
+//                   <button
+//                     onClick={() => {
+//                       changeLanguage("en");
+//                       setShowLanguages(false);
+//                     }}
+//                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+//                   >
+//                     English
+//                   </button>
+//                   <button
+//                     onClick={() => {
+//                       changeLanguage("vi");
+//                       setShowLanguages(false);
+//                     }}
+//                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+//                   >
+//                     Tiếng Việt
+//                   </button>
+//                 </div>
+//               )}
+//             </div>
+
+//             {isLoggedIn ? (
+//               <button onClick={toggleSidebar} className="flex items-center space-x-2 text-gray-700 hover:text-pink-600">
+//                 <UserCircle className={`w-6 h-6 ${scrolled ? "w-5 h-5" : "w-6 h-6"}`} />
+//                 <span>{user?.name?.split(" ")[0] || "Nguyen"}</span>
+//               </button>
+//             ) : (
+//               <Link
+//                 to="/login"
+//                 className={`bg-pink-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-pink-700 transition-all duration-300 shadow-sm ${
+//                   scrolled ? "text-sm px-4 py-2" : "text-base px-5 py-2.5"
+//                 }`}
+//               >
+//                 BEAUTYA
+//               </span>
+//             </Link>
+
+//             <div className="hidden lg:flex lg:items-center lg:space-x-10 h-full">
+//               <NavLink
+//                 to="/"
+//                 className={({ isActive }) =>
+//                   `text-base font-medium transition-colors h-full flex items-center ${
+//                     isActive
+//                       ? "text-pink-600 border-b-2 border-pink-600"
+//                       : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                   }`
+//                 }
+//               >
+//                 Home
+//               </NavLink>
+//               <NavLink
+//                 to="/about"
+//                 className={({ isActive }) =>
+//                   `text-base font-medium transition-colors h-full flex items-center ${
+//                     isActive
+//                       ? "text-pink-600 border-b-2 border-pink-600"
+//                       : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                   }`
+//                 }
+//               >
+//                 About
+//               </NavLink>
+//               <NavLink
+//                 to="/blog"
+//                 className={({ isActive }) =>
+//                   `text-base font-medium transition-colors h-full flex items-center ${
+//                     isActive
+//                       ? "text-pink-600 border-b-2 border-pink-600"
+//                       : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                   }`
+//                 }
+//               >
+//                 Blog
+//               </NavLink>
+//               <NavLink
+//                 to="/specialist"
+//                 className={({ isActive }) =>
+//                   `text-base font-medium transition-colors h-full flex items-center ${
+//                     isActive
+//                       ? "text-pink-600 border-b-2 border-pink-600"
+//                       : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                   }`
+//                 }
+//               >
+//                 Specialist
+//               </NavLink>
+//               <NavLink
+//                 to="/services"
+//                 className={({ isActive }) =>
+//                   `text-base font-medium transition-colors h-full flex items-center ${
+//                     isActive
+//                       ? "text-pink-600 border-b-2 border-pink-600"
+//                       : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+//                   }`
+//                 }
+//               >
+//                 Services
+//               </NavLink>
+//             </div>
+
+//             <div className="hidden lg:flex lg:items-center lg:space-x-8 h-full">
+//               <div className="relative h-auto">
+//                 <button
+//                   onClick={() => setShowNotifications(!showNotifications)}
+//                   className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto relative"
+//                 >
+//                   <Bell
+//                     className={`w-5 h-5 transition-all duration-300 ${
+//                       scrolled ? "w-4 h-4" : "w-5 h-5"
+//                     }`}
+//                   />
+//                   {notifications.some((n) => n.status === "unread") && (
+//                     <>
+//                       <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
+//                       {showNotificationMessage && (
+//                         <div className="absolute top-6 right-0 bg-pink-600 text-white text-xs py-1 px-2 rounded shadow-md whitespace-nowrap animate-fadeIn">
+//                           <div className="absolute top-0 right-3 transform -translate-y-1/2 w-2 h-2 bg-pink-600 rotate-45"></div>
+//                           You have a new notification!
+//                         </div>
+//                       )}
+//                     </>
+//                   )}
+//                 </button>
+
+//                 {showNotifications && (
+//                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 notifications-container">
+//                     {loadingNotifications && (
+//                       <div className="px-4 py-2 text-sm text-gray-500">
+//                         Loading notifications...
+//                       </div>
+//                     )}
+//                     {errorNotifications && (
+//                       <div className="px-4 py-2 text-sm text-red-500">
+//                         {errorNotifications}
+//                       </div>
+//                     )}
+//                     {!loadingNotifications &&
+//                       !errorNotifications &&
+//                       notifications.length === 0 && (
+//                         <div className="px-4 py-2 text-sm text-gray-500">
+//                           No notifications available
+//                         </div>
+//                       )}
+//                     {!loadingNotifications &&
+//                       !errorNotifications &&
+//                       notifications.length > 0 && (
+//                         <>
+//                           <div className="px-4 py-2 border-b border-gray-100">
+//                             <h3 className="text-sm font-semibold text-gray-900">
+//                               Notifications
+//                             </h3>
+//                           </div>
+//                           <div className="max-h-96 overflow-y-auto">
+//                             {notifications.map((notification) => (
+//                               <div
+//                                 key={notification.id}
+//                                 onClick={() =>
+//                                   markNotificationAsRead(notification)
+//                                 }
+//                                 className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
+//                                   notification.status === "unread"
+//                                     ? "bg-pink-50"
+//                                     : ""
+//                                 }`}
+//                               >
+//                                 <p
+//                                   className={`text-sm text-gray-900 ${
+//                                     notification.status === "unread"
+//                                       ? "font-medium"
+//                                       : "font-normal"
+//                                   }`}
+//                                 >
+//                                   {notification.message}
+//                                 </p>
+//                                 <p className="text-xs text-gray-400 mt-1">
+//                                   {notification.time}
+//                                 </p>
+//                               </div>
+//                             ))}
+//                           </div>
+//                           <div className="px-4 py-2 border-t border-gray-100">
+//                             <button className="text-sm text-pink-600 hover:text-pink-700 font-medium">
+//                               View all notifications
+//                             </button>
+//                           </div>
+//                         </>
+//                       )}
+//                   </div>
+//                 )}
+//               </div>
+
+//               <div className="relative h-auto">
+//                 <button
+//                   onClick={() => {
+//                     // Toggle dropdown logic can be added here if needed
+//                   }}
+//                   className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto"
+//                 >
+//                   <Globe
+//                     className={`w-5 h-5 mr-2 transition-all duration-300 ${
+//                       scrolled ? "w-4 h-4" : "w-5 h-5"
+//                     }`}
+//                   />
+//                   {language === "en" ? "English" : "Tiếng Việt"}
+//                   <ChevronDown
+//                     className={`ml-1 transition-all duration-300 ${
+//                       scrolled ? "w-3 h-3" : "w-4 h-4"
+//                     }`}
+//                   />
+//                 </button>
+
+//                 {/* Language Dropdown */}
+//                 {/* This can be added back if you want a dropdown */}
+//                 {/* {false && (
+//                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
+//                     <button
+//                       onClick={() => changeLanguage("en")}
+//                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+//                     >
+//                       English
+//                     </button>
+//                     <button
+//                       onClick={() => changeLanguage("vi")}
+//                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+//                     >
+//                       Tiếng Việt
+//                     </button>
+//                   </div>
+//                 )} */}
+//               </div>
+
+//               <div id="google_translate_element" className="hidden"></div>
+
+//               {isLoggedIn ? (
+//                 <button
+//                   onClick={toggleSidebar}
+//                   className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 text-base font-medium h-auto"
+//                 >
+//                   <UserCircle
+//                     className={`transition-all duration-300 ${
+//                       scrolled ? "w-5 h-5" : "w-6 h-6"
+//                     }`}
+//                   />
+//                   <span>{user?.name?.split(" ")[0] || "User"}</span>
+//                 </button>
+//               ) : (
+//                 <Link
+//                   to="/login"
+//                   className={`bg-pink-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-pink-700 transition-all duration-300 shadow-sm h-auto ${
+//                     scrolled ? "text-sm px-4 py-2" : "text-base px-5 py-2.5"
+//                   }`}
+//                 >
+//                   Login
+//                 </Link>
+//               )}
+//             </div>
+
+//             <div className="lg:hidden h-auto">
+//               <button
+//                 onClick={() => setShowMobileMenu(!showMobileMenu)}
+//                 className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 focus:outline-none"
+//               >
+//                 <span className="sr-only">Open main menu</span>
+//                 {showMobileMenu ? (
+//                   <X
+//                     className={`block transition-all duration-300 ${
+//                       scrolled ? "h-6 w-6" : "h-7 w-7"
+//                     }`}
+//                     aria-hidden="true"
+//                   />
+//                 ) : (
+//                   <Menu
+//                     className={`block transition-all duration-300 ${
+//                       scrolled ? "h-6 w-6" : "h-7 w-7"
+//                     }`}
+//                     aria-hidden="true"
+//                   />
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       </nav>
+
+//       <div className="h-20 w-full"></div>
+
+//       {/* Mobile Menu */}
+//       <div
+//         className={`lg:hidden ${
+//           showMobileMenu ? "block" : "hidden"
+//         } w-full absolute bg-white shadow-lg transition-all duration-300 ease-in-out`}
+//         style={{ zIndex: 999 }}
+//       >
+//         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 w-full">
+//           <NavLink
+//             to="/"
+//             className={({ isActive }) =>
+//               `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+//                 isActive
+//                   ? "text-pink-600 bg-pink-50"
+//                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+//               }`
+//             }
+//             onClick={() => setShowMobileMenu(false)}
+//           >
+//             Home
+//           </NavLink>
+//           <NavLink
+//             to="/about"
+//             className={({ isActive }) =>
+//               `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+//                 isActive
+//                   ? "text-pink-600 bg-pink-50"
+//                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+//               }`
+//             }
+//             onClick={() => setShowMobileMenu(false)}
+//           >
+//             About
+//           </NavLink>
+//           <NavLink
+//             to="/blog"
+//             className={({ isActive }) =>
+//               `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+//                 isActive
+//                   ? "text-pink-600 bg-pink-50"
+//                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+//               }`
+//             }
+//             onClick={() => setShowMobileMenu(false)}
+//           >
+//             Blog
+//           </NavLink>
+//           <NavLink
+//             to="/specialist"
+//             className={({ isActive }) =>
+//               `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+//                 isActive
+//                   ? "text-pink-600 bg-pink-50"
+//                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+//               }`
+//             }
+//             onClick={() => setShowMobileMenu(false)}
+//           >
+//             Specialist
+//           </NavLink>
+//           <NavLink
+//             to="/services"
+//             className={({ isActive }) =>
+//               `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+//                 isActive
+//                   ? "text-pink-600 bg-pink-50"
+//                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+//               }`
+//             }
+//             onClick={() => setShowMobileMenu(false)}
+//           >
+//             Services
+//           </NavLink>
+//           <div className="px-3 py-3 w-full h-auto">
+//             <div className="flex flex-col space-y-2 w-full">
+//               <span className="text-sm font-medium text-gray-500">
+//                 Language
+//               </span>
+//               <div className="flex space-x-2 w-full">
+//                 <button
+//                   onClick={() => changeLanguage("en")}
+//                   className={`px-3 py-1.5 text-sm rounded-full h-auto ${
+//                     language === "en"
+//                       ? "bg-pink-600 text-white"
+//                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+//                   }`}
+//                 >
+//                   English
+//                 </button>
+//                 <button
+//                   onClick={() => changeLanguage("vi")}
+//                   className={`px-3 py-1.5 text-sm rounded-full h-auto ${
+//                     language === "vi"
+//                       ? "bg-pink-600 text-white"
+//                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+//                   }`}
+//                 >
+//                   Tiếng Việt
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//           <div className="px-3 py-3 w-full h-auto">
+//             <button
+//               onClick={() => {
+//                 setShowMobileMenu(false);
+//                 setShowNotifications(!showNotifications);
+//               }}
+//               className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto relative"
+//             >
+//               <Bell
+//                 className={`w-5 h-5 transition-all duration-300 ${
+//                   scrolled ? "w-4 h-4" : "w-5 h-5"
+//                 }`}
+//               />
+//               {notifications.some((n) => n.status === "unread") && (
+//                 <>
+//                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
+//                   {showNotificationMessage && (
+//                     <div className="absolute top-6 right-0 bg-pink-600 text-white text-xs py-1 px-2 rounded shadow-md whitespace-nowrap animate-fadeIn">
+//                       <div className="absolute top-0 right-3 transform -translate-y-1/2 w-2 h-2 bg-pink-600 rotate-45"></div>
+//                       You have a new notification!
+//                     </div>
+//                   )}
+//                 </>
+//               )}
+//             </button>
+//           </div>
+//           {isLoggedIn ? (
+//             <div className="px-3 py-3 w-full h-auto">
+//               <button
+//                 onClick={() => {
+//                   toggleSidebar();
+//                   setShowMobileMenu(false);
+//                 }}
+//                 className="flex items-center space-x-2 text-pink-600 font-medium w-full h-auto py-2"
+//               >
+//                 <UserCircle className="w-5 h-5" />
+//                 <span>My Profile</span>
+//               </button>
+//             </div>
+//           ) : (
+//             <div className="px-3 py-3 w-full h-auto">
+//               <Link
+//                 to="/login"
+//                 className="block w-full text-center bg-pink-600 text-white px-4 py-3 rounded-md text-base font-medium hover:bg-pink-700 h-auto"
+//                 onClick={() => setShowMobileMenu(false)}
+//               >
+//                 Login
+//               </Link>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* User Profile Sidebar */}
+//       {isLoggedIn && (
+//         <>
+//           {showSidebar && (
+//             <div
+//               className="fixed top-20 bottom-0 left-0 right-0 bg-black bg-opacity-50 transition-opacity z-40"
+//               onClick={toggleSidebar}
+//             ></div>
+//           )}
+
+//           <div
+//             className={`fixed top-20 bottom-0 right-0 max-w-xs w-full bg-white shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out ${
+//               showSidebar ? "translate-x-0" : "translate-x-full"
+//             }`}
+//           >
+//             <div className="p-6 w-full h-auto">
+//               <div className="flex items-center justify-between mb-6 w-full">
+//                 <h2 className="text-xl font-bold text-gray-900">My Account</h2>
+//                 <button
+//                   onClick={toggleSidebar}
+//                   className="text-gray-500 hover:text-gray-700 focus:outline-none"
+//                 >
+//                   <X className="h-6 w-6" />
+//                 </button>
+//               </div>
+
+//               <div className="mb-6 pb-6 border-b border-gray-200 w-full h-auto">
+//                 <div className="flex items-center space-x-4 w-full">
+//                   <div className="bg-gradient-to-r from-pink-500 to-pink-600 p-3 rounded-full h-auto">
+//                     <UserCircle className="h-8 w-8 text-white" />
+//                   </div>
+//                   <div className="w-auto h-auto">
+//                     <h3 className="text-lg font-medium text-gray-900">
+//                       {user?.name || "User"}
+//                     </h3>
+//                     <p className="text-sm text-gray-500">
+//                       {user?.email || "user@example.com"}
+//                     </p>
+//                   </div>
+//                 </div>
+//               </div>
+
+//               <nav className="space-y-1 w-full h-auto">
+//                 <Link
+//                   to="/profile"
+//                   className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+//                   onClick={() => setShowSidebar(false)}
+//                 >
+//                   <User className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
+//                   Edit Profile
+//                 </Link>
+//                 <Link
+//                   to="/mybooking"
+//                   className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+//                   onClick={() => setShowSidebar(false)}
+//                 >
+//                   <ShoppingBag className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
+//                   My Bookings
+//                 </Link>
+//                 <Link
+//                   to="/wishlist"
+//                   className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+//                   onClick={() => setShowSidebar(false)}
+//                 >
+//                   <Heart className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
+//                   Wishlist
+//                 </Link>
+//                 <Link
+//                   to="/myskintype"
+//                   className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+//                   onClick={() => setShowSidebar(false)}
+//                 >
+//                   <Settings className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
+//                   My Skin Type
+//                 </Link>
+//                 <button
+//                   onClick={handleLogout}
+//                   className="w-full h-auto group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+//                 >
+//                   <LogOut className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
+//                   Logout
+//                 </button>
+//               </nav>
+//             </div>
+//           </div>
+//         </>
+//       )}
+
+//       {/* Logout Popup */}
+//       {showLogoutPopup && (
+//         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+//           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full animate-fade-in">
+//             <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+//               Do you want to logout?
+//             </h3>
+//             <div className="flex justify-center space-x-4">
+//               <button
+//                 onClick={confirmLogout}
+//                 className="bg-pink-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-pink-800 transition-colors"
+//               >
+//                 Yes
+//               </button>
+//               <button
+//                 onClick={() => setShowLogoutPopup(false)}
+//                 className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+//               >
+//                 No
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// // Add animation styles
+// const styles = `
+//   @keyframes fadeIn {
+//     from { opacity: 0; transform: translateY(-10px); }
+//     to { opacity: 1; transform: translateY(0); }
+//   }
+  
+//   .animate-fadeIn {
+//     animation: fadeIn 0.3s ease-out forwards;
+//   }
+// `;
+
+// const styleSheet = new CSSStyleSheet();
+// styleSheet.replaceSync(styles);
+// document.adoptedStyleSheets = [styleSheet];
+
+// export default Navbar;
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -64,13 +1206,14 @@ const Navbar = () => {
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [errorNotifications, setErrorNotifications] = useState(null);
   const [user, setUser] = useLocalStorage("user", {
-    name: "User",
+    name: "Nguyen",
     email: "user@example.com",
   });
-  const [language, setLanguage] = useState("en"); // Initialize language state
+  const [language, setLanguage] = useState("en");
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
-  const baseUrl =
-    "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app";
+  const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
+  const [showLanguages, setShowLanguages] = useState(false); // Thêm state cho language dropdown
+  const baseUrl = "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
 
   // Check login status and fetch user profile
   useEffect(() => {
@@ -90,8 +1233,6 @@ const Navbar = () => {
           },
           timeout: 10000,
         });
-
-        console.log("Fetch user profile response:", response.data);
 
         const userData = {
           userId: response.data.userId || null,
@@ -127,9 +1268,6 @@ const Navbar = () => {
       notification.id.toString().includes(".") ||
       !Number.isInteger(Number(notification.id));
     if (isTempId) {
-      console.warn(
-        `Skipping mark as read for temporary ID: ${notification.id}`
-      );
       setNotifications((prevNotifications) =>
         prevNotifications.map((n) =>
           n.id === notification.id ? { ...n, status: "read" } : n
@@ -147,7 +1285,6 @@ const Navbar = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found");
         return;
       }
 
@@ -163,7 +1300,6 @@ const Navbar = () => {
           timeout: 10000,
         }
       );
-      console.log(`Notification ${notification.id} marked as read in database`);
     } catch (error) {
       console.error("Error marking notification as read in database:", error);
       alert("Failed to mark notification as read. Please try again.");
@@ -183,9 +1319,7 @@ const Navbar = () => {
         setErrorNotifications(null);
         const token = localStorage.getItem("token");
         if (!token) {
-          setErrorNotifications(
-            "No authentication token found. Please log in."
-          );
+          setErrorNotifications("No authentication token found. Please log in.");
           setLoadingNotifications(false);
           return;
         }
@@ -201,23 +1335,12 @@ const Navbar = () => {
         });
 
         let rawData = response.data;
-        console.log("Raw response data:", rawData);
-
         let parsedData;
+
         if (typeof rawData === "string") {
           rawData = rawData.trim();
           if (rawData.startsWith("[")) {
-            try {
-              parsedData = JSON.parse(rawData);
-            } catch (parseError) {
-              console.error("Initial parse error:", parseError);
-              const jsonMatch = rawData.match(/(\[.*\])/s);
-              if (jsonMatch && jsonMatch[1]) {
-                parsedData = JSON.parse(jsonMatch[1]);
-              } else {
-                throw new Error("No valid JSON array found in response");
-              }
-            }
+            parsedData = JSON.parse(rawData);
           } else {
             throw new Error("Response is not a JSON array string");
           }
@@ -229,46 +1352,21 @@ const Navbar = () => {
           throw new Error("Unexpected response format");
         }
 
-        const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
-
-        const processedNotifications = dataArray.map((item) => {
-          if (!item.id) {
-            console.warn("Notification missing ID:", item);
-            const tempId = item.createdAt
-              ? `temp_${new Date(item.createdAt).getTime()}`
-              : `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            return {
-              id: tempId,
-              message: item.message || "New Notification",
-              time: item.createdAt
-                ? new Date(item.createdAt).toLocaleString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })
-                : "Unknown time",
-              createdAt: item.createdAt,
-              status: item.read ? "read" : "unread",
-            };
-          }
-          return {
-            id: item.id,
-            message: item.message || "New Notification",
-            time: item.createdAt
-              ? new Date(item.createdAt).toLocaleString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })
-              : "Unknown time",
-            createdAt: item.createdAt,
-            status: item.read ? "read" : "unread",
-          };
-        });
+        const processedNotifications = parsedData.map((item) => ({
+          id: item.id || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          message: item.message || "New Notification",
+          time: item.createdAt
+            ? new Date(item.createdAt).toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+            : "Unknown time",
+          createdAt: item.createdAt,
+          status: item.read ? "read" : "unread",
+        }));
 
         const sortedNotifications = processedNotifications.sort((a, b) => {
           const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
@@ -277,17 +1375,14 @@ const Navbar = () => {
         });
 
         setNotifications(sortedNotifications);
-        console.log("Sorted notifications:", sortedNotifications);
       } catch (error) {
         console.error("Error fetching notifications:", error);
         if (retryCount > 0 && error.code === "ECONNABORTED") {
-          console.log(`Retrying... Attempts left: ${retryCount}`);
           await new Promise((resolve) => setTimeout(resolve, 2000));
           return fetchNotifications(retryCount - 1);
         }
         setErrorNotifications(
-          error.message ||
-            "Failed to fetch notifications. Check server or network."
+          error.message || "Failed to fetch notifications. Check server or network."
         );
       } finally {
         setLoadingNotifications(false);
@@ -337,6 +1432,19 @@ const Navbar = () => {
           },
           "google_translate_element"
         );
+
+        const waitForGoogleTranslate = setInterval(() => {
+          const translateElement = document.querySelector(".goog-te-combo");
+          if (translateElement) {
+            setGoogleTranslateReady(true);
+            clearInterval(waitForGoogleTranslate);
+
+            const savedLanguage = localStorage.getItem("selectedLanguage");
+            if (savedLanguage) {
+              changeLanguage(savedLanguage);
+            }
+          }
+        }, 100);
       };
     };
 
@@ -370,6 +1478,7 @@ const Navbar = () => {
       translateElement.dispatchEvent(new Event("change"));
     }
     setLanguage(lang);
+    localStorage.setItem("selectedLanguage", lang); // Lưu ngôn ngữ đã chọn
   };
 
   const toggleSidebar = () => setShowSidebar(!showSidebar);
@@ -398,7 +1507,7 @@ const Navbar = () => {
   }, [showNotifications]);
 
   return (
-    <div>
+    <>
       {/* Navbar */}
       <nav
         className={`fixed top-0 left-0 right-0 w-full bg-white shadow-sm border-b border-pink-100 transition-all duration-300 ${
@@ -406,268 +1515,250 @@ const Navbar = () => {
         }`}
         style={{ zIndex: 1000 }}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full">
-          <div className="flex justify-between items-center h-full w-full transition-all duration-300">
-            <Link to="/" className="flex items-center space-x-2 h-auto">
-              <img
-                src="home/logo/logo.webp"
-                alt="Beauty Logo"
-                className={`transition-all duration-300 ${
-                  scrolled ? "h-10" : "h-12"
-                } w-auto`}
-              />
-              <span
-                className={`text-pink-600 font-bold tracking-tight transition-all duration-300 ${
-                  scrolled ? "text-xl" : "text-2xl"
-                }`}
-              >
-                BEAUTYA
-              </span>
-            </Link>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2">
+            <img
+              src="home/logo/logo.webp"
+              alt="Beauty Logo"
+              onError={(e) => {
+                console.error("Image failed to load:", e);
+                e.target.style.display = "none";
+              }}
+              className={`transition-all duration-300 ${scrolled ? "h-10" : "h-12"} w-auto`}
+            />
+            <span
+              className={`text-pink-600 font-bold tracking-tight transition-all duration-300 ${
+                scrolled ? "text-xl" : "text-2xl"
+              }`}
+            >
+              BEAUTYA
+            </span>
+          </Link>
 
-            <div className="hidden lg:flex lg:items-center lg:space-x-10 h-full">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Home
-              </NavLink>
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                About
-              </NavLink>
-              <NavLink
-                to="/blog"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Blog
-              </NavLink>
-              <NavLink
-                to="/specialist"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Specialist
-              </NavLink>
-              <NavLink
-                to="/services"
-                className={({ isActive }) =>
-                  `text-base font-medium transition-colors h-full flex items-center ${
-                    isActive
-                      ? "text-pink-600 border-b-2 border-pink-600"
-                      : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                  }`
-                }
-              >
-                Services
-              </NavLink>
-            </div>
+          <div className="hidden lg:flex lg:items-center lg:space-x-10">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive
+                    ? "text-pink-600 border-b-2 border-pink-600"
+                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Home
+            </NavLink>
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive
+                    ? "text-pink-600 border-b-2 border-pink-600"
+                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              About
+            </NavLink>
+            <NavLink
+              to="/blog"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive
+                    ? "text-pink-600 border-b-2 border-pink-600"
+                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Blog
+            </NavLink>
+            <NavLink
+              to="/specialist"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive
+                    ? "text-pink-600 border-b-2 border-pink-600"
+                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Specialist
+            </NavLink>
+            <NavLink
+              to="/services"
+              className={({ isActive }) =>
+                `text-base font-medium transition-colors ${
+                  isActive
+                    ? "text-pink-600 border-b-2 border-pink-600"
+                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
+                }`
+              }
+            >
+              Services
+            </NavLink>
+          </div>
 
-            <div className="hidden lg:flex lg:items-center lg:space-x-8 h-full">
-              <div className="relative h-auto">
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto relative"
-                >
-                  <Bell
-                    className={`w-5 h-5 transition-all duration-300 ${
-                      scrolled ? "w-4 h-4" : "w-5 h-5"
-                    }`}
-                  />
-                  {notifications.some((n) => n.status === "unread") && (
-                    <>
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
-                      {showNotificationMessage && (
-                        <div className="absolute top-6 right-0 bg-pink-600 text-white text-xs py-1 px-2 rounded shadow-md whitespace-nowrap animate-fadeIn">
-                          <div className="absolute top-0 right-3 transform -translate-y-1/2 w-2 h-2 bg-pink-600 rotate-45"></div>
-                          You have a new notification!
-                        </div>
-                      )}
-                    </>
+          <div className="hidden lg:flex lg:items-center lg:space-x-8">
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="flex items-center text-gray-700 hover:text-pink-600"
+              >
+                <Bell
+                  className={`w-5 h-5 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`}
+                />
+                {notifications.some((n) => n.status === "unread") && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-600 rounded-full"></span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 notifications-container">
+                  {loadingNotifications && (
+                    <div className="px-4 py-2 text-sm text-gray-500">
+                      Loading notifications...
+                    </div>
                   )}
-                </button>
-
-                {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 notifications-container">
-                    {loadingNotifications && (
+                  {errorNotifications && (
+                    <div className="px-4 py-2 text-sm text-red-500">
+                      {errorNotifications}
+                    </div>
+                  )}
+                  {!loadingNotifications &&
+                    !errorNotifications &&
+                    notifications.length === 0 && (
                       <div className="px-4 py-2 text-sm text-gray-500">
-                        Loading notifications...
+                        No notifications available
                       </div>
                     )}
-                    {errorNotifications && (
-                      <div className="px-4 py-2 text-sm text-red-500">
-                        {errorNotifications}
-                      </div>
-                    )}
-                    {!loadingNotifications &&
-                      !errorNotifications &&
-                      notifications.length === 0 && (
-                        <div className="px-4 py-2 text-sm text-gray-500">
-                          No notifications available
+                  {!loadingNotifications &&
+                    !errorNotifications &&
+                    notifications.length > 0 && (
+                      <>
+                        <div className="px-4 py-2 border-b border-gray-100">
+                          <h3 className="text-sm font-semibold text-gray-900">
+                            Notifications
+                          </h3>
                         </div>
-                      )}
-                    {!loadingNotifications &&
-                      !errorNotifications &&
-                      notifications.length > 0 && (
-                        <>
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <h3 className="text-sm font-semibold text-gray-900">
-                              Notifications
-                            </h3>
-                          </div>
-                          <div className="max-h-96 overflow-y-auto">
-                            {notifications.map((notification) => (
-                              <div
-                                key={notification.id}
-                                onClick={() =>
-                                  markNotificationAsRead(notification)
-                                }
-                                className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
+                        <div className="max-h-96 overflow-y-auto">
+                          {notifications.map((notification) => (
+                            <div
+                              key={notification.id}
+                              onClick={() => markNotificationAsRead(notification)}
+                              className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
+                                notification.status === "unread"
+                                  ? "bg-pink-50"
+                                  : ""
+                              }`}
+                            >
+                              <p
+                                className={`text-sm text-gray-900 ${
                                   notification.status === "unread"
-                                    ? "bg-pink-50"
-                                    : ""
+                                    ? "font-medium"
+                                    : "font-normal"
                                 }`}
                               >
-                                <p
-                                  className={`text-sm text-gray-900 ${
-                                    notification.status === "unread"
-                                      ? "font-medium"
-                                      : "font-normal"
-                                  }`}
-                                >
-                                  {notification.message}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">
-                                  {notification.time}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="px-4 py-2 border-t border-gray-100">
-                            <button className="text-sm text-pink-600 hover:text-pink-700 font-medium">
-                              View all notifications
-                            </button>
-                          </div>
-                        </>
-                      )}
-                  </div>
-                )}
-              </div>
-
-              <div className="relative h-auto">
-                <button
-                  onClick={() => {
-                    // Toggle dropdown logic can be added here if needed
-                  }}
-                  className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto"
-                >
-                  <Globe
-                    className={`w-5 h-5 mr-2 transition-all duration-300 ${
-                      scrolled ? "w-4 h-4" : "w-5 h-5"
-                    }`}
-                  />
-                  {language === "en" ? "English" : "Tiếng Việt"}
-                  <ChevronDown
-                    className={`ml-1 transition-all duration-300 ${
-                      scrolled ? "w-3 h-3" : "w-4 h-4"
-                    }`}
-                  />
-                </button>
-
-                {/* Language Dropdown */}
-                {/* This can be added back if you want a dropdown */}
-                {/* {false && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
-                    <button
-                      onClick={() => changeLanguage("en")}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
-                    >
-                      English
-                    </button>
-                    <button
-                      onClick={() => changeLanguage("vi")}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
-                    >
-                      Tiếng Việt
-                    </button>
-                  </div>
-                )} */}
-              </div>
-
-              <div id="google_translate_element" className="hidden"></div>
-
-              {isLoggedIn ? (
-                <button
-                  onClick={toggleSidebar}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 text-base font-medium h-auto"
-                >
-                  <UserCircle
-                    className={`transition-all duration-300 ${
-                      scrolled ? "w-5 h-5" : "w-6 h-6"
-                    }`}
-                  />
-                  <span>{user?.name?.split(" ")[0] || "User"}</span>
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className={`bg-pink-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-pink-700 transition-all duration-300 shadow-sm h-auto ${
-                    scrolled ? "text-sm px-4 py-2" : "text-base px-5 py-2.5"
-                  }`}
-                >
-                  Login
-                </Link>
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {notification.time}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="px-4 py-2 border-t border-gray-100">
+                          <button className="text-sm text-pink-600 hover:text-pink-700 font-medium">
+                            View all notifications
+                          </button>
+                        </div>
+                      </>
+                    )}
+                </div>
               )}
             </div>
 
-            <div className="lg:hidden h-auto">
+            <div className="relative">
               <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 focus:outline-none"
+                onClick={() => setShowLanguages(!showLanguages)}
+                className="flex items-center text-gray-700 hover:text-pink-600"
               >
-                <span className="sr-only">Open main menu</span>
-                {showMobileMenu ? (
-                  <X
-                    className={`block transition-all duration-300 ${
-                      scrolled ? "h-6 w-6" : "h-7 w-7"
-                    }`}
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <Menu
-                    className={`block transition-all duration-300 ${
-                      scrolled ? "h-6 w-6" : "h-7 w-7"
-                    }`}
-                    aria-hidden="true"
-                  />
-                )}
+                <Globe
+                  className={`w-5 h-5 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`}
+                />
+                {language === "en" ? "English" : "Tiếng Việt"}
+                <ChevronDown
+                  className={`ml-1 w-4 h-4 ${scrolled ? "w-3 h-3" : "w-4 h-4"}`}
+                />
               </button>
+
+              {showLanguages && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 language-dropdown">
+                  <button
+                    onClick={() => {
+                      changeLanguage("en");
+                      setShowLanguages(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => {
+                      changeLanguage("vi");
+                      setShowLanguages(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+                  >
+                    Tiếng Việt
+                  </button>
+                </div>
+              )}
             </div>
+
+            {isLoggedIn ? (
+              <button
+                onClick={toggleSidebar}
+                className="flex items-center space-x-2 text-gray-700 hover:text-pink-600"
+              >
+                <UserCircle
+                  className={`w-6 h-6 ${scrolled ? "w-5 h-5" : "w-6 h-6"}`}
+                />
+                <span>{user?.name?.split(" ")[0] || "Nguyen"}</span>
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className={`bg-pink-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-pink-700 transition-all duration-300 shadow-sm ${
+                  scrolled ? "text-sm px-4 py-2" : "text-base px-5 py-2.5"
+                }`}
+              >
+                Login
+              </Link>
+            )}
+          </div>
+
+          <div className="lg:hidden">
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 focus:outline-none"
+            >
+              <span className="sr-only">Open main menu</span>
+              {showMobileMenu ? (
+                <X
+                  className={`block transition-all duration-300 ${
+                    scrolled ? "h-6 w-6" : "h-7 w-7"
+                  }`}
+                  aria-hidden="true"
+                />
+              ) : (
+                <Menu
+                  className={`block transition-all duration-300 ${
+                    scrolled ? "h-6 w-6" : "h-7 w-7"
+                  }`}
+                  aria-hidden="true"
+                />
+              )}
+            </button>
           </div>
         </div>
       </nav>
@@ -685,7 +1776,7 @@ const Navbar = () => {
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium w-full ${
                 isActive
                   ? "text-pink-600 bg-pink-50"
                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
@@ -698,7 +1789,7 @@ const Navbar = () => {
           <NavLink
             to="/about"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium w-full ${
                 isActive
                   ? "text-pink-600 bg-pink-50"
                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
@@ -711,7 +1802,7 @@ const Navbar = () => {
           <NavLink
             to="/blog"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium w-full ${
                 isActive
                   ? "text-pink-600 bg-pink-50"
                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
@@ -724,7 +1815,7 @@ const Navbar = () => {
           <NavLink
             to="/specialist"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium w-full ${
                 isActive
                   ? "text-pink-600 bg-pink-50"
                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
@@ -737,7 +1828,7 @@ const Navbar = () => {
           <NavLink
             to="/services"
             className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full h-auto ${
+              `block px-3 py-3 rounded-md text-base font-medium w-full ${
                 isActive
                   ? "text-pink-600 bg-pink-50"
                   : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
@@ -747,15 +1838,15 @@ const Navbar = () => {
           >
             Services
           </NavLink>
-          <div className="px-3 py-3 w-full h-auto">
+          <div className="px-3 py-3 w-full">
             <div className="flex flex-col space-y-2 w-full">
-              <span className="text-sm font-medium text-gray-500">
-                Language
-              </span>
+              <span className="text-sm font-medium text-gray-500">Language</span>
               <div className="flex space-x-2 w-full">
                 <button
-                  onClick={() => changeLanguage("en")}
-                  className={`px-3 py-1.5 text-sm rounded-full h-auto ${
+                  onClick={() => {
+                    changeLanguage("en");
+                  }}
+                  className={`px-3 py-1.5 text-sm rounded-full ${
                     language === "en"
                       ? "bg-pink-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -764,8 +1855,10 @@ const Navbar = () => {
                   English
                 </button>
                 <button
-                  onClick={() => changeLanguage("vi")}
-                  className={`px-3 py-1.5 text-sm rounded-full h-auto ${
+                  onClick={() => {
+                    changeLanguage("vi");
+                  }}
+                  className={`px-3 py-1.5 text-sm rounded-full ${
                     language === "vi"
                       ? "bg-pink-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -776,13 +1869,13 @@ const Navbar = () => {
               </div>
             </div>
           </div>
-          <div className="px-3 py-3 w-full h-auto">
+          <div className="px-3 py-3 w-full">
             <button
               onClick={() => {
                 setShowMobileMenu(false);
                 setShowNotifications(!showNotifications);
               }}
-              className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium h-auto relative"
+              className="flex items-center text-gray-700 hover:text-pink-600 text-base font-medium relative"
             >
               <Bell
                 className={`w-5 h-5 transition-all duration-300 ${
@@ -803,23 +1896,23 @@ const Navbar = () => {
             </button>
           </div>
           {isLoggedIn ? (
-            <div className="px-3 py-3 w-full h-auto">
+            <div className="px-3 py-3 w-full">
               <button
                 onClick={() => {
                   toggleSidebar();
                   setShowMobileMenu(false);
                 }}
-                className="flex items-center space-x-2 text-pink-600 font-medium w-full h-auto py-2"
+                className="flex items-center space-x-2 text-pink-600 font-medium w-full py-2"
               >
                 <UserCircle className="w-5 h-5" />
                 <span>My Profile</span>
               </button>
             </div>
           ) : (
-            <div className="px-3 py-3 w-full h-auto">
+            <div className="px-3 py-3 w-full">
               <Link
                 to="/login"
-                className="block w-full text-center bg-pink-600 text-white px-4 py-3 rounded-md text-base font-medium hover:bg-pink-700 h-auto"
+                className="block w-full text-center bg-pink-600 text-white px-4 py-3 rounded-md text-base font-medium hover:bg-pink-700"
                 onClick={() => setShowMobileMenu(false)}
               >
                 Login
@@ -834,17 +1927,17 @@ const Navbar = () => {
         <>
           {showSidebar && (
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40 w-full h-full"
+              className="fixed top-20 bottom-0 left-0 right-0 bg-black bg-opacity-50 transition-opacity z-40"
               onClick={toggleSidebar}
             ></div>
           )}
 
           <div
-            className={`fixed inset-y-0 right-0 max-w-xs w-full h-full bg-white shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out ${
+            className={`fixed top-20 bottom-0 right-0 max-w-xs w-full bg-white shadow-xl overflow-y-auto z-50 transform transition-transform duration-300 ease-in-out ${
               showSidebar ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="p-6 w-full h-auto">
+            <div className="p-6 w-full">
               <div className="flex items-center justify-between mb-6 w-full">
                 <h2 className="text-xl font-bold text-gray-900">My Account</h2>
                 <button
@@ -855,12 +1948,12 @@ const Navbar = () => {
                 </button>
               </div>
 
-              <div className="mb-6 pb-6 border-b border-gray-200 w-full h-auto">
+              <div className="mb-6 pb-6 border-b border-gray-200 w-full">
                 <div className="flex items-center space-x-4 w-full">
-                  <div className="bg-gradient-to-r from-pink-500 to-pink-600 p-3 rounded-full h-auto">
+                  <div className="bg-gradient-to-r from-pink-500 to-pink-600 p-3 rounded-full">
                     <UserCircle className="h-8 w-8 text-white" />
                   </div>
-                  <div className="w-auto h-auto">
+                  <div className="w-auto">
                     <h3 className="text-lg font-medium text-gray-900">
                       {user?.name || "User"}
                     </h3>
@@ -871,10 +1964,10 @@ const Navbar = () => {
                 </div>
               </div>
 
-              <nav className="space-y-1 w-full h-auto">
+              <nav className="space-y-1 w-full">
                 <Link
                   to="/profile"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full"
                   onClick={() => setShowSidebar(false)}
                 >
                   <User className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -882,7 +1975,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/mybooking"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full"
                   onClick={() => setShowSidebar(false)}
                 >
                   <ShoppingBag className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -890,7 +1983,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/wishlist"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full"
                   onClick={() => setShowSidebar(false)}
                 >
                   <Heart className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -898,7 +1991,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/myskintype"
-                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full h-auto"
+                  className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50 w-full"
                   onClick={() => setShowSidebar(false)}
                 >
                   <Settings className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
@@ -906,7 +1999,7 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full h-auto group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
+                  className="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-md text-gray-700 hover:text-pink-600 hover:bg-pink-50"
                 >
                   <LogOut className="mr-3 h-5 w-5 text-gray-500 group-hover:text-pink-600" />
                   Logout
@@ -941,24 +2034,23 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-// Add animation styles
+// Add animation styles (moved to CSS file or styled-components for better React integration)
 const styles = `
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-out forwards;
   }
 `;
 
-const styleSheet = new CSSStyleSheet();
-styleSheet.replaceSync(styles);
-document.adoptedStyleSheets = [styleSheet];
+// Thay bằng cách thêm CSS vào file riêng hoặc dùng styled-components
+// Ví dụ: Tạo file styles.css và import
+// import './styles.css';
 
 export default Navbar;

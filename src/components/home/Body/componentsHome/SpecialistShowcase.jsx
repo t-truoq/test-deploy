@@ -5,13 +5,12 @@ import { SpecialistDetail } from "../../../Therapist/SpecialistPage"; // Import 
 import axios from "axios";
 
 export default function SpecialistShowcase() {
-  const navigate = useNavigate();
-  const [specialists, setSpecialists] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedSpecialist, setSelectedSpecialist] = useState(null); // State để quản lý popup
-  const baseUrl =
-    "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app";
+  const navigate = useNavigate()
+  const [specialists, setSpecialists] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [selectedSpecialist, setSelectedSpecialist] = useState(null) // State để quản lý popup
+  const baseUrl = "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app"
 
   useEffect(() => {
     const fetchSpecialists = async () => {
