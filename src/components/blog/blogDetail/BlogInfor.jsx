@@ -730,135 +730,17 @@ const BlogDetail = () => {
   const contentRef = useRef(null);
 
   useEffect(() => {
-    const fetchBlogDetail = async () => {
-      try {
-        setLoading(true);
-        // const token = localStorage.getItem("token");
-        const headers = {
-          "ngrok-skip-browser-warning": "true",
-          "Content-Type": "application/json",
-          // Authorization: token ? `Bearer ${token}` : undefined,
-        };
-
-        const response = await axios.get(
-          `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/blogs/${id}`,
-          { headers }
-        );
-
-        const blogData = response.data;
-        const formattedBlog = {
-          id: blogData.blogId,
-          title: blogData.title,
-          content: blogData.content,
-          author: blogData.author.name,
-          authorRole: "Beauty Expert",
-          authorImage: `https://ui-avatars.com/api/?name=${blogData.author.name}&background=A10550&color=fff`,
-          date: new Date(blogData.createdAt).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }),
-          image:
-            blogData.images && blogData.images.length > 0
-              ? blogData.images[0].url
-              : "/placeholder.svg?height=600&width=1200",
-          category: [
-            "Skincare",
-            "Beauty Tips",
-            "Wellness",
-            "Treatments",
-            "Lifestyle",
-          ][Math.floor(Math.random() * 5)],
-          readTime: `${Math.max(
-            Math.ceil(blogData.content.length / 1000),
-            1
-          )} min read`,
-        };
-
-        setBlog(formattedBlog);
+    const fetchBlogDetail = () => {
+      setLoading(true);
+      const foundBlog = staticBlogs.find((b) => b.id === parseInt(id));
+      if (foundBlog) {
+        setBlog(foundBlog);
         setLikeCount(Math.floor(Math.random() * 50) + 10);
-        fetchRelatedPosts();
-      } catch (error) {
-        console.error("Error fetching blog detail:", error);
-        if (error.response) {
-          console.log("Error response:", error.response.data);
-          console.log("Status:", error.response.status);
-          if (error.response.status === 401) {
-            setError("Unauthorized: Please login again.");
-            setTimeout(() => {
-              navigate("/login");
-            }, 2000);
-          } else if (error.response.status === 404) {
-            setError("Blog post not found.");
-          } else {
-            setError(
-              error.response.data.message ||
-                "Failed to load blog post. Please try again."
-            );
-          }
-        } else if (error.request) {
-          console.log("No response received:", error.request);
-          setError(
-            "Unable to connect to server. CORS issue or server error. Please try again."
-          );
-        } else {
-          setError(
-            error.message || "Failed to load blog post. Please try again."
-          );
-        }
-      } finally {
-        setLoading(false);
+        setRelatedPosts(staticBlogs.filter((b) => b.id !== parseInt(id)).slice(0, 3));
+      } else {
+        setError("Blog post not found.");
       }
-    };
-
-    const fetchRelatedPosts = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const headers = {
-          "ngrok-skip-browser-warning": "true",
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : undefined,
-        };
-
-        const response = await axios.get(
-          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/blogs",
-          { headers }
-        );
-
-        if (Array.isArray(response.data)) {
-          const otherPosts = response.data
-            .filter((post) => post.blogId.toString() !== id)
-            .slice(0, 3);
-          const formattedPosts = otherPosts.map((post) => ({
-            id: post.blogId,
-            title: post.title,
-            excerpt:
-              post.content.length > 100
-                ? post.content.substring(0, 100) + "..."
-                : post.content,
-            author: post.author.name,
-            date: new Date(post.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }),
-            image:
-              post.images && post.images.length > 0
-                ? post.images[0].url
-                : "/placeholder.svg?height=200&width=300",
-            category: [
-              "Skincare",
-              "Beauty Tips",
-              "Wellness",
-              "Treatments",
-              "Lifestyle",
-            ][Math.floor(Math.random() * 5)],
-          }));
-          setRelatedPosts(formattedPosts);
-        }
-      } catch (error) {
-        console.error("Error fetching related posts:", error);
-      }
+      setLoading(false);
     };
 
     fetchBlogDetail();
@@ -879,19 +761,13 @@ const BlogDetail = () => {
     let shareUrl;
     switch (platform) {
       case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-          url
-        )}`;
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         break;
       case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-          url
-        )}&text=${encodeURIComponent(title)}`;
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
         break;
       case "linkedin":
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-          url
-        )}`;
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
         break;
       case "copy":
         navigator.clipboard.writeText(url);
@@ -954,25 +830,16 @@ const BlogDetail = () => {
             <Link to="/" className="hover:text-[#F06292] transition-colors">
               Home
             </Link>
-            <Link
-              to="/about"
-              className="hover:text-[#F06292] transition-colors"
-            >
+            <Link to="/about" className="hover:text-[#F06292] transition-colors">
               About
             </Link>
             <Link to="/blog" className="hover:text-[#F06292] transition-colors">
               Blog
             </Link>
-            <Link
-              to="/specialist"
-              className="hover:text-[#F06292] transition-colors"
-            >
+            <Link to="/specialist" className="hover:text-[#F06292] transition-colors">
               Specialist
             </Link>
-            <Link
-              to="/services"
-              className="hover:text-[#F06292] transition-colors"
-            >
+            <Link to="/services" className="hover:text-[#F06292] transition-colors">
               Services
             </Link>
           </nav>
@@ -1000,9 +867,7 @@ const BlogDetail = () => {
           <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm mb-4">
             {blog.category}
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl">
-            {blog.content.h1}
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl">{blog.content.h1}</h1>
           <div className="flex items-center">
             <img
               src={blog.authorImage || "/placeholder.svg"}
@@ -1184,9 +1049,7 @@ const BlogDetail = () => {
                         <h4 className="font-bold text-gray-800 mr-2">
                           Jane Doe
                         </h4>
-                        <span className="text-sm text-gray-500">
-                          2 days ago
-                        </span>
+                        <span className="text-sm text-gray-500">2 days ago</span>
                       </div>
                       <p className="text-gray-700">
                         This article was amazing! I feel so relaxed after trying
@@ -1218,13 +1081,8 @@ const BlogDetail = () => {
                   color: bookmarked ? "white" : "#F06292",
                 }}
               >
-                <Bookmark
-                  className={bookmarked ? "fill-white" : ""}
-                  size={18}
-                />
-                <span>
-                  {bookmarked ? "Bookmarked" : "Bookmark This Article"}
-                </span>
+                <Bookmark className={bookmarked ? "fill-white" : ""} size={18} />
+                <span>{bookmarked ? "Bookmarked" : "Bookmark This Article"}</span>
               </button>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 mb-8">
@@ -1233,11 +1091,7 @@ const BlogDetail = () => {
               </h3>
               <div className="space-y-6">
                 {relatedPosts.map((post) => (
-                  <Link
-                    key={post.id}
-                    to={`/blog/${post.id}`}
-                    className="block group"
-                  >
+                  <Link key={post.id} to={`/blog/${post.id}`} className="block group">
                     <div className="flex items-start">
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 mr-4">
                         <img
@@ -1250,9 +1104,7 @@ const BlogDetail = () => {
                         <h4 className="font-medium text-gray-800 group-hover:text-[#F06292] transition-colors line-clamp-2">
                           {post.title}
                         </h4>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {post.date}
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">{post.date}</p>
                       </div>
                     </div>
                   </Link>
@@ -1260,30 +1112,23 @@ const BlogDetail = () => {
               </div>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-              <h3 className="text-xl font-bold text-gray-800 mb-6">
-                Categories
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-6">Categories</h3>
               <div className="space-y-2">
-                {["Skincare", "Treatments", "Wellness", "Lifestyle"].map(
-                  (cat) => (
-                    <Link
-                      key={cat}
-                      to={`/blog?category=${cat}`}
-                      className="block py-2 px-4 hover:bg-gray-50 rounded-lg text-gray-700 hover:text-[#F06292] transition-colors"
-                    >
-                      {cat}
-                    </Link>
-                  )
-                )}
+                {["Skincare", "Treatments", "Wellness", "Lifestyle"].map((cat) => (
+                  <Link
+                    key={cat}
+                    to={`/blog?category=${cat}`}
+                    className="block py-2 px-4 hover:bg-gray-50 rounded-lg text-gray-700 hover:text-[#F06292] transition-colors"
+                  >
+                    {cat}
+                  </Link>
+                ))}
               </div>
             </div>
             <div className="bg-gradient-to-r from-[#1C2526] to-[#F06292] text-white rounded-xl shadow-md p-6">
-              <h3 className="text-xl font-bold mb-4">
-                Subscribe to Our Newsletter
-              </h3>
+              <h3 className="text-xl font-bold mb-4">Subscribe to Our Newsletter</h3>
               <p className="text-white/90 mb-6">
-                Get the latest spa tips and exclusive offers delivered to your
-                inbox
+                Get the latest spa tips and exclusive offers delivered to your inbox
               </p>
               <form>
                 <input
