@@ -29,7 +29,7 @@ const BlogPage = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://dea0-2405-4802-8132-b860-c0f1-9db4-3f51-d919.ngrok-free.app/api/blogs",
+          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/blogs",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
