@@ -50,14 +50,14 @@ const MyBooking = () => {
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackComment, setFeedbackComment] = useState("");
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  const [feedbackStatus, setFeedbackStatus] = useState({}); // Track feedback status
-  const [feedbackData, setFeedbackData] = useState({}); // Store feedback data (rating and comment)
+  const [feedbackStatus, setFeedbackStatus] = useState({});
+  const [feedbackData, setFeedbackData] = useState({});
+  const [feedbackResponses, setFeedbackResponses] = useState({});
   const [paymentNotification, setPaymentNotification] = useState({
     message: "",
     isSuccess: false,
     show: false,
   });
-
 
   const fadeIn = {
     initial: { opacity: 0 },
@@ -111,7 +111,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings/user",
+          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -130,51 +130,45 @@ const MyBooking = () => {
 
           const feedbackStatusMap = {};
           const feedbackDataMap = {};
-          await Promise.all(
-            sortedBookings.map(async (booking) => {
-              try {
-                const feedbackResponse = await axios.get(
-                  `https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                      "ngrok-skip-browser-warning": "true",
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
-                feedbackStatusMap[booking.bookingId] = feedbackResponse.data.hasFeedback || false;
-                if (feedbackResponse.data.rating || feedbackResponse.data.comment) {
-                  feedbackDataMap[booking.bookingId] = {
-                    rating: feedbackResponse.data.rating || 0,
-                    comment: feedbackResponse.data.comment || "",
-                  };
+          const feedbackResponsesMap = {};
+
+          for (const booking of sortedBookings) {
+            try {
+              const feedbackResponse = await axios.get(
+                `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "ngrok-skip-browser-warning": "true",
+                    "Content-Type": "application/json",
+                  },
                 }
-              } catch (error) {
-                console.error(`Error fetching feedback for booking ${booking.bookingId}:`, error);
-                feedbackStatusMap[booking.bookingId] = false;
+              );
+              console.log(`Feedback response for booking ${booking.bookingId}:`, feedbackResponse.data);
+
+              feedbackResponsesMap[booking.bookingId] = feedbackResponse.data;
+
+              const hasFeedback = Array.isArray(feedbackResponse.data) && feedbackResponse.data.length > 0;
+              feedbackStatusMap[booking.bookingId] = hasFeedback;
+
+              if (hasFeedback) {
+                const feedbackData = feedbackResponse.data[0];
+                feedbackDataMap[booking.bookingId] = {
+                  rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
+                  comment: feedbackData.comment || "",
+                };
               }
-            })
-          );
+            } catch (error) {
+              console.error(`Error fetching feedback for booking ${booking.bookingId}:`, error);
+              feedbackStatusMap[booking.bookingId] = false;
+              feedbackResponsesMap[booking.bookingId] = [];
+            }
+          }
 
           setFeedbackStatus(feedbackStatusMap);
           setFeedbackData(feedbackDataMap);
+          setFeedbackResponses(feedbackResponsesMap);
           setBookings(sortedBookings);
-
-          if (sortedBookings.length === 0) {
-            const defaultBooking = {
-              bookingId: 1,
-              bookingDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-              timeSlot: "14:00-15:00",
-              status: "COMPLETED",
-              paymentStatus: "SUCCESS",
-              totalPrice: 50.0,
-              createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            };
-            setBookings([defaultBooking]);
-            setFeedbackStatus({ 1: false });
-            setFeedbackData({ 1: { rating: 0, comment: "" } });
-          }
         } else {
           throw new Error("Invalid response format: Expected an array of bookings");
         }
@@ -196,6 +190,7 @@ const MyBooking = () => {
         } else {
           setErrorPopup(error.message || "Failed to load bookings. Please try again.");
         }
+        setBookings([]); // Đặt bookings về mảng rỗng nếu có lỗi
       }
     };
 
@@ -205,7 +200,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users/specialists/active",
+          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -231,13 +226,12 @@ const MyBooking = () => {
     Promise.all([fetchBookings(), fetchSpecialists()]).finally(() => setLoading(false));
   }, [navigate, refresh]);
 
-  // Handle payment redirect and token
   useEffect(() => {
     const token = searchParams.get("token");
     const status = searchParams.get("status");
 
     if (token) {
-      localStorage.setItem("token", token); // Lưu token vào localStorage
+      localStorage.setItem("token", token);
       console.log("Token received and saved:", token);
     }
 
@@ -276,7 +270,7 @@ const MyBooking = () => {
     const timeSlot = `${startTime}-${endDateTime.toTimeString().slice(0, 5)}`;
 
     return bookings.some((booking) => {
-      if (booking.status === "CANCELLED" || booking.bookingId === 1) return false;
+      if (booking.status === "CANCELLED") return false; // Loại bỏ kiểm tra bookingId === 1
       const existingDate = new Date(booking.bookingDate).toISOString().split("T")[0];
       const existingTimeSlot = booking.timeSlot;
       return existingDate === bookingDate && existingTimeSlot === timeSlot;
@@ -320,7 +314,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings",
+        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -427,18 +421,8 @@ const MyBooking = () => {
         return null;
       }
 
-      if (bookingId === 1) {
-        return {
-          ...booking,
-          services: [{ id: 1, name: "Default Facial", duration: 60, price: 50.0 }],
-          specialist: { name: "Default Specialist", userId: 999, specialization: "Skin Therapist" },
-          totalDuration: 60,
-          totalPrice: 50.0,
-        };
-      }
-
       const response = await axios.get(
-        `https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -522,38 +506,46 @@ const MyBooking = () => {
 
       const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
 
-      // Fetch feedback data
       let feedback = { rating: 0, comment: "" };
-      try {
-        const feedbackResponse = await axios.get(
-          `https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log("Feedback response data:", JSON.stringify(feedbackResponse.data, null, 2));
+      let feedbackResponseData = feedbackResponses[bookingId];
 
-        // Xử lý mảng response, lấy phần tử đầu tiên
-        if (Array.isArray(feedbackResponse.data) && feedbackResponse.data.length > 0) {
-          const feedbackData = feedbackResponse.data[0];
-          feedback = {
-            rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5), // Giới hạn rating từ 0-5
-            comment: feedbackData.comment || "",
-          };
-        } else if (feedbackResponse.data && typeof feedbackResponse.data === "object") {
-          feedback = {
-            rating: Math.min(Math.max(feedbackResponse.data.rating || 0, 0), 5),
-            comment: feedbackResponse.data.comment || "",
-          };
+      if (!feedbackResponseData) {
+        try {
+          const feedbackResponse = await axios.get(
+            `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true",
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          console.log("Feedback response data:", JSON.stringify(feedbackResponse.data, null, 2));
+          feedbackResponseData = feedbackResponse.data;
+
+          setFeedbackResponses((prev) => ({
+            ...prev,
+            [bookingId]: feedbackResponseData,
+          }));
+        } catch (feedbackError) {
+          console.error(`Error fetching feedback for booking ${bookingId}:`, feedbackError);
+          feedbackResponseData = [];
         }
-        setFeedbackData((prev) => ({ ...prev, [bookingId]: feedback }));
-      } catch (feedbackError) {
-        console.error(`Error fetching feedback for booking ${bookingId}:`, feedbackError);
       }
+
+      if (Array.isArray(feedbackResponseData) && feedbackResponseData.length > 0) {
+        const feedbackData = feedbackResponseData[0];
+        feedback = {
+          rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
+          comment: feedbackData.comment || "",
+        };
+        setFeedbackStatus((prev) => ({
+          ...prev,
+          [bookingId]: true,
+        }));
+      }
+      setFeedbackData((prev) => ({ ...prev, [bookingId]: feedback }));
 
       return {
         ...booking,
@@ -568,6 +560,10 @@ const MyBooking = () => {
       setErrorPopup("Failed to fetch booking details. Please try again.");
       return null;
     }
+  };
+  // Hàm định dạng giá tiền VND với dấu phân cách hàng nghìn
+  const formatVND = (price) => {
+    return price.toLocaleString("vi-VN") + " ₫"; // Định dạng theo kiểu Việt Nam
   };
 
   const closePopup = () => {
@@ -599,7 +595,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -654,7 +650,7 @@ const MyBooking = () => {
       };
 
       const response = await axios.post(
-        "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks",
+        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {
@@ -668,9 +664,8 @@ const MyBooking = () => {
       console.log("Feedback post response:", response.data);
 
       if (response.status === 200 || response.status === 201) {
-        // Fetch lại feedback từ DB
         const feedbackResponse = await axios.get(
-          `https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
+          `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -687,11 +682,6 @@ const MyBooking = () => {
           updatedFeedback = {
             rating: Math.min(Math.max(feedbackData.rating || feedbackRating, 0), 5),
             comment: feedbackData.comment || feedbackComment,
-          };
-        } else if (feedbackResponse.data && typeof feedbackResponse.data === "object") {
-          updatedFeedback = {
-            rating: Math.min(Math.max(feedbackResponse.data.rating || feedbackRating, 0), 5),
-            comment: feedbackResponse.data.comment || feedbackComment,
           };
         }
 
@@ -716,27 +706,74 @@ const MyBooking = () => {
         setFeedbackComment("");
         setErrorPopup("Feedback submitted successfully!");
         setTimeout(() => setErrorPopup(""), 2000);
+
+        setRefresh((prev) => !prev);
       } else {
         throw new Error("Failed to save feedback to server.");
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      setErrorPopup(
-        error.response?.data.message ||
-        error.message ||
-        "Failed to submit feedback. Please try again or contact support."
-      );
+      if (error.response?.status === 400 && error.response?.data.message === "feedback already exist") {
+        setErrorPopup("You have already submitted feedback for this booking.");
+        setFeedbackStatus((prev) => ({
+          ...prev,
+          [selectedBooking.bookingId]: true,
+        }));
+        setIsFeedbackPopupOpen(false);
+      } else {
+        setErrorPopup(
+          error.response?.data.message ||
+          error.message ||
+          "Failed to submit feedback. Please try again or contact support."
+        );
+      }
     } finally {
       setIsSubmittingFeedback(false);
     }
   };
+
   const closeErrorPopup = () => setErrorPopup("");
   const handleOpenFeedback = (booking) => {
     setSelectedBooking(booking);
     setIsFeedbackPopupOpen(true);
   };
+  useEffect(() => {
+    const hasShownNotification = localStorage.getItem("paymentNotificationShown");
+    if (hasShownNotification) {
+      setPaymentNotification((prev) => ({ ...prev, show: false }));
+    }
+
+    const token = searchParams.get("token");
+    const status = searchParams.get("status");
+
+    if (token) {
+      localStorage.setItem("token", token);
+      console.log("Token received and saved:", token);
+    }
+
+    if (status) {
+      if (status === "success" && !hasShownNotification) {
+        setPaymentNotification({
+          message: "Payment successful!",
+          isSuccess: true,
+          show: true,
+        });
+        localStorage.setItem("paymentNotificationShown", "true"); // Đánh dấu đã hiển thị
+      } else if (status === "failed" && !hasShownNotification) {
+        setPaymentNotification({
+          message: "Payment failed. Please try again.",
+          isSuccess: false,
+          show: true,
+        });
+        localStorage.setItem("paymentNotificationShown", "true"); // Đánh dấu đã hiển thị
+      }
+      setRefresh((prev) => !prev);
+    }
+  }, [searchParams]);
+
   const closePaymentNotification = () => {
     setPaymentNotification((prev) => ({ ...prev, show: false }));
+    localStorage.setItem("paymentNotificationShown", "true"); // Đánh dấu đã đóng thủ công
   };
 
   const getStatusBadgeClass = (status) => {
@@ -827,7 +864,7 @@ const MyBooking = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Bookings</h1>
           <p className="text-gray-600">View and manage all your service appointments</p>
         </motion.div>
-        {/* Payment Notification - Show in the center of the screen */}
+
         {paymentNotification.show && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
             <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full">
@@ -892,13 +929,13 @@ const MyBooking = () => {
                           <p className="font-medium text-gray-800">{service.name}</p>
                           <p className="text-sm text-gray-600">{service.duration} minutes</p>
                         </div>
-                        <p className="font-semibold text-green-600">${service.price.toFixed(2)}</p>
+                        <p className="font-semibold text-green-600">${formatVND(service.price)}</p>
                       </motion.li>
                     ))}
                   </ul>
                   <div className="mt-3 pt-3 border-t border-green-100 flex justify-between">
                     <p className="font-medium text-gray-800">Total</p>
-                    <p className="font-semibold text-green-600">${confirmedBooking.totalPrice.toFixed(2)}</p>
+                    <p className="font-semibold text-green-600">{formatVND(confirmedBooking.totalPrice)}</p>
                   </div>
                 </motion.div>
               </div>
@@ -933,14 +970,14 @@ const MyBooking = () => {
                           <p className="font-medium text-gray-800">{service.name}</p>
                           <p className="text-sm text-gray-600">{service.duration} minutes</p>
                         </div>
-                        <p className="font-semibold text-rose-600">${service.price.toFixed(2)}</p>
+                        <p className="font-semibold text-rose-600">{formatVND(service.price)}</p>
                       </motion.li>
                     ))}
                   </ul>
                   <div className="mt-3 pt-3 border-t border-rose-100 flex justify-between">
                     <p className="font-medium text-gray-800">Total</p>
                     <p className="font-semibold text-rose-600">
-                      ${selectedServices.reduce((sum, service) => sum + service.price, 0).toFixed(2)}
+                      {formatVND(selectedServices.reduce((sum, service) => sum + service.price, 0))}
                     </p>
                   </div>
                 </motion.div>
@@ -1120,7 +1157,7 @@ const MyBooking = () => {
                             <CreditCard className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
                               <p className="text-sm text-gray-500">Total Price</p>
-                              <p className="font-medium text-gray-800">${booking.totalPrice || "N/A"}</p>
+                              <p className="font-medium text-gray-800">{formatVND(booking.totalPrice) || "N/A"}</p>
                             </div>
                           </div>
                         </div>
@@ -1163,17 +1200,15 @@ const MyBooking = () => {
                       >
                         <Eye className="w-4 h-4 mr-2" /> View Details
                       </motion.button>
-                      {booking.status === "COMPLETED" && (
-                        feedbackStatus[booking.bookingId] && (
-                          <motion.button
-                            onClick={() => handleOpenFeedback(booking)}
-                            className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <MessageSquare className="w-4 h-4 mr-2" /> Feedback
-                          </motion.button>
-                        )
+                      {booking.status === "COMPLETED" && !feedbackStatus[booking.bookingId] && (
+                        <motion.button
+                          onClick={() => handleOpenFeedback(booking)}
+                          className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" /> Feedback
+                        </motion.button>
                       )}
                     </div>
                   </div>
@@ -1241,7 +1276,7 @@ const MyBooking = () => {
                     Your booking has been successfully paid. Thank you!
                   </p>
                   <motion.button
-                    onClick={closePaymentSuccessPopup}
+                    onClick={() => setIsPaymentSuccessPopupOpen(false)}
                     className="inline-flex items-center px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -1366,7 +1401,7 @@ const MyBooking = () => {
                               </div>
                               <div className="text-right">
                                 <p className="font-semibold text-rose-600">
-                                  ${service.price ? service.price.toFixed(0) : "0.00"}
+                                  {formatVND(service.price) ? formatVND(service.price) : "0.00"}
                                 </p>
                               </div>
                             </div>
@@ -1375,11 +1410,10 @@ const MyBooking = () => {
                       </ul>
                       <div className="bg-gray-50 p-4 flex justify-between items-center border-t border-gray-200">
                         <p className="font-medium text-gray-800">Total</p>
-                        <p className="font-bold text-rose-600 text-lg">${selectedBooking.totalPrice.toFixed(0)}</p>
+                        <p className="font-bold text-rose-600 text-lg">{formatVND(selectedBooking.totalPrice)}</p>
                       </div>
                     </motion.div>
                   </div>
-                  {/* Hiển thị feedback nếu có */}
                   {bookingDetails.feedback && bookingDetails.feedback.rating > 0 && (
                     <motion.div
                       className="mb-6 bg-teal-50 rounded-xl p-5"
@@ -1441,35 +1475,33 @@ const MyBooking = () => {
                           <p className="text-gray-600">Method</p>
                           <p className="font-medium text-gray-800">VNPay</p>
                         </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-200">
                           <p className="font-medium text-gray-800">Total</p>
-                          <p className="font-bold text-rose-600">${selectedBooking.totalPrice.toFixed(2)}</p>
+                          <p className="font-bold text-rose-600">{formatVND(selectedBooking.totalPrice)}</p>
                         </div>
                       </motion.div>
-                      {selectedBooking.bookingId !== 1 &&
-                        bookingDetails.paymentStatus === "PENDING" &&
-                        selectedBooking.status !== "CANCELLED" && (
-                          <motion.button
-                            onClick={handlePayment}
-                            disabled={isPaying}
-                            className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
-                              ? "bg-gray-400 text-white cursor-not-allowed"
-                              : "bg-rose-600 text-white hover:bg-rose-700"
-                              } mb-4`}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                          >
-                            {isPaying ? (
-                              <>
-                                <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Processing...
-                              </>
-                            ) : (
-                              <>
-                                <DollarSign className="w-5 h-5 mr-2" /> Pay Now
-                              </>
-                            )}
-                          </motion.button>
-                        )}
+                      {bookingDetails.paymentStatus === "PENDING" && selectedBooking.status !== "CANCELLED" && (
+                        <motion.button
+                          onClick={handlePayment}
+                          disabled={isPaying}
+                          className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
+                            ? "bg-gray-400 text-white cursor-not-allowed"
+                            : "bg-rose-600 text-white hover:bg-rose-700"
+                            } mb-4`}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          {isPaying ? (
+                            <>
+                              <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Processing...
+                            </>
+                          ) : (
+                            <>
+                              <DollarSign className="w-5 h-5 mr-2" /> Pay Now
+                            </>
+                          )}
+                        </motion.button>
+                      )}
                     </>
                   )}
                   {selectedBooking.status === "CANCELLED" && (
@@ -1486,19 +1518,10 @@ const MyBooking = () => {
                       <p className="text-gray-600 mt-2">This booking has been cancelled and no payment is required.</p>
                     </motion.div>
                   )}
+
                   <div className="space-y-3 mt-auto">
                     {selectedBooking.status === "COMPLETED" && (
-                      feedbackStatus[selectedBooking.bookingId] ? (
-                        <motion.button
-                          onClick={() => setIsFeedbackPopupOpen(true)}
-                          className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <MessageSquare className="w-4 h-4 mr-2" /> Feedback
-                        </motion.button>
-
-                      ) : (
+                      feedbackStatus[selectedBooking.bookingId] === true ? (
                         <motion.div
                           className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg"
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -1507,6 +1530,15 @@ const MyBooking = () => {
                         >
                           <MessageSquare className="w-4 h-4 mr-2" /> Thank you for your feedback
                         </motion.div>
+                      ) : (
+                        <motion.button
+                          onClick={() => setIsFeedbackPopupOpen(true)}
+                          className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" /> Feedback
+                        </motion.button>
                       )
                     )}
                     <motion.button
@@ -1560,8 +1592,8 @@ const MyBooking = () => {
                             key={index}
                             type="button"
                             onClick={() => setFeedbackRating(starValue)}
-                            onMouseEnter={() => setFeedbackRating(starValue)} // Hiệu ứng hover
-                            onMouseLeave={() => setFeedbackRating(feedbackRating)} // Giữ rating hiện tại khi rời chuột
+                            onMouseEnter={() => setFeedbackRating(starValue)}
+                            onMouseLeave={() => setFeedbackRating(feedbackRating)}
                             className={`text-3xl cursor-pointer transition-colors duration-200 ${starValue <= feedbackRating ? "text-yellow-400" : "text-gray-300"
                               }`}
                             whileHover={{ scale: 1.2 }}
@@ -1625,4 +1657,3 @@ const MyBooking = () => {
 };
 
 export default MyBooking;
-

@@ -14,7 +14,7 @@ export default function ServiceHome() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/services",
+          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -68,37 +68,49 @@ export default function ServiceHome() {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {services.map((service) => (
-          <div
-            key={service.serviceId}
-            className="relative bg-pink-50 rounded-xl overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full"
-          >
-            <div className="aspect-[4/3] w-full overflow-hidden">
-              <img
-                src={service.image || "/placeholder.svg"}
-                alt={service.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
+        {services.map((service) => {
+          // Lấy URL ảnh từ mảng images (ảnh đầu tiên nếu có)
+          const imageUrl =
+            service.images && service.images.length > 0
+              ? service.images[0].url
+              : "/placeholder.svg";
+
+          return (
+            <div
+              key={service.serviceId}
+              className="relative bg-pink-50 rounded-xl overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full"
+            >
+              <div className="aspect-[4/3] w-full overflow-hidden">
+                <img
+                  src={imageUrl} // Sử dụng imageUrl đã tính toán
+                  alt={service.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
+              <div className="p-6 md:p-8">
+                <h3 className="text-xl md:text-2xl font-bold text-[#A10550] mb-3">
+                  {service.name}
+                </h3>
+                <p className="text-gray-700 mb-4 text-lg">
+                {service.price.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}{" "}
+                  - {service.duration} min
+                </p>
+                <p className="text-base text-gray-600 mb-6 line-clamp-3">
+                  {service.description}
+                </p>
+                <button
+                  onClick={() => handleBookNow(service.serviceId)}
+                  className="w-full bg-[#2D0A31] text-white px-6 py-3 rounded-lg text-lg hover:bg-[#1a061d] transition-all duration-300 transform hover:scale-105"
+                >
+                  Book Now
+                </button>
+              </div>
             </div>
-            <div className="p-6 md:p-8">
-              <h3 className="text-xl md:text-2xl font-bold text-[#A10550] mb-3">
-                {service.name}
-              </h3>
-              <p className="text-gray-700 mb-4 text-lg">
-                ${service.price.toFixed(2)} - {service.duration} min
-              </p>
-              <p className="text-base text-gray-600 mb-6 line-clamp-3">
-                {service.description}
-              </p>
-              <button
-                onClick={() => handleBookNow(service.serviceId)}
-                className="w-full bg-[#2D0A31] text-white px-6 py-3 rounded-lg text-lg hover:bg-[#1a061d] transition-all duration-300 transform hover:scale-105"
-              >
-                Book Now
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

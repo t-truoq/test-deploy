@@ -30,7 +30,7 @@ export default function SignIn() {
       const response = await axios.get(
         `/login/oauth2/code/google?code=${code}`,
 
-        `https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+        `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/login/oauth2/code/google?code=${code}`,
 
         { headers: { "Content-Type": "application/json" } }
       );
@@ -97,7 +97,7 @@ export default function SignIn() {
 
       console.log("Request data:", { email, password });
       const response = await axios.post(
-        "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/auth/token",
+        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/auth/token",
 
 
         { email, password },
@@ -170,7 +170,7 @@ export default function SignIn() {
     window.location.href = "/oauth2/authorization/google";
 
     window.location.href =
-      "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/oauth2/authorization/google";
+      "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/oauth2/authorization/google";
 
   };
 

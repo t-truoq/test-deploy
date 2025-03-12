@@ -64,7 +64,7 @@ const ChangePassword = () => {
       console.log("Sending change password data:", updateData);
 
       const response = await axios.put(
-        `https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users/profile`,
+        `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users/profile`,
         updateData,
         {
           headers: {

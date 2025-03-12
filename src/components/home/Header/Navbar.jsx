@@ -70,7 +70,7 @@
 //   const [language, setLanguage] = useState("en"); // Initialize language state
 //   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
 //   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
-//   const baseUrl = "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
+//   const baseUrl = "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
 
 //   // Check login status and fetch user profile
 //   useEffect(() => {
@@ -1213,7 +1213,7 @@ const Navbar = () => {
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false); // Thêm state cho language dropdown
-  const baseUrl = "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
+  const baseUrl = "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
 
   // Check login status and fetch user profile
   useEffect(() => {

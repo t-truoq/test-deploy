@@ -5,7 +5,7 @@ import { Printer, Send, Filter, ChevronDown } from "lucide-react";
 import axios from "axios";
 
 const BASE_URL =
-  "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings";
+  "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings";
 
 export default function Payment() {
   const [bookings, setBookings] = useState([]);
