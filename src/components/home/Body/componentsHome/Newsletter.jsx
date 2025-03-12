@@ -80,11 +80,7 @@ export default function Newsletter() {
     email: "",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-    message: ""
-  })
+  
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false) // Added loading state
@@ -102,9 +98,7 @@ export default function Newsletter() {
     setError("");
     setSubmitted(false);
     setIsLoading(true);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  
 
     // Check required fields
     if (!formData.fullName.trim()) {
@@ -248,3 +242,4 @@ export default function Newsletter() {
     </section>
   );
 }
+
