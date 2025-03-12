@@ -135,7 +135,7 @@ export default function Newsletter() {
         },
         body: JSON.stringify(requestData),
       })
-
+      ////
       if (!response.ok) {
         throw new Error('An error occurred while sending the request')
       }
