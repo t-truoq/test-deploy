@@ -42,18 +42,20 @@ export function Customers() {
         throw new Error(data.msg || "API returned an error");
       }
 
-      const mappedClients = data.result.map((user) => ({
-        id: user.userId.toString(),
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "N/A",
-        address: user.address || "N/A",
-        role: user.role,
-        status: user.status || "active", // Add status field, default to "active"
-        createdAt: new Date(user.createdAt).toLocaleDateString(),
-        updatedAt: new Date(user.updatedAt).toLocaleDateString(),
-        visits: 0,
-      }));
+      const mappedClients = data.result
+        .filter((user) => user.role === "CUSTOMER") // Filter only CUSTOMER role
+        .map((user) => ({
+          id: user.userId.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone || "N/A",
+          address: user.address || "N/A",
+          role: user.role,
+          status: user.status || "active",
+          createdAt: new Date(user.createdAt).toLocaleDateString(),
+          updatedAt: new Date(user.updatedAt).toLocaleDateString(),
+          visits: 0,
+        }));
 
       setClients(mappedClients);
     } catch (error) {

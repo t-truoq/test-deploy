@@ -27,7 +27,7 @@ export default function FeedbackList({ filter }) {
         };
 
         const feedbackResponse = await axios.get(
-          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks",
+          "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/specialist/feedbacks",
           { headers }
         );
 
@@ -43,12 +43,13 @@ export default function FeedbackList({ filter }) {
           return;
         }
 
+        // Ánh xạ dữ liệu từ API, sử dụng customerName và specialistName
         const mappedData = feedbackResponse.data.map((item) => ({
           id: item.feedbackId,
-          customer: `Khách hàng ID: ${item.customerId}`,
-          email: "Email không khả dụng",
+          customer: item.customerName, // Thay vì `Khách hàng ID: ${item.customerId}`
+          email: "Email không khả dụng", // Nếu backend trả email thì có thể thêm vào
           avatar: "/placeholder.svg?height=40&width=40",
-          service: `Dịch vụ ID: ${item.specialistId}`,
+          service: item.specialistName, // Thay vì `Dịch vụ ID: ${item.specialistId}`
           message: item.comment,
           rating: item.rating,
           date: item.createdAt.split("T")[0],
@@ -84,7 +85,7 @@ export default function FeedbackList({ filter }) {
       .map((_, i) => (
         <svg
           key={i}
-          xmlns="http://www.w3.org/2000/svg"
+          xmlns="http://www.w3.org/2000/svg" // Sử dụng SVG namespace từ W3C
           className={`h-4 w-4 ${
             i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
           }`}
@@ -158,7 +159,7 @@ export default function FeedbackList({ filter }) {
                   <div className="flex items-center gap-1 mb-2">
                     {renderStars(item.rating)}
                   </div>
-                  <p className="text-sm font-medium"> {item.service}</p>
+                  <p className="text-sm font-medium">{item.service}</p>
                   <p className="mt-2 text-sm">{item.message}</p>
                 </div>
               </div>
@@ -180,7 +181,7 @@ export default function FeedbackList({ filter }) {
                   className="text-gray-500 hover:text-gray-700"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns="http://www.w3.org/2000/svg" // Sử dụng SVG namespace
                     className="h-5 w-5"
                     viewBox="0 0 24 24"
                     fill="none"
@@ -199,7 +200,8 @@ export default function FeedbackList({ filter }) {
             <div className="p-4 space-y-4">
               <div className="flex justify-between">
                 <div>
-                  <p className="text-sm font-medium">Dịch vụ</p>
+                  <p className="text-sm font-medium">Chuyên gia</p>{" "}
+                  {/* Đổi nhãn từ "Dịch vụ" thành "Chuyên gia" */}
                   <p className="text-sm">{selectedFeedback.service}</p>
                 </div>
                 <div>

@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { Search, MoreHorizontal } from "lucide-react";
 import { EditClientModal } from "./EditClientModal";
 
-
-const API_URL = "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users";
-
+const API_URL =
+  "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users";
 
 export function StaffClients() {
   const [clients, setClients] = useState([]);
@@ -43,17 +42,19 @@ export function StaffClients() {
         throw new Error(data.msg || "API returned an error");
       }
 
-      const mappedClients = data.result.map((user) => ({
-        id: user.userId.toString(),
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "N/A",
-        address: user.address || "N/A",
-        role: user.role,
-        createdAt: new Date(user.createdAt).toLocaleDateString(),
-        updatedAt: new Date(user.updatedAt).toLocaleDateString(),
-        visits: 0,
-      }));
+      const mappedClients = data.result
+        .filter((user) => user.role === "CUSTOMER") // Chỉ lấy role CUSTOMER
+        .map((user) => ({
+          id: user.userId.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone || "N/A",
+          address: user.address || "N/A",
+          role: user.role,
+          createdAt: new Date(user.createdAt).toLocaleDateString(),
+          updatedAt: new Date(user.updatedAt).toLocaleDateString(),
+          visits: 0,
+        }));
 
       setClients(mappedClients);
     } catch (error) {
