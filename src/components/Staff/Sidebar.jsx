@@ -15,7 +15,7 @@ export default function AppSidebar() {
         { name: "Appointments", icon: Calendar, path: "/staff/home" },
         { name: "Clients", icon: Users, path: "/staff/clients" },
         { name: "Skin therapist", icon: Users, path: "/staff/skintherapist" },
-        { name: "Staff Schedule", icon: Clock, path: "/staff/schedule" },
+        { name: "Manager Schedule", icon: Clock, path: "/staff/schedule" },
         {
           name: "Feedback",
           icon: MessageCircleWarning,

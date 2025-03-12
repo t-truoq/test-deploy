@@ -42,18 +42,20 @@ export function SkinTherapist() {
         throw new Error(data.msg || "API returned an error");
       }
 
-      const mappedClients = data.result.map((user) => ({
-        id: user.userId.toString(),
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "N/A",
-        address: user.address || "N/A",
-        role: user.role,
-        status: user.status || "active", // Add status field, default to "active"
-        createdAt: new Date(user.createdAt).toLocaleDateString(),
-        updatedAt: new Date(user.updatedAt).toLocaleDateString(),
-        visits: 0,
-      }));
+      const mappedClients = data.result
+        .filter((user) => user.role === "SPECIALIST") // Filter only SPECIALIST role
+        .map((user) => ({
+          id: user.userId.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone || "N/A",
+          address: user.address || "N/A",
+          role: user.role,
+          status: user.status || "active",
+          createdAt: new Date(user.createdAt).toLocaleDateString(),
+          updatedAt: new Date(user.updatedAt).toLocaleDateString(),
+          visits: 0,
+        }));
 
       setClients(mappedClients);
     } catch (error) {
@@ -102,7 +104,7 @@ export function SkinTherapist() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search clients by name"
+            placeholder="Search specialists by name"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -110,7 +112,7 @@ export function SkinTherapist() {
         </div>
 
         {isLoading && (
-          <div className="text-center py-4">Loading clients...</div>
+          <div className="text-center py-4">Loading specialists...</div>
         )}
 
         {error && (
@@ -214,14 +216,14 @@ export function SkinTherapist() {
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 role="menuitem"
                               >
-                                Edit Client
+                                Edit Specialist
                               </button>
                               <button
                                 onClick={() => handleDeleteClient(client.id)}
                                 className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                                 role="menuitem"
                               >
-                                Delete Client
+                                Delete Specialist
                               </button>
                             </div>
                           </div>
@@ -247,7 +249,7 @@ export function SkinTherapist() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
             <h3 className="text-lg font-bold mb-4">Confirm Deletion</h3>
-            <p>Are you sure you want to delete this client?</p>
+            <p>Are you sure you want to delete this specialist?</p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setClientToDelete(null)}

@@ -84,7 +84,7 @@ export function StaffSchedule() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">Staff Schedule</h2>
+      <h2 className="text-2xl font-bold mb-4">Manager Schedule</h2>
       <div className="mb-4 flex justify-between items-center">
         <button
           onClick={() => setCurrentWeek((prev) => addDays(prev, -7))}
