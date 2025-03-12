@@ -5,24 +5,25 @@ import { Printer, Send, Filter, ChevronDown } from "lucide-react";
 import axios from "axios";
 
 const BASE_URL =
-  "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings";
+  "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/v1/vnpay";
 
-export default function Payment() {
-  const [bookings, setBookings] = useState([]);
+export default function PaymentStaff() {
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
   const [dateFilter, setDateFilter] = useState("all");
-  const [costFilter, setCostFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
-  const [showCostDropdown, setShowCostDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   useEffect(() => {
     if (hasFetched) return;
 
-    const fetchCompletedBookings = async () => {
+    const fetchPayments = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Token:", token); // Debug token
         if (!token) {
           throw new Error("No token found. Please login again.");
         }
@@ -35,42 +36,64 @@ export default function Payment() {
           maxRedirects: 5,
         });
 
-        console.log("API Response:", response.data); // Debug the API response
+        console.log("API Response:", response.data); // Debug full response
 
-        if (Array.isArray(response.data)) {
-          const completedBookings = response.data
-            .filter((booking) => booking.status === "COMPLETED")
-            .map((booking) => ({
-              id: booking.bookingId,
-              service: booking.serviceNames
-                ? booking.serviceNames.join(", ")
-                : "N/A",
-              time: booking.timeSlot, // Assuming timeSlot can represent duration
-              cost: booking.totalPrice != null ? booking.totalPrice : 0, // Fallback to 0 if null
-              date: booking.bookingDate,
-            }));
-          setBookings(completedBookings);
-        } else {
-          throw new Error("Bookings data is not an array");
+        if (!response.data || !Array.isArray(response.data)) {
+          throw new Error("Invalid or empty response from payments API");
         }
+
+        const paymentData = response.data.map((payment) => ({
+          paymentId: payment.paymentId || "N/A",
+          amount: payment.amount ? Number(payment.amount) : 0,
+          paymentMethod: payment.paymentMethod || "N/A",
+          paymentTime: payment.paymentTime || "N/A",
+          status: payment.status || "N/A",
+          transactionId: payment.transactionId || "N/A",
+          bookingId: payment.bookingId || "N/A",
+        }));
+        setPayments(paymentData);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error("Detailed Error:", error); // Log full error
+        console.log("Server Response:", error.response?.data); // Log server response details
         if (error.response) {
-          if (error.response.status === 302) {
-            setError(
-              "Redirect detected. Please check authentication or server configuration."
-            );
-          } else if (error.response.status === 401) {
-            setError("Unauthorized: Please login again.");
-          } else if (error.response.status === 404) {
-            setError("No completed bookings found.");
-          } else {
-            setError(error.response.data.message || "Failed to load bookings.");
+          switch (error.response.status) {
+            case 400:
+              setError(
+                "Bad request. Please check the token or API endpoint. Details: " +
+                  (error.response.data?.message || "No additional details")
+              );
+              break;
+            case 401:
+              setError("Unauthorized: Please login again.");
+              break;
+            case 404:
+              setError("No payment data found.");
+              break;
+            default:
+              setError(
+                `API error (Status: ${error.response.status}) - ${error.message}`
+              );
           }
         } else if (error.request) {
           setError("Unable to connect to server. Please try again.");
         } else {
-          setError(error.message || "Failed to load bookings.");
+          setError(error.message || "An unexpected error occurred.");
+        }
+        // Fallback to mock data if API fails
+        if (!payments.length) {
+          console.log("Using mock data due to API failure");
+          const mockData = [
+            {
+              paymentId: "9007199254740991",
+              amount: 0,
+              paymentMethod: "string", // Placeholder, replace with actual method if available
+              paymentTime: "2025-03-12T15:14:42.819Z",
+              status: "PENDING",
+              transactionId: "9007199254740991",
+              bookingId: "9007199254740991",
+            },
+          ];
+          setPayments(mockData);
         }
       } finally {
         setLoading(false);
@@ -78,30 +101,32 @@ export default function Payment() {
       }
     };
 
-    fetchCompletedBookings();
+    fetchPayments();
   }, [hasFetched]);
 
-  // Filter treatments based on selected filters
-  const filteredTreatments = bookings.sort((a, b) => {
-    // Date sorting
-    if (dateFilter === "newest") return new Date(b.date) - new Date(a.date);
-    if (dateFilter === "oldest") return new Date(a.date) - new Date(b.date);
+  // Filter payments based on selected filters
+  const filteredPayments = payments
+    .filter(
+      (payment) => statusFilter === "all" || payment.status === statusFilter
+    )
+    .sort((a, b) => {
+      if (dateFilter === "newest") {
+        return new Date(b.paymentTime || 0) - new Date(a.paymentTime || 0);
+      }
+      if (dateFilter === "oldest") {
+        return new Date(a.paymentTime || 0) - new Date(b.paymentTime || 0);
+      }
+      return 0;
+    });
 
-    // Cost sorting
-    if (costFilter === "lowToHigh") return a.cost - b.cost;
-    if (costFilter === "highToLow") return b.cost - a.cost;
-
-    return 0;
-  });
-
-  const totalAmount = filteredTreatments.reduce(
-    (sum, treatment) => sum + treatment.cost,
+  const totalAmount = filteredPayments.reduce(
+    (sum, payment) => sum + (payment.amount || 0),
     0
   );
 
   const resetFilters = () => {
     setDateFilter("all");
-    setCostFilter("all");
+    setStatusFilter("all");
   };
 
   if (loading) {
@@ -109,7 +134,7 @@ export default function Payment() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-600">Loading bookings...</p>
+          <p className="text-xl text-gray-600">Loading payments...</p>
         </div>
       </div>
     );
@@ -135,6 +160,12 @@ export default function Payment() {
             </svg>
           </div>
           <p className="text-gray-600 mb-8 text-lg">{error}</p>
+          <button
+            className="px-4 py-2 bg-[#3D021E] text-white rounded-md hover:bg-[#3D021E]/90"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -155,7 +186,7 @@ export default function Payment() {
             className="flex items-center justify-between gap-2 px-4 py-2 text-sm border rounded-md min-w-[100px] bg-white"
             onClick={() => {
               setShowDateDropdown(!showDateDropdown);
-              setShowCostDropdown(false);
+              setShowStatusDropdown(false);
             }}
           >
             Date
@@ -201,59 +232,64 @@ export default function Payment() {
           )}
         </div>
 
-        {/* Skin therapist Filter - Static for now */}
-        <button className="flex items-center justify-between gap-2 px-4 py-2 text-sm border rounded-md min-w-[120px] bg-white">
-          Skin therapist
-          <ChevronDown className="w-4 h-4" />
-        </button>
-
-        {/* Cost Filter */}
+        {/* Status Filter */}
         <div className="relative">
           <button
-            className="flex items-center justify-between gap-2 px-4 py-2 text-sm border rounded-md min-w-[100px] bg-white"
+            className="flex items-center justify-between gap-2 px-4 py-2 text-sm border rounded-md min-w-[120px] bg-white"
             onClick={() => {
-              setShowCostDropdown(!showCostDropdown);
+              setShowStatusDropdown(!showStatusDropdown);
               setShowDateDropdown(false);
             }}
           >
-            Cost
+            Status
             <ChevronDown className="w-4 h-4" />
           </button>
 
-          {showCostDropdown && (
+          {showStatusDropdown && (
             <div className="absolute top-full mt-1 w-[150px] bg-white border rounded-md shadow-lg z-10">
               <button
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  costFilter === "all" ? "bg-gray-50" : ""
+                  statusFilter === "all" ? "bg-gray-50" : ""
                 }`}
                 onClick={() => {
-                  setCostFilter("all");
-                  setShowCostDropdown(false);
+                  setStatusFilter("all");
+                  setShowStatusDropdown(false);
                 }}
               >
-                All Prices
+                All Status
               </button>
               <button
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  costFilter === "lowToHigh" ? "bg-gray-50" : ""
+                  statusFilter === "PENDING" ? "bg-gray-50" : ""
                 }`}
                 onClick={() => {
-                  setCostFilter("lowToHigh");
-                  setShowCostDropdown(false);
+                  setStatusFilter("PENDING");
+                  setShowStatusDropdown(false);
                 }}
               >
-                Low to High
+                Pending
               </button>
               <button
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  costFilter === "highToLow" ? "bg-gray-50" : ""
+                  statusFilter === "SUCCESS" ? "bg-gray-50" : ""
                 }`}
                 onClick={() => {
-                  setCostFilter("highToLow");
-                  setShowCostDropdown(false);
+                  setStatusFilter("SUCCESS");
+                  setShowStatusDropdown(false);
                 }}
               >
-                High to Low
+                Success
+              </button>
+              <button
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                  statusFilter === "FAILED" ? "bg-gray-50" : ""
+                }`}
+                onClick={() => {
+                  setStatusFilter("FAILED");
+                  setShowStatusDropdown(false);
+                }}
+              >
+                Failed
               </button>
             </div>
           )}
@@ -273,42 +309,54 @@ export default function Payment() {
           <thead>
             <tr className="border-b">
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Serial No.
+                Payment ID
               </th>
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Service
+                Amount
               </th>
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Skin therapist
+                Payment method
               </th>
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
                 Time
               </th>
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Cost
+                Status
               </th>
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Note
+                Transaction ID
+              </th>
+              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
+                Booking ID
               </th>
             </tr>
           </thead>
           <tbody>
-            {filteredTreatments.map((treatment) => (
-              <tr key={treatment.id} className="border-b">
+            {filteredPayments.map((payment) => (
+              <tr key={payment.paymentId} className="border-b">
                 <td className="py-4 px-4 text-sm text-gray-900">
-                  {treatment.id}
+                  {payment.paymentId}
                 </td>
                 <td className="py-4 px-4 text-sm text-gray-900">
-                  {treatment.service}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900"></td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {treatment.time}
+                  ${payment.amount.toLocaleString()}
                 </td>
                 <td className="py-4 px-4 text-sm text-gray-900">
-                  ${treatment.cost}
+                  {payment.paymentMethod}
                 </td>
-                <td className="py-4 px-4 text-sm text-gray-900"></td>
+                <td className="py-4 px-4 text-sm text-gray-900">
+                  {payment.paymentTime
+                    ? new Date(payment.paymentTime).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td className="py-4 px-4 text-sm text-gray-900">
+                  {payment.status}
+                </td>
+                <td className="py-4 px-4 text-sm text-gray-900">
+                  {payment.transactionId}
+                </td>
+                <td className="py-4 px-4 text-sm text-gray-900">
+                  {payment.bookingId}
+                </td>
               </tr>
             ))}
           </tbody>

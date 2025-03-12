@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
@@ -24,7 +23,9 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         const token = localStorage.getItem("token");
         console.log("Token:", token);
         if (!token) {
-          throw new Error("No authentication token found. Please log in again.");
+          throw new Error(
+            "No authentication token found. Please log in again."
+          );
         }
 
         const response = await axios.get(
@@ -144,7 +145,9 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
   }
 
   if (!booking) {
-    return <div className="p-6 text-center text-gray-500">Appointment not found</div>;
+    return (
+      <div className="p-6 text-center text-gray-500">Appointment not found</div>
+    );
   }
 
   const getStatusBadge = (status) => {
@@ -193,7 +196,9 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Appointment Details</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Appointment Details
+            </h2>
             <p className="text-sm text-gray-500">Booking ID: {bookingId}</p>
           </div>
           {getStatusBadge(booking.status)}
@@ -250,19 +255,26 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           <div className="space-y-2">
             {booking.services.map((service, index) => (
               <div key={index} className="flex justify-between">
-                <span className="text-sm text-gray-500">Service {index + 1}</span>
+                <span className="text-sm text-gray-500">
+                  Service {index + 1}
+                </span>
                 <span className="font-medium text-gray-800">
-                  {service.name} ({service.duration} min) - ${service.price.toFixed(2)}
+                  {service.name} ({service.duration} min) - $
+                  {service.price.toFixed(2)}
                 </span>
               </div>
             ))}
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">Total Price</span>
-              <span className="font-medium text-gray-800">${booking.totalPrice || "N/A"}</span>
+              <span className="font-medium text-gray-800">
+                ${booking.totalPrice || "N/A"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">Specialist ID</span>
-              <span className="text-gray-800">{booking.specialistId || "Unknown"}</span>
+              <span className="text-gray-800">
+                {booking.specialistId || "Unknown"}
+              </span>
             </div>
           </div>
         </div>
@@ -299,8 +311,12 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       {isStatusDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Edit Appointment Status</h3>
-            <p className="text-gray-600 mb-4">Change the status of this appointment.</p>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Edit Appointment Status
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Change the status of this appointment.
+            </p>
             <div className="flex items-center gap-4 p-4 border rounded-md bg-gray-50 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -317,15 +333,21 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
                 />
               </svg>
               <div>
-                <p className="font-medium text-gray-800">{booking.serviceNames.join(", ")}</p>
+                <p className="font-medium text-gray-800">
+                  {booking.serviceNames.join(", ")}
+                </p>
                 <p className="text-sm text-gray-500">
-                  {format(new Date(booking.bookingDate), "MMMM d, yyyy")} at {booking.timeSlot}
+                  {format(new Date(booking.bookingDate), "MMMM d, yyyy")} at{" "}
+                  {booking.timeSlot}
                 </p>
               </div>
             </div>
             <div className="grid gap-4 mb-6">
               <div className="flex flex-col gap-2">
-                <label htmlFor="status" className="text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="status"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Status
                 </label>
                 <div className="grid grid-cols-1 gap-2">

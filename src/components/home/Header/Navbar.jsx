@@ -71,6 +71,7 @@
 //   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
 //   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
 //   const baseUrl = "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
+//   const baseUrl = "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
 
 //   // Check login status and fetch user profile
 //   useEffect(() => {
@@ -1128,7 +1129,7 @@
 //     from { opacity: 0; transform: translateY(-10px); }
 //     to { opacity: 1; transform: translateY(0); }
 //   }
-  
+
 //   .animate-fadeIn {
 //     animation: fadeIn 0.3s ease-out forwards;
 //   }
@@ -1213,7 +1214,8 @@ const Navbar = () => {
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false); // Thêm state cho language dropdown
-  const baseUrl = "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
+  const baseUrl =
+    "https://f820-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app";
 
   // Check login status and fetch user profile
   useEffect(() => {
@@ -1319,7 +1321,9 @@ const Navbar = () => {
         setErrorNotifications(null);
         const token = localStorage.getItem("token");
         if (!token) {
-          setErrorNotifications("No authentication token found. Please log in.");
+          setErrorNotifications(
+            "No authentication token found. Please log in."
+          );
           setLoadingNotifications(false);
           return;
         }
@@ -1353,7 +1357,9 @@ const Navbar = () => {
         }
 
         const processedNotifications = parsedData.map((item) => ({
-          id: item.id || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id:
+            item.id ||
+            `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           message: item.message || "New Notification",
           time: item.createdAt
             ? new Date(item.createdAt).toLocaleString("en-US", {
@@ -1382,7 +1388,8 @@ const Navbar = () => {
           return fetchNotifications(retryCount - 1);
         }
         setErrorNotifications(
-          error.message || "Failed to fetch notifications. Check server or network."
+          error.message ||
+            "Failed to fetch notifications. Check server or network."
         );
       } finally {
         setLoadingNotifications(false);
@@ -1524,7 +1531,9 @@ const Navbar = () => {
                 console.error("Image failed to load:", e);
                 e.target.style.display = "none";
               }}
-              className={`transition-all duration-300 ${scrolled ? "h-10" : "h-12"} w-auto`}
+              className={`transition-all duration-300 ${
+                scrolled ? "h-10" : "h-12"
+              } w-auto`}
             />
             <span
               className={`text-pink-600 font-bold tracking-tight transition-all duration-300 ${
@@ -1644,7 +1653,9 @@ const Navbar = () => {
                           {notifications.map((notification) => (
                             <div
                               key={notification.id}
-                              onClick={() => markNotificationAsRead(notification)}
+                              onClick={() =>
+                                markNotificationAsRead(notification)
+                              }
                               className={`px-4 py-3 hover:bg-gray-50 cursor-pointer ${
                                 notification.status === "unread"
                                   ? "bg-pink-50"
@@ -1840,7 +1851,9 @@ const Navbar = () => {
           </NavLink>
           <div className="px-3 py-3 w-full">
             <div className="flex flex-col space-y-2 w-full">
-              <span className="text-sm font-medium text-gray-500">Language</span>
+              <span className="text-sm font-medium text-gray-500">
+                Language
+              </span>
               <div className="flex space-x-2 w-full">
                 <button
                   onClick={() => {
