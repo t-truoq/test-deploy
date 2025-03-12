@@ -3,8 +3,13 @@ import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { useState, useRef } from "react";
 import { addItem } from "../../../../../store/cartSlice";
-import { Heart, Clock, DollarSign, ChevronRight, Tag } from 'lucide-react';
+import { Heart, Clock, ChevronRight, Tag } from "lucide-react"; // Loại bỏ DollarSign
 import { motion } from "framer-motion";
+
+// Hàm định dạng giá tiền VND với dấu phân cách hàng nghìn
+const formatVND = (price) => {
+  return price.toLocaleString("vi-VN") + " ₫"; // Định dạng theo kiểu Việt Nam
+};
 
 export default function ServiceCard({ service, onSelect, isSelected, onAddToWishlist, isInWishlist, variant }) {
   const navigate = useNavigate();
@@ -136,8 +141,8 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
               </h5>
               
               <div className="flex items-center mb-4">
-                <DollarSign className="w-5 h-5 text-gray-700" />
-                <span className="font-bold text-xl lg:text-2xl text-gray-800">${service.price.toFixed(2)}</span>
+                {/* Thay DollarSign bằng ký hiệu ₫ trong span */}
+                <span className="font-bold text-xl lg:text-2xl text-gray-800">{formatVND(service.price)}</span>
               </div>
               
               <p className="text-gray-600 mb-6 line-clamp-3">{service.description}</p>

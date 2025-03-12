@@ -128,6 +128,10 @@ const BookingSummaryPanel = ({ selectedServices, onRemoveService, onBookServices
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
+  // Hàm định dạng giá tiền VND với dấu phân cách hàng nghìn
+  const formatVND = (price) => {
+    return price.toLocaleString("vi-VN") + " ₫"; // Định dạng theo kiểu Việt Nam
+  };
 
   return (
     <>
@@ -142,9 +146,8 @@ const BookingSummaryPanel = ({ selectedServices, onRemoveService, onBookServices
       {/* Floating button for mobile */}
       {showFloatingButton && (
         <motion.button
-          className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 rounded-full shadow-lg ${
-            selectedServices.length > 0 ? "bg-[#A10550] text-white" : "bg-gray-200 text-gray-600"
-          }`}
+          className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 rounded-full shadow-lg ${selectedServices.length > 0 ? "bg-[#A10550] text-white" : "bg-gray-200 text-gray-600"
+            }`}
           onClick={toggleVisibility}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -287,7 +290,7 @@ const BookingSummaryPanel = ({ selectedServices, onRemoveService, onBookServices
                             )}
                             <div className="flex justify-between items-center">
                               <span className="text-gray-600">Total Price:</span>
-                              <span className="font-bold text-lg text-[#A10550]">${totalPrice.toFixed(2)}</span>
+                              <span className="font-bold text-lg text-[#A10550]">{formatVND(totalPrice)}</span>
                             </div>
                           </div>
 
