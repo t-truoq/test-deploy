@@ -74,6 +74,13 @@ export default function SkinAnalysis() {
       },
     },
   }
+  const handleViewQuiz = () => {
+    navigate("/quiz"); // Điều hướng đến trang SpecialistPage
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+  };
 
   return (
     <section className="py-16 md:py-24 w-full">
@@ -98,7 +105,7 @@ export default function SkinAnalysis() {
                 <p className="text-white/90 text-lg">Scan With Your Phone To Get Started</p>
                 <p className="text-white/90 text-lg">Or</p>
                 <button
-                  onClick={() => navigate("/quiz")}
+                  onClick={handleViewQuiz}
                   className="border-2 border-white/20 text-white px-8 py-3 rounded-lg text-lg hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
                 >
                   Answer A Few Questions

@@ -190,7 +190,18 @@ export default function BlogHome() {
 
   const handleClick = (blogId) => {
     navigate(`/blog/${blogId}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleViewAllBlogs = () => {
+    navigate("/blog");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -240,6 +251,7 @@ export default function BlogHome() {
         <div className="text-center">
           <Link
             to="/blog"
+            onClick={handleViewAllBlogs}
             className="inline-block border-2 border-[#A10550] text-[#A10550] hover:bg-[#A10550] hover:text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors"
           >
             View All Articles

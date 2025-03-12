@@ -31,7 +31,7 @@ export const staticBlogs = [
     author: "Emily Johnson",
     authorImage: "https://ui-avatars.com/api/?name=Emily+Johnson&background=A10550&color=fff",
     date: "March 10, 2025",
-    image: "./blog/1.png",
+    image: "/blog/1.png",
     category: "Treatments",
     readTime: "3 min read",
     metaDescription: "Discover the benefits of a full body massage at our spa, including stress relief and improved circulation.",
@@ -62,7 +62,7 @@ export const staticBlogs = [
     author: "Sophie Miller",
     authorImage: "https://ui-avatars.com/api/?name=Sophie+Miller&background=A10550&color=fff",
     date: "March 8, 2025",
-    image: "./blog/2.webp",
+    image: "/blog/2.webp",
     category: "Skincare",
     readTime: "2 min read",
     metaDescription: "Learn about our deep facial care treatments to achieve a radiant and healthy complexion.",
@@ -93,7 +93,7 @@ export const staticBlogs = [
     author: "Liam Brown",
     authorImage: "https://ui-avatars.com/api/?name=Liam+Brown&background=A10550&color=fff",
     date: "March 5, 2025",
-    image: "./blog/3.jpg",
+    image: "/blog/3.jpg",
     category: "Wellness",
     readTime: "2 min read",
     metaDescription: "Explore the unique salt stone sauna experience for detoxification and improved wellness.",
@@ -124,7 +124,7 @@ export const staticBlogs = [
     author: "Olivia Davis",
     authorImage: "https://ui-avatars.com/api/?name=Olivia+Davis&background=A10550&color=fff",
     date: "March 1, 2025",
-    image: "./blog/4.jpg",
+    image: "/blog/4.jpg",
     category: "Lifestyle",
     readTime: "3 min read",
     metaDescription: "Treat yourself to our luxury spa package for a complete rejuvenation experience.",
@@ -160,7 +160,7 @@ export const staticBlogs = [
     "author": "Ava Wilson",
     "authorImage": "https://ui-avatars.com/api/?name=Ava+Wilson&background=A10550&color=fff",
     "date": "March 12, 2025",
-    "image": "./blog/5.jpg",
+    "image": "/blog/5.jpg",
     "category": "Wellness",
     "readTime": "2 min read",
     "metaDescription": "Explore the benefits of aromatherapy at our spa, from stress relief to improved sleep."
@@ -196,7 +196,7 @@ export const staticBlogs = [
     "author": "Ethan Harris",
     "authorImage": "https://ui-avatars.com/api/?name=Ethan+Harris&background=A10550&color=fff",
     "date": "March 11, 2025",
-    "image": "./blog/6.jpg",
+    "image": "/blog/6.jpg",
     "category": "Treatments",
     "readTime": "3 min read",
     "metaDescription": "Learn how hydrotherapy can rejuvenate your body and mind with our specialized water treatments."
@@ -232,7 +232,7 @@ export const staticBlogs = [
     "author": "Mia Thompson",
     "authorImage": "https://ui-avatars.com/api/?name=Mia+Thompson&background=A10550&color=fff",
     "date": "March 9, 2025",
-    "image": "./blog/7.webp",
+    "image": "/blog/7.webp",
     "category": "Skincare",
     "readTime": "2 min read",
     "metaDescription": "Discover the detoxifying benefits of herbal body wraps at our spa."
@@ -268,7 +268,7 @@ export const staticBlogs = [
     "author": "Noah Clark",
     "authorImage": "https://ui-avatars.com/api/?name=Noah+Clark&background=A10550&color=fff",
     "date": "March 7, 2025",
-    "image": "./blog/8.jpg",
+    "image": "/blog/8.jpg",
     "category": "Treatments",
     "readTime": "3 min read",
     "metaDescription": "Experience deep relaxation with our hot stone massage therapy at the spa."
@@ -304,7 +304,7 @@ export const staticBlogs = [
     "author": "Isabella Lewis",
     "authorImage": "https://ui-avatars.com/api/?name=Isabella+Lewis&background=A10550&color=fff",
     "date": "March 6, 2025",
-    "image": "./blog/9.png",
+    "image": "/blog/9.png",
     "category": "Wellness",
     "readTime": "2 min read",
     "metaDescription": "Discover the healing benefits of reflexology with our certified therapists."
@@ -340,7 +340,7 @@ export const staticBlogs = [
     "author": "Lucas Walker",
     "authorImage": "https://ui-avatars.com/api/?name=Lucas+Walker&background=A10550&color=fff",
     "date": "March 4, 2025",
-    "image": "./blog/10.jpg",
+    "image": "/blog/10.jpg",
     "category": "Skincare",
     "readTime": "3 min read",
     "metaDescription": "Rejuvenate your skin with our anti-aging facial treatments at the spa."
@@ -376,7 +376,7 @@ export const staticBlogs = [
     "author": "Emma Taylor",
     "authorImage": "https://ui-avatars.com/api/?name=Emma+Taylor&background=A10550&color=fff",
     "date": "March 3, 2025",
-    "image": "./blog/11.jpg",
+    "image": "/blog/11.jpg",
     "category": "Treatments",
     "readTime": "2 min read",
     "metaDescription": "Enjoy total relaxation with our Swedish massage, tailored to your needs."
@@ -412,7 +412,7 @@ export const staticBlogs = [
     "author": "Lily Adams",
     "authorImage": "https://ui-avatars.com/api/?name=Lily+Adams&background=A10550&color=fff",
     "date": "March 2, 2025",
-    "image": "./blog/12.avif",
+    "image": "/blog/12.avif",
     "category": "Skincare",
     "readTime": "2 min read",
     "metaDescription": "Restore moisture to dry skin with our hydrating facial treatments."
@@ -448,7 +448,7 @@ export const staticBlogs = [
     "author": "Mason Scott",
     "authorImage": "https://ui-avatars.com/api/?name=Mason+Scott&background=A10550&color=fff",
     "date": "February 28, 2025",
-    "image": "./blog/13.jpg",
+    "image": "/blog/13.jpg",
     "category": "Wellness",
     "readTime": "3 min read",
     "metaDescription": "Boost your mental health with our guided meditation and mindfulness sessions."
@@ -484,7 +484,7 @@ export const staticBlogs = [
     "author": "Sophie Reed",
     "authorImage": "https://ui-avatars.com/api/?name=Sophie+Reed&background=A10550&color=fff",
     "date": "February 27, 2025",
-    "image": "./blog/14.jpg",
+    "image": "/blog/14.jpg",
     "category": "Lifestyle",
     "readTime": "3 min read",
     "metaDescription": "Enjoy a luxurious couple’s spa day with tailored treatments and private amenities."
@@ -520,7 +520,7 @@ export const staticBlogs = [
     "author": "Jacob Hill",
     "authorImage": "https://ui-avatars.com/api/?name=Jacob+Hill&background=A10550&color=fff",
     "date": "February 26, 2025",
-    "image": "./blog/15.avif",
+    "image": "/blog/15.avif",
     "category": "Skincare",
     "readTime": "2 min read",
     "metaDescription": "Discover skin rejuvenation with our cryotherapy treatments at the spa."
@@ -556,7 +556,7 @@ export const staticBlogs = [
     "author": "Zoe Martinez",
     "authorImage": "https://ui-avatars.com/api/?name=Zoe+Martinez&background=A10550&color=fff",
     "date": "February 25, 2025",
-    "image": "./blog/16.jpg",
+    "image": "/blog/16.jpg",
     "category": "Treatments",
     "readTime": "3 min read",
     "metaDescription": "Enhance flexibility and vitality with our Thai massage therapy."

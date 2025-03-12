@@ -89,6 +89,10 @@ export default function SpecialistShowcase() {
 
   const handleViewAllDoctors = () => {
     navigate("/specialist"); // Điều hướng đến trang SpecialistPage
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
   };
 
   if (loading) {

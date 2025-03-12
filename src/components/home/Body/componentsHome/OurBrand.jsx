@@ -78,6 +78,13 @@ export default function OurBrand() {
       },
     },
   }
+  const handleViewOurBrand = () => {
+    navigate("/about"); // Điều hướng đến trang SpecialistPage
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+  };
 
   return (
     <section className="py-16 md:py-24 w-full">
@@ -101,13 +108,7 @@ export default function OurBrand() {
               </motion.p>
               <motion.div variants={itemVariants}>
                 <button
-                  onClick={() => {
-                    navigate("/about")
-                    window.scrollTo({
-                      top: 0,
-                      behavior: "smooth",
-                    })
-                  }}
+                  onClick={handleViewOurBrand} 
                   className="border-2 border-white/20 text-white px-8 py-3 rounded-lg text-lg hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
                 >
                   Discover More
