@@ -259,7 +259,7 @@ const BookingSummaryPanel = ({ selectedServices, onRemoveService, onBookServices
                                           </>
                                         )}
                                         <DollarSign className="w-3.5 h-3.5 mr-1" />
-                                        <span>${service.price.toFixed(2)}</span>
+                                        <span>${formatVND(service.price)}</span>
                                       </div>
                                     </div>
                                     <motion.button

@@ -13,11 +13,13 @@ const AboutDoctor = () => {
       specialist.role === "ADMIN"
         ? "Skincare Expert"
         : specialist.role || "Specialist",
-    image: specialist.image || "/placeholder.svg", // Giả định ảnh nếu API không cung cấp
+    image:
+      specialist.image || // Giữ nguyên image từ API nếu có
+      "/placeholder.svg?height=300&width=300", // Fallback image
     description:
       specialist.description || "Expert in skincare and beauty treatments.",
     experience:
-      specialist.experience || `${Math.floor(Math.random() * 10) + 5} years`, // Giả định kinh nghiệm
+      specialist.experience || `${Math.floor(Math.random() * 10) + 5} years`,
     quote: specialist.quote || "Committed to enhancing your natural beauty.",
   });
 
@@ -28,7 +30,7 @@ const AboutDoctor = () => {
           "https://9592-118-69-70-166.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
-              "ngrok-skip-browser-warning": "true", // Bỏ qua cảnh báo trình duyệt của ngrok
+              "ngrok-skip-browser-warning": "true",
             },
           }
         );
@@ -37,6 +39,17 @@ const AboutDoctor = () => {
 
         if (Array.isArray(response.data)) {
           const filledData = response.data
+            .map((specialist) => ({
+              name: specialist.name,
+              role: specialist.role,
+              image:
+                specialist.images && specialist.images.length > 0
+                  ? specialist.images[0].url // Lấy URL ảnh đầu tiên từ images
+                  : "/placeholder.svg?height=300&width=300", // Fallback image
+              description: specialist.description,
+              experience: specialist.experience,
+              quote: specialist.quote,
+            }))
             .map((specialist) => fillMissingData(specialist))
             .slice(0, 4); // Giới hạn 4 bác sĩ
           setSpecialists(filledData);

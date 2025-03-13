@@ -4,19 +4,76 @@ import { useState, useEffect } from "react";
 import { SpecialistDetail } from "../../../Therapist/SpecialistPage"; // Import SpecialistDetail
 import axios from "axios";
 
+// Hàm để điền dữ liệu còn thiếu với giá trị ngẫu nhiên
+const fillMissingData = (specialist) => {
+  const getRandomNumber = (min, max) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+  const getRandomExperience = () => {
+    const years = getRandomNumber(1, 10);
+    return `${years} year${years > 1 ? "s" : ""}`;
+  };
+
+  const descriptions = [
+    `Specialist ${specialist.name || "Unknown"} is part of our expert team with a passion for beauty.`,
+    `Meet ${specialist.name || "Unknown"}, a dedicated professional in our beauty services.`,
+    `${specialist.name || "Unknown"} brings expertise and care to our specialist team.`,
+    `Discover the skills of ${specialist.name || "Unknown"}, a valued member of our crew.`,
+  ];
+  const randomDescription =
+    descriptions[getRandomNumber(0, descriptions.length - 1)];
+
+  const abouts = [
+    `${specialist.name || "This specialist"} has years of experience in transforming skin health with personalized care and advanced techniques.`,
+    `With a deep passion for beauty, ${specialist.name || "this specialist"} specializes in creating tailored skincare routines for every client.`,
+    `${specialist.name || "This expert"} is renowned for their innovative approach to beauty treatments and client satisfaction.`,
+    `Dedicated to excellence, ${specialist.name || "this professional"} combines science and art to enhance your natural glow.`,
+  ];
+  const randomAbout = abouts[getRandomNumber(0, abouts.length - 1)];
+
+  // Giả lập số điện thoại, email, và địa chỉ ngẫu nhiên nếu không có từ API
+  const randomPhone = `+84 ${getRandomNumber(900, 999)} ${getRandomNumber(
+    100,
+    999
+  )} ${getRandomNumber(100, 999)}`;
+  const randomEmail = `${(specialist.name || "specialist")
+    .toLowerCase()
+    .replace(/\s+/g, "")}${getRandomNumber(1, 999)}@example.com`;
+  const randomAddress = `${getRandomNumber(
+    1,
+    999
+  )} ${["Nguyen Van Cu", "Le Loi", "Tran Hung Dao", "Pham Ngu Lao"][
+    getRandomNumber(0, 3)
+  ]}, District ${getRandomNumber(1, 10)}, Ho Chi Minh City`;
+
+  return {
+    id: specialist.id || specialist.userId || Date.now(),
+    name: specialist.name || "Unknown Specialist",
+    role: specialist.role || "Specialist",
+    image:
+      specialist.images && specialist.images.length > 0
+        ? specialist.images[0].url
+        : "/placeholder.svg?height=400&width=300",
+    description: specialist.description || randomDescription,
+    about: specialist.about || randomAbout,
+    experience: specialist.experience || getRandomExperience(),
+    phone: specialist.phone || randomPhone, // Thêm phone
+    email: specialist.email || randomEmail, // Thêm email
+    address: specialist.address || randomAddress, // Thêm address
+  };
+};
+
 export default function SpecialistShowcase() {
   const navigate = useNavigate();
   const [specialists, setSpecialists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedSpecialist, setSelectedSpecialist] = useState(null); // State để quản lý popup
-  const baseUrl =
-    "https://9592-118-69-70-166.ngrok-free.app";
+  const [selectedSpecialist, setSelectedSpecialist] = useState(null);
+  const baseUrl = "https://9592-118-69-70-166.ngrok-free.app";
 
   useEffect(() => {
     const fetchSpecialists = async () => {
       try {
-        // Gọi API mà không cần token
         const response = await axios.get(
           `${baseUrl}/api/users/specialists/active`,
           {
@@ -30,7 +87,6 @@ export default function SpecialistShowcase() {
         console.log("Response status text:", response.statusText);
         console.log("Full response data:", response.data);
 
-        // Kiểm tra nếu response.data là mảng hoặc object
         if (
           !response.data ||
           (Array.isArray(response.data) && response.data.length === 0)
@@ -43,33 +99,19 @@ export default function SpecialistShowcase() {
           : [response.data];
         const firstFourSpecialists = processedSpecialists
           .slice(0, 4)
-          .map((specialist) => ({
-            id:
-              specialist.userId ||
-              specialist.id ||
-              Math.random().toString(36).substr(2, 9), // Fallback ID
-            name: specialist.name || "Unknown Specialist",
-            role: specialist.role || "Specialist",
-            image: specialist.image || "/placeholder.svg?height=400&width=300", // Fallback image
-            description: specialist.description || "No description available", // Fallback description
-          }));
+          .map((specialist) => fillMissingData(specialist)); // Áp dụng fillMissingData
         setSpecialists(firstFourSpecialists);
       } catch (err) {
         console.error("Error fetching specialists:", err);
         if (err.response) {
-          console.log("Error response data:", err.response.data);
-          console.log("Error response status:", err.response.status);
-          console.log("Error response headers:", err.response.headers);
           setError(
             `Failed to fetch specialists: ${err.response.status} - ${err.response.statusText}. Details: ${err.message}`
           );
         } else if (err.request) {
-          console.log("No response received:", err.request);
           setError(
             "No response from the server. Check your network or API endpoint."
           );
         } else {
-          console.log("Error in request setup:", err.message);
           setError(`Error: ${err.message}`);
         }
       } finally {
@@ -81,19 +123,19 @@ export default function SpecialistShowcase() {
   }, []);
 
   const handleSpecialistClick = (specialist) => {
-    setSelectedSpecialist(specialist); // Mở popup với thông tin của chuyên gia được chọn
+    setSelectedSpecialist(specialist);
   };
 
   const handleCloseDetail = () => {
-    setSelectedSpecialist(null); // Đóng popup
+    setSelectedSpecialist(null);
   };
 
   const handleViewAllDoctors = () => {
-    navigate("/specialist"); // Điều hướng đến trang SpecialistPage
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+    navigate("/specialist");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   if (loading) {
@@ -148,7 +190,7 @@ export default function SpecialistShowcase() {
           {specialists.map((specialist) => (
             <div
               key={specialist.id}
-              onClick={() => handleSpecialistClick(specialist)} // Mở popup khi nhấp vào thẻ
+              onClick={() => handleSpecialistClick(specialist)}
               className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group cursor-pointer"
             >
               <div className="aspect-[3/4] w-full overflow-hidden">
@@ -171,7 +213,6 @@ export default function SpecialistShowcase() {
           ))}
         </div>
 
-        {/* Nút View All Doctors */}
         <div className="text-center mt-12">
           <button
             onClick={handleViewAllDoctors}
@@ -179,9 +220,8 @@ export default function SpecialistShowcase() {
           >
             View All Doctors
           </button>
-        </div>
+        </div>  
 
-        {/* Popup chi tiết chuyên gia */}
         {selectedSpecialist && (
           <SpecialistDetail
             specialist={selectedSpecialist}
