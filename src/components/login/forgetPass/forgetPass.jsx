@@ -188,7 +188,6 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `/forgotPassword/verifyMail/${email}`,
 
         `https://9592-118-69-70-166.ngrok-free.app/forgotPassword/verifyMail/${email}`,
 
@@ -252,7 +251,6 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `/forgotPassword/verifyOtp/${otp}/${email}`,
 
         `https://9592-118-69-70-166.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
 
@@ -331,7 +329,6 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `/forgotPassword/changePassword/${email}`,
 
         `https://9592-118-69-70-166.ngrok-free.app/forgotPassword/changePassword/${email}`,
 
