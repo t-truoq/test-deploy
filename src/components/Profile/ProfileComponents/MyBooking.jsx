@@ -51,8 +51,7 @@ const MyBooking = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [bookingDetails, setBookingDetails] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
-  const [isPaymentSuccessPopupOpen, setIsPaymentSuccessPopupOpen] =
-    useState(false);
+  const [isPaymentSuccessPopupOpen, setIsPaymentSuccessPopupOpen] = useState(false);
   const [isFeedbackPopupOpen, setIsFeedbackPopupOpen] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackComment, setFeedbackComment] = useState("");
@@ -143,8 +142,10 @@ const MyBooking = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found. Please login again.");
 
-        const response = await axios.get(
-          "https://9592-118-69-70-166.ngrok-free.app/api/bookings/user",
+        // Lấy danh sách bookings
+        console.log("Fetching bookings from /api/bookings/user...");
+        const bookingsResponse = await axios.get(
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -154,93 +155,98 @@ const MyBooking = () => {
           }
         );
 
-        if (Array.isArray(response.data)) {
-          const sortedBookings = [...response.data].sort((a, b) => {
-            const dateA = new Date(a.createdAt || a.bookingDate);
-            const dateB = new Date(b.createdAt || b.bookingDate);
-            return dateB - dateA;
-          });
+        console.log("Bookings response:", bookingsResponse.data);
 
-          const feedbackStatusMap = {};
-          const feedbackDataMap = {};
-          const feedbackResponsesMap = {};
-
-          for (const booking of sortedBookings) {
-            try {
-              const feedbackResponse = await axios.get(
-                `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    "ngrok-skip-browser-warning": "true",
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              console.log(
-                `Feedback response for booking ${booking.bookingId}:`,
-                feedbackResponse.data
-              );
-
-              feedbackResponsesMap[booking.bookingId] = feedbackResponse.data;
-
-              const hasFeedback =
-                Array.isArray(feedbackResponse.data) &&
-                feedbackResponse.data.length > 0;
-              feedbackStatusMap[booking.bookingId] = hasFeedback;
-
-              if (hasFeedback) {
-                const feedbackData = feedbackResponse.data[0];
-                feedbackDataMap[booking.bookingId] = {
-                  rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
-                  comment: feedbackData.comment || "",
-                };
-              }
-            } catch (error) {
-              console.error(
-                `Error fetching feedback for booking ${booking.bookingId}:`,
-                error
-              );
-              feedbackStatusMap[booking.bookingId] = false;
-              feedbackResponsesMap[booking.bookingId] = [];
-            }
-          }
-
-          setFeedbackStatus(feedbackStatusMap);
-          setFeedbackData(feedbackDataMap);
-          setFeedbackResponses(feedbackResponsesMap);
-          setBookings(sortedBookings);
-        } else {
-          throw new Error(
-            "Invalid response format: Expected an array of bookings"
-          );
+        if (!Array.isArray(bookingsResponse.data)) {
+          throw new Error("Invalid response format: Expected an array of bookings");
         }
+
+        const sortedBookings = [...bookingsResponse.data].sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.bookingDate);
+          const dateB = new Date(b.createdAt || b.bookingDate);
+          return dateB - dateA;
+        });
+
+        console.log("Sorted bookings:", sortedBookings);
+
+        // Lấy toàn bộ feedback trong một lần gọi
+        console.log("Fetching feedbacks from /api/feedbacks...");
+        const feedbackResponse = await axios.get(
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Feedbacks response:", feedbackResponse.data);
+
+        const feedbacks = Array.isArray(feedbackResponse.data) ? feedbackResponse.data : [];
+        console.log("Feedbacks after validation:", feedbacks);
+
+        // Xử lý dữ liệu feedback
+        const feedbackStatusMap = {};
+        const feedbackDataMap = {};
+        const feedbackResponsesMap = {};
+
+        console.log("Processing feedbacks for each booking...");
+        for (const booking of sortedBookings) {
+          const feedback = feedbacks.find(f => f.bookingId === booking.bookingId) || {
+            feedbackStatus: "NOT_FEEDBACK",
+            rating: 0,
+            comment: "",
+          };
+
+          console.log(`Feedback for booking ${booking.bookingId}:`, feedback);
+
+          feedbackResponsesMap[booking.bookingId] = feedback;
+          const hasFeedback = feedback.feedbackStatus === "FEEDBACK_DONE";
+          feedbackStatusMap[booking.bookingId] = hasFeedback;
+
+          if (hasFeedback) {
+            feedbackDataMap[booking.bookingId] = {
+              rating: Math.min(Math.max(feedback.rating || 0, 0), 5),
+              comment: feedback.comment || "",
+            };
+          }
+        }
+
+        console.log("Feedback status map:", feedbackStatusMap);
+        console.log("Feedback data map:", feedbackDataMap);
+        console.log("Feedback responses map:", feedbackResponsesMap);
+
+        setFeedbackStatus(feedbackStatusMap);
+        setFeedbackData(feedbackDataMap);
+        setFeedbackResponses(feedbackResponsesMap);
+        setBookings(sortedBookings);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error("Error fetching bookings or feedbacks:", error);
         if (error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
           if (error.response.status === 401) {
             setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => navigate("/login"), 2000);
           } else if (error.response.status === 403) {
-            setErrorPopup(
-              "You do not have permission to access your bookings."
-            );
+            setErrorPopup("You do not have permission to access your bookings.");
           } else if (error.response.status === 404) {
             setErrorPopup("No bookings found.");
           } else {
             setErrorPopup(
-              error.response.data.message ||
-                "Failed to load bookings. Please try again."
+              error.response.data.message || "Failed to load bookings. Please try again."
             );
           }
         } else if (error.request) {
+          console.error("No response received (CORS or network issue):", error.request);
           setErrorPopup(
             "Unable to connect to server. CORS issue or server error. Please try again."
           );
         } else {
-          setErrorPopup(
-            error.message || "Failed to load bookings. Please try again."
-          );
+          console.error("Error message:", error.message);
+          setErrorPopup(error.message || "Failed to load bookings. Please try again.");
         }
         setBookings([]);
       }
@@ -252,7 +258,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9592-118-69-70-166.ngrok-free.app/api/users/specialists/active",
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -314,11 +320,11 @@ const MyBooking = () => {
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-        const bookingDateFormatted = new Date(booking.bookingDate)
-          .toISOString()
-          .split("T")[0];
-        return bookingDateFormatted === searchDate;
-      })
+      const bookingDateFormatted = new Date(booking.bookingDate)
+        .toISOString()
+        .split("T")[0];
+      return bookingDateFormatted === searchDate;
+    })
     : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
@@ -379,7 +385,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://9592-118-69-70-166.ngrok-free.app/api/bookings",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -494,7 +500,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.get(
-        `https://9592-118-69-70-166.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -504,14 +510,9 @@ const MyBooking = () => {
         }
       );
 
-      const bookingData = Array.isArray(response.data)
-        ? response.data[0]
-        : response.data;
-      console.log(
-        "Full booking data from API:",
-        JSON.stringify(bookingData, null, 2)
-      );
+      const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
 
+      // Lấy thông tin services (giữ nguyên logic hiện tại)
       const storedServicesKey = `selectedServicesForBooking_${bookingId}`;
       const storedServices = localStorage.getItem(storedServicesKey);
       const storedServicesMap = new Map();
@@ -535,40 +536,14 @@ const MyBooking = () => {
       if (bookingData.serviceNames && Array.isArray(bookingData.serviceNames)) {
         services = bookingData.serviceNames.map((name, index) => {
           const storedService = storedServicesMap.get(name);
-
           const duration =
             bookingData.serviceDurations && bookingData.serviceDurations[name]
               ? Number(bookingData.serviceDurations[name])
               : storedService?.duration || 0;
-
-          const priceFromAPI =
+          const price =
             bookingData.servicePrices && bookingData.servicePrices[name]
               ? Number(bookingData.servicePrices[name])
-              : null;
-          const priceFromStored = storedService?.price;
-          let price;
-          if (priceFromAPI != null) {
-            price = priceFromAPI;
-          } else if (priceFromStored != null) {
-            price = priceFromStored;
-          } else if (
-            bookingData.totalPrice != null &&
-            Number(bookingData.totalPrice) > 0
-          ) {
-            price =
-              bookingData.serviceNames.length === 1
-                ? Number(bookingData.totalPrice)
-                : Number(bookingData.totalPrice) /
-                  (bookingData.serviceNames.length || 1);
-          } else {
-            price = 0;
-          }
-
-          console.log(
-            `Service ${
-              index + 1
-            }: name=${name}, duration=${duration}, price=${price}`
-          );
+              : storedService?.price || 0;
 
           return {
             id: index + 1,
@@ -577,25 +552,16 @@ const MyBooking = () => {
             price,
           };
         });
-      } else {
-        console.warn("No serviceNames found in bookingData:", bookingData);
       }
 
-      const specialistId =
-        bookingData.specialistId || booking.specialistId || null;
-      const specialistFromList = specialists.find(
-        (spec) => spec.userId === specialistId
-      );
-      const specialist = specialistFromList || {
+      const specialistId = bookingData.specialistId || booking.specialistId || null;
+      const specialist = specialists.find((spec) => spec.userId === specialistId) || {
         name: bookingData.specialistName || "Not assigned",
         userId: specialistId || 0,
         specialization: bookingData.specialization || "Skin Therapist",
       };
 
-      const totalDuration = services.reduce(
-        (sum, service) => sum + service.duration,
-        0
-      );
+      const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
 
       let feedback = { rating: 0, comment: "" };
       let feedbackResponseData = feedbackResponses[bookingId];
@@ -603,7 +569,7 @@ const MyBooking = () => {
       if (!feedbackResponseData) {
         try {
           const feedbackResponse = await axios.get(
-            `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
+            `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -612,40 +578,37 @@ const MyBooking = () => {
               },
             }
           );
-          console.log(
-            "Feedback response data:",
-            JSON.stringify(feedbackResponse.data, null, 2)
-          );
           feedbackResponseData = feedbackResponse.data;
-
           setFeedbackResponses((prev) => ({
             ...prev,
             [bookingId]: feedbackResponseData,
           }));
         } catch (feedbackError) {
-          console.error(
-            `Error fetching feedback for booking ${bookingId}:`,
-            feedbackError
-          );
-          feedbackResponseData = [];
+          console.error(`Error fetching feedback for booking ${bookingId}:`, feedbackError);
+          feedbackResponseData = { feedbackStatus: "NOT_FEEDBACK", rating: 0, comment: "" };
         }
       }
 
-      if (
-        Array.isArray(feedbackResponseData) &&
-        feedbackResponseData.length > 0
-      ) {
-        const feedbackData = feedbackResponseData[0];
+      const feedbackData = Array.isArray(feedbackResponseData)
+        ? feedbackResponseData[0]
+        : feedbackResponseData;
+      const hasFeedback = feedbackData?.feedbackStatus === "FEEDBACK_DONE";
+
+      if (hasFeedback && feedbackData) {
         feedback = {
           rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
           comment: feedbackData.comment || "",
         };
-        setFeedbackStatus((prev) => ({
-          ...prev,
-          [bookingId]: true,
-        }));
       }
-      setFeedbackData((prev) => ({ ...prev, [bookingId]: feedback }));
+
+      setFeedbackStatus((prev) => ({
+        ...prev,
+        [bookingId]: hasFeedback,
+      }));
+      setFeedbackData((prev) => ({
+        ...prev,
+        [bookingId]: feedback,
+      }));
 
       return {
         ...booking,
@@ -695,7 +658,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://9592-118-69-70-166.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -720,7 +683,7 @@ const MyBooking = () => {
       console.error("Error initiating payment:", error);
       setErrorPopup(
         error.response?.data.message ||
-          "Failed to initiate payment. Please try again."
+        "Failed to initiate payment. Please try again."
       );
     } finally {
       setIsPaying(false);
@@ -755,7 +718,7 @@ const MyBooking = () => {
       };
 
       const response = await axios.post(
-        "https://9592-118-69-70-166.ngrok-free.app/api/feedbacks",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {
@@ -766,45 +729,15 @@ const MyBooking = () => {
         }
       );
 
-      console.log("Feedback post response:", response.data);
-
       if (response.status === 200 || response.status === 201) {
-        const feedbackResponse = await axios.get(
-          `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(
-          "Feedback fetch response:",
-          JSON.stringify(feedbackResponse.data, null, 2)
-        );
-
-        let updatedFeedback = {
+        const updatedFeedback = {
           rating: feedbackRating,
           comment: feedbackComment,
         };
-        if (
-          Array.isArray(feedbackResponse.data) &&
-          feedbackResponse.data.length > 0
-        ) {
-          const feedbackData = feedbackResponse.data[0];
-          updatedFeedback = {
-            rating: Math.min(
-              Math.max(feedbackData.rating || feedbackRating, 0),
-              5
-            ),
-            comment: feedbackData.comment || feedbackComment,
-          };
-        }
 
         setFeedbackStatus((prev) => ({
           ...prev,
-          [selectedBooking.bookingId]: true,
+          [selectedBooking.bookingId]: true, // Cập nhật thành đã feedback
         }));
         setFeedbackData((prev) => ({
           ...prev,
@@ -843,8 +776,7 @@ const MyBooking = () => {
       } else {
         setErrorPopup(
           error.response?.data.message ||
-            error.message ||
-            "Failed to submit feedback. Please try again or contact support."
+          "Failed to submit feedback. Please try again."
         );
       }
     } finally {
@@ -864,7 +796,7 @@ const MyBooking = () => {
       if (!token) throw new Error("No token found. Please login again.");
 
       const response = await axios.get(
-        `https://9592-118-69-70-166.ngrok-free.app/api/schedules/${specialistId}`,
+        `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/schedules/${specialistId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -906,44 +838,45 @@ const MyBooking = () => {
     const selectedDate = new Date(bookingDate);
     const isToday = selectedDate.toDateString() === now.toDateString();
     if (!isToday) return true;
-  
+
     const [hour, minute] = time.split(":");
     const selectedTime = new Date(bookingDate).setHours(hour, minute, 0, 0);
     return selectedTime >= now.getTime();
   };
-  
+
   // Inside the time picker:
-  {timeSlots.map((time) => {
-    const isAvailable =
-      (!selectedSpecialist ||
-        specialistSchedule.some(
-          (slot) => slot.timeSlot === time && slot.availability
-        )) &&
-      isTimeSlotAvailable(time);
-    return (
-      <motion.button
-        key={time}
-        onClick={() => {
-          if (isAvailable) {
-            setStartTime(time);
-            setIsTimePickerOpen(false);
-          }
-        }}
-        disabled={!isAvailable}
-        className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-          startTime === time
+  {
+    timeSlots.map((time) => {
+      const isAvailable =
+        (!selectedSpecialist ||
+          specialistSchedule.some(
+            (slot) => slot.timeSlot === time && slot.availability
+          )) &&
+        isTimeSlotAvailable(time);
+      return (
+        <motion.button
+          key={time}
+          onClick={() => {
+            if (isAvailable) {
+              setStartTime(time);
+              setIsTimePickerOpen(false);
+            }
+          }}
+          disabled={!isAvailable}
+          className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${startTime === time
             ? "bg-rose-600 text-white"
             : !isAvailable
-            ? "text-gray-400 cursor-not-allowed"
-            : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
-        }`}
-        whileHover={{ scale: !isAvailable ? 1 : 1.02 }}
-        whileTap={{ scale: !isAvailable ? 1 : 0.98 }}
-      >
-        {time} {!isAvailable && "(Unavailable)"}
-      </motion.button>
-    );
-  })}
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+            }`}
+          whileHover={{ scale: !isAvailable ? 1 : 1.02 }}
+          whileTap={{ scale: !isAvailable ? 1 : 0.98 }}
+        >
+          {time} {!isAvailable && "(Unavailable)"}
+        </motion.button>
+      );
+    })
+  }
 
   const closeErrorPopup = () => setErrorPopup("");
   const handleOpenFeedback = (booking) => {
@@ -1025,10 +958,10 @@ const MyBooking = () => {
   const formatDate = (dateString) =>
     dateString
       ? new Date(dateString).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
@@ -1096,26 +1029,25 @@ const MyBooking = () => {
         </motion.div>
 
         {paymentNotification.show && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-            <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full">
-              <div className="flex flex-col items-center">
-                {paymentNotification.isSuccess ? (
-                  <CheckCircle className="w-12 h-12 text-green-600 mb-4" />
-                ) : (
-                  <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-                )}
-                <p className="text-lg font-medium text-gray-800 mb-6 text-center">
-                  {paymentNotification.message}
-                </p>
-                <button
-                  onClick={closePaymentNotification}
-                  className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                >
-                  Close
-                </button>
-              </div>
+          <motion.div
+            className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg ${paymentNotification.isSuccess
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-rose-50 text-rose-700 border border-rose-200"
+              }`}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex items-center">
+              {paymentNotification.isSuccess ? (
+                <CheckCircle className="w-5 h-5 mr-2" /> // Icon dấu tích khi thành công
+              ) : (
+                <AlertCircle className="w-5 h-5 mr-2" /> // Icon dấu X khi thất bại
+              )}
+              <span className="text-sm font-medium">{paymentNotification.message}</span>
             </div>
-          </div>
+          </motion.div>
         )}
 
         <AnimatePresence>
@@ -1328,13 +1260,12 @@ const MyBooking = () => {
                                     disabled={
                                       selectedSpecialist && !isAvailable
                                     }
-                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                      startTime === time
-                                        ? "bg-rose-600 text-white"
-                                        : selectedSpecialist && !isAvailable
+                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${startTime === time
+                                      ? "bg-rose-600 text-white"
+                                      : selectedSpecialist && !isAvailable
                                         ? "text-gray-400 cursor-not-allowed"
                                         : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
-                                    }`}
+                                      }`}
                                     whileHover={{
                                       scale:
                                         selectedSpecialist && !isAvailable
@@ -1403,19 +1334,17 @@ const MyBooking = () => {
                           {specialistSchedule.map((slot, index) => (
                             <div
                               key={index}
-                              className={`flex justify-between items-center py-1 px-2 rounded-md text-sm ${
-                                slot.availability
-                                  ? "text-gray-700"
-                                  : "text-gray-400"
-                              }`}
+                              className={`flex justify-between items-center py-1 px-2 rounded-md text-sm ${slot.availability
+                                ? "text-gray-700"
+                                : "text-gray-400"
+                                }`}
                             >
                               <span>{slot.timeSlot}</span>
                               <span
-                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                  slot.availability
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${slot.availability
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                                  }`}
                               >
                                 {slot.availability
                                   ? "Available"
@@ -1438,11 +1367,10 @@ const MyBooking = () => {
                 <motion.button
                   onClick={handleConfirmBooking}
                   disabled={isBooking}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
-                    isBooking
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-rose-600 text-white hover:bg-rose-700"
-                  }`}
+                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-rose-600 text-white hover:bg-rose-700"
+                    }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -1505,8 +1433,8 @@ const MyBooking = () => {
         </motion.div>
 
         {filteredBookings.length === 0 &&
-        selectedServices.length === 0 &&
-        !confirmedBooking ? (
+          selectedServices.length === 0 &&
+          !confirmedBooking ? (
           <motion.div
             className="bg-white rounded-xl shadow-md p-8 text-center"
             variants={fadeIn}
@@ -1593,9 +1521,7 @@ const MyBooking = () => {
                           <div className="flex items-start">
                             <CreditCard className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-500">
-                                Total Price
-                              </p>
+                              <p className="text-sm text-gray-500">Total Price</p>
                               <p className="font-medium text-gray-800">
                                 {formatVND(booking.totalPrice) || "N/A"}
                               </p>
@@ -1604,9 +1530,7 @@ const MyBooking = () => {
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-gray-500">
-                              Payment Status
-                            </p>
+                            <p className="text-sm text-gray-500">Payment Status</p>
                             <span
                               className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPaymentBadgeClass(
                                 booking.paymentStatus
@@ -1617,9 +1541,7 @@ const MyBooking = () => {
                           </div>
                           {booking.checkInTime && (
                             <div>
-                              <p className="text-sm text-gray-500">
-                                Check-in Time
-                              </p>
+                              <p className="text-sm text-gray-500">Check-in Time</p>
                               <p className="font-medium text-gray-800">
                                 {new Date(booking.checkInTime).toLocaleString()}
                               </p>
@@ -1627,13 +1549,9 @@ const MyBooking = () => {
                           )}
                           {booking.checkOutTime && (
                             <div>
-                              <p className="text-sm text-gray-500">
-                                Check-out Time
-                              </p>
+                              <p className="text-sm text-gray-500">Check-out Time</p>
                               <p className="font-medium text-gray-800">
-                                {new Date(
-                                  booking.checkOutTime
-                                ).toLocaleString()}
+                                {new Date(booking.checkOutTime).toLocaleString()}
                               </p>
                             </div>
                           )}
@@ -1649,17 +1567,17 @@ const MyBooking = () => {
                       >
                         <Eye className="w-4 h-4 mr-2" /> View Details
                       </motion.button>
-                      {booking.status === "COMPLETED" &&
-                        !feedbackStatus[booking.bookingId] && (
-                          <motion.button
-                            onClick={() => handleOpenFeedback(booking)}
-                            className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <MessageSquare className="w-4 h-4 mr-2" /> Feedback
-                          </motion.button>
-                        )}
+                      {/* Chỉ hiển thị nút Feedback nếu status là COMPLETED và chưa feedback */}
+                      {booking.status === "COMPLETED" && !feedbackStatus[booking.bookingId] && (
+                        <motion.button
+                          onClick={() => handleOpenFeedback(booking)}
+                          className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" /> Feedback
+                        </motion.button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -1775,14 +1693,14 @@ const MyBooking = () => {
                     {filteredBookings.findIndex(
                       (b) => b.bookingId === selectedBooking.bookingId
                     ) !== -1 && (
-                      <span className="text-lg font-semibold text-gray-800">
-                        Booking #
-                        {filteredBookings.length -
-                          filteredBookings.findIndex(
-                            (b) => b.bookingId === selectedBooking.bookingId
-                          )}
-                      </span>
-                    )}
+                        <span className="text-lg font-semibold text-gray-800">
+                          Booking #
+                          {filteredBookings.length -
+                            filteredBookings.findIndex(
+                              (b) => b.bookingId === selectedBooking.bookingId
+                            )}
+                        </span>
+                      )}
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(
                         selectedBooking.status
@@ -1911,11 +1829,10 @@ const MyBooking = () => {
                               {Array.from({ length: 5 }, (_, i) => (
                                 <span
                                   key={i}
-                                  className={`w-5 h-5 ${
-                                    i < bookingDetails.feedback.rating
-                                      ? "text-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
+                                  className={`w-5 h-5 ${i < bookingDetails.feedback.rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                                    }`}
                                 >
                                   ★
                                 </span>
@@ -1938,8 +1855,7 @@ const MyBooking = () => {
                   {selectedBooking.status !== "CANCELLED" && (
                     <>
                       <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" />{" "}
-                        Payment
+                        <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" /> Payment
                       </h3>
                       <motion.div
                         className="bg-white rounded-xl shadow-sm p-4 mb-6"
@@ -1968,30 +1884,43 @@ const MyBooking = () => {
                           </p>
                         </div>
                       </motion.div>
-                      {bookingDetails.paymentStatus === "PENDING" &&
-                        selectedBooking.status !== "CANCELLED" && (
-                          <motion.button
-                            onClick={handlePayment}
-                            disabled={isPaying}
-                            className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
-                              isPaying
+                      {(bookingDetails.paymentStatus === "PENDING" ||
+                        bookingDetails.paymentStatus === "FAILED") && (
+                          <>
+                            {bookingDetails.paymentStatus === "FAILED" && (
+                              <motion.div
+                                className="mb-4 p-3 bg-rose-50 rounded-lg flex items-center"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                              >
+                                <AlertCircle className="w-5 h-5 text-rose-600 mr-2" />
+                                <p className="text-sm text-rose-700">
+                                  Payment failed. Please try again.
+                                </p>
+                              </motion.div>
+                            )}
+                            <motion.button
+                              onClick={handlePayment}
+                              disabled={isPaying}
+                              className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
                                 ? "bg-gray-400 text-white cursor-not-allowed"
                                 : "bg-rose-600 text-white hover:bg-rose-700"
-                            } mb-4`}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                          >
-                            {isPaying ? (
-                              <>
-                                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                <DollarSign className="w-5 h-5 mr-2" /> Pay Now
-                              </>
-                            )}
-                          </motion.button>
+                                } mb-4`}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                            >
+                              {isPaying ? (
+                                <>
+                                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Processing...
+                                </>
+                              ) : (
+                                <>
+                                  <DollarSign className="w-5 h-5 mr-2" /> Pay Now
+                                </>
+                              )}
+                            </motion.button>
+                          </>
                         )}
                     </>
                   )}
@@ -2017,15 +1946,14 @@ const MyBooking = () => {
 
                   <div className="space-y-3 mt-auto">
                     {selectedBooking.status === "COMPLETED" &&
-                      (feedbackStatus[selectedBooking.bookingId] === true ? (
+                      (feedbackStatus[selectedBooking.bookingId] ? (
                         <motion.div
                           className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg"
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.2 }}
                         >
-                          <MessageSquare className="w-4 h-4 mr-2" /> Thank you
-                          for your feedback
+                          <MessageSquare className="w-4 h-4 mr-2" /> Thank you for your feedback
                         </motion.div>
                       ) : (
                         <motion.button
@@ -2096,11 +2024,10 @@ const MyBooking = () => {
                             onMouseLeave={() =>
                               setFeedbackRating(feedbackRating)
                             }
-                            className={`text-3xl cursor-pointer transition-colors duration-200 ${
-                              starValue <= feedbackRating
-                                ? "text-yellow-400"
-                                : "text-gray-300"
-                            }`}
+                            className={`text-3xl cursor-pointer transition-colors duration-200 ${starValue <= feedbackRating
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                              }`}
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.9 }}
                           >
@@ -2113,14 +2040,14 @@ const MyBooking = () => {
                       {feedbackRating === 0
                         ? "Select a rating"
                         : feedbackRating === 1
-                        ? "1 - Poor"
-                        : feedbackRating === 2
-                        ? "2 - Fair"
-                        : feedbackRating === 3
-                        ? "3 - Good"
-                        : feedbackRating === 4
-                        ? "4 - Very Good"
-                        : "5 - Excellent"}
+                          ? "1 - Poor"
+                          : feedbackRating === 2
+                            ? "2 - Fair"
+                            : feedbackRating === 3
+                              ? "3 - Good"
+                              : feedbackRating === 4
+                                ? "4 - Very Good"
+                                : "5 - Excellent"}
                     </p>
                   </div>
                   <div>
@@ -2138,11 +2065,10 @@ const MyBooking = () => {
                   <motion.button
                     onClick={handleSubmitFeedback}
                     disabled={isSubmittingFeedback}
-                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                      isSubmittingFeedback
-                        ? "bg-gray-400 text-white cursor-not-allowed"
-                        : "bg-rose-600 text-white hover:bg-rose-700"
-                    }`}
+                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isSubmittingFeedback
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-rose-600 text-white hover:bg-rose-700"
+                      }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
