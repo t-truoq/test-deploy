@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { EditClientModal } from "./EditClientModal";
 
 const API_URL =
-  "https://9592-118-69-70-166.ngrok-free.app/api/users";
+  "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users";
 
 export function StaffClients() {
   const [clients, setClients] = useState([]);
