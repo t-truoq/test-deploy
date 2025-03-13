@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -39,6 +40,15 @@ const fillMissingData = (specialist) => {
   ];
   const randomDescription =
     descriptions[getRandomNumber(0, descriptions.length - 1)];
+
+  // Thêm trường about với nội dung ngẫu nhiên
+  const abouts = [
+    `${specialist.name || "This specialist"} has years of experience in transforming skin health with personalized care and advanced techniques.`,
+    `With a deep passion for beauty, ${specialist.name || "this specialist"} specializes in creating tailored skincare routines for every client.`,
+    `${specialist.name || "This expert"} is renowned for their innovative approach to beauty treatments and client satisfaction.`,
+    `Dedicated to excellence, ${specialist.name || "this professional"} combines science and art to enhance your natural glow.`,
+  ];
+  const randomAbout = abouts[getRandomNumber(0, abouts.length - 1)];
 
   const treatmentsPool = [
     "General Treatment",
@@ -85,7 +95,7 @@ const fillMissingData = (specialist) => {
   }
 
   return {
-    id: specialist.userId || Date.now(),
+    id: specialist.id || specialist.userId || Date.now(),
     name: specialist.name || "Unknown Specialist",
     email: specialist.email || "N/A",
     phone: specialist.phone || "N/A",
@@ -94,15 +104,18 @@ const fillMissingData = (specialist) => {
     status: specialist.status || "N/A",
     createdAt: specialist.createdAt || new Date().toISOString(),
     updatedAt: specialist.updatedAt || new Date().toISOString(),
-    specialty: specialist.role || "Specialist",
-    image: `/placeholder.svg?height=300&width=400&id=${specialist.userId}`,
-    rating: (getRandomNumber(35, 50) / 10).toFixed(1),
-    reviews: getRandomNumber(1, 50),
-    experience: getRandomExperience(),
-    description: randomDescription,
-    education: randomEducation,
-    availability: randomAvailability,
-    treatments: randomTreatments,
+    specialty: specialist.specialty || "Specialist",
+    image:
+      specialist.image ||
+      `/placeholder.svg?height=300&width=400&id=${specialist.userId || Date.now()}`,
+    rating: specialist.rating || (getRandomNumber(35, 50) / 10).toFixed(1),
+    reviews: specialist.reviews || getRandomNumber(1, 50),
+    experience: specialist.experience || getRandomExperience(),
+    description: specialist.description || randomDescription,
+    about: specialist.about || randomAbout, // Thêm trường about
+    education: specialist.education || randomEducation,
+    availability: specialist.availability || randomAvailability,
+    treatments: specialist.treatments || randomTreatments,
   };
 };
 
@@ -206,7 +219,7 @@ export const SpecialistDetail = ({ specialist, onClose }) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   About
                 </h3>
-                <p className="text-gray-600">{filledSpecialist.description}</p>
+                <p className="text-gray-600">{filledSpecialist.about}</p> {/* Hiển thị about thay vì description */}
               </div>
 
               <div className="mt-6 grid md:grid-cols-2 gap-4">
@@ -293,27 +306,34 @@ const SpecialistPage = () => {
   useEffect(() => {
     const fetchSpecialists = async () => {
       try {
-        // const token = localStorage.getItem("token");
-        // if (!token) {
-        //   throw new Error("No token found. Please login again.");
-        // }
-
         const response = await axios.get(
           "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
-              // Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true",
-              // "Content-Type": "application/json",
             },
           }
         );
 
         console.log("Fetch specialists response:", response.data);
         if (Array.isArray(response.data)) {
-          const filledData = response.data.map((specialist) =>
-            fillMissingData(specialist)
-          );
+          const filledData = response.data.map((specialist) => ({
+            id: specialist.userId || Math.random().toString(36).substr(2, 9),
+            name: specialist.name || "Unknown Specialist",
+            specialty: specialist.specialty || "Specialist",
+            image:
+              specialist.images && specialist.images.length > 0
+                ? specialist.images[0].url
+                : "/placeholder.svg?height=400&width=300",
+            description: specialist.description || "No description available",
+            email: specialist.email,
+            phone: specialist.phone,
+            address: specialist.address,
+            role: specialist.role,
+            status: specialist.status,
+            createdAt: specialist.createdAt,
+            updatedAt: specialist.updatedAt,
+          }));
           setSpecialists(filledData);
         } else {
           throw new Error(
@@ -456,3 +476,4 @@ const SpecialistPage = () => {
 
 // Export cả SpecialistPage và SpecialistDetail
 export default SpecialistPage;
+

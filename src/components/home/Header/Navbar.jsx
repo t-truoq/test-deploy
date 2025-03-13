@@ -71,8 +71,7 @@ const Navbar = () => {
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false); // State cho language dropdown
-  const baseUrl =
-    "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
+  const baseUrl = "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
 
   // Check login status and fetch user profile
   useEffect(() => {

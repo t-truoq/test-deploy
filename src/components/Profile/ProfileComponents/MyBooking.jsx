@@ -29,6 +29,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import CalendarMyBooking from "../../Profile/ProfileComponents/MybookingComponents/CalendarMyBooking"; // Adjust the import path as needed
 
 const MyBooking = () => {
   const navigate = useNavigate();
@@ -59,11 +60,26 @@ const MyBooking = () => {
   const [feedbackStatus, setFeedbackStatus] = useState({});
   const [feedbackData, setFeedbackData] = useState({});
   const [feedbackResponses, setFeedbackResponses] = useState({});
+  const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const [specialistSchedule, setSpecialistSchedule] = useState([]);
+  const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const [paymentNotification, setPaymentNotification] = useState({
     message: "",
     isSuccess: false,
     show: false,
   });
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false); // State to toggle calendar visibility
+
+  // Generate time slots (08:00 to 20:00, 30-minute intervals)
+  const timeSlots = [];
+  for (let hour = 8; hour <= 19; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const time = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      timeSlots.push(time);
+    }
+  }
 
   const fadeIn = {
     initial: { opacity: 0 },
@@ -127,7 +143,9 @@ const MyBooking = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found. Please login again.");
 
-        const response = await axios.get(
+        // Lấy danh sách bookings
+        console.log("Fetching bookings from /api/bookings/user...");
+        const bookingsResponse = await axios.get(
           "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/user",
           {
             headers: {
@@ -138,70 +156,78 @@ const MyBooking = () => {
           }
         );
 
-        if (Array.isArray(response.data)) {
-          const sortedBookings = [...response.data].sort((a, b) => {
-            const dateA = new Date(a.createdAt || a.bookingDate);
-            const dateB = new Date(b.createdAt || b.bookingDate);
-            return dateB - dateA;
-          });
+        console.log("Bookings response:", bookingsResponse.data);
 
-          const feedbackStatusMap = {};
-          const feedbackDataMap = {};
-          const feedbackResponsesMap = {};
-
-          for (const booking of sortedBookings) {
-            try {
-              const feedbackResponse = await axios.get(
-                `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    "ngrok-skip-browser-warning": "true",
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              console.log(
-                `Feedback response for booking ${booking.bookingId}:`,
-                feedbackResponse.data
-              );
-
-              feedbackResponsesMap[booking.bookingId] = feedbackResponse.data;
-
-              const hasFeedback =
-                Array.isArray(feedbackResponse.data) &&
-                feedbackResponse.data.length > 0;
-              feedbackStatusMap[booking.bookingId] = hasFeedback;
-
-              if (hasFeedback) {
-                const feedbackData = feedbackResponse.data[0];
-                feedbackDataMap[booking.bookingId] = {
-                  rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
-                  comment: feedbackData.comment || "",
-                };
-              }
-            } catch (error) {
-              console.error(
-                `Error fetching feedback for booking ${booking.bookingId}:`,
-                error
-              );
-              feedbackStatusMap[booking.bookingId] = false;
-              feedbackResponsesMap[booking.bookingId] = [];
-            }
-          }
-
-          setFeedbackStatus(feedbackStatusMap);
-          setFeedbackData(feedbackDataMap);
-          setFeedbackResponses(feedbackResponsesMap);
-          setBookings(sortedBookings);
-        } else {
-          throw new Error(
-            "Invalid response format: Expected an array of bookings"
-          );
+        if (!Array.isArray(bookingsResponse.data)) {
+          throw new Error("Invalid response format: Expected an array of bookings");
         }
+
+        const sortedBookings = [...bookingsResponse.data].sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.bookingDate);
+          const dateB = new Date(b.createdAt || b.bookingDate);
+          return dateB - dateA;
+        });
+
+        console.log("Sorted bookings:", sortedBookings);
+
+        // Lấy toàn bộ feedback trong một lần gọi
+        console.log("Fetching feedbacks from /api/feedbacks...");
+        const feedbackResponse = await axios.get(
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Feedbacks response:", feedbackResponse.data);
+
+        const feedbacks = Array.isArray(feedbackResponse.data) ? feedbackResponse.data : [];
+        console.log("Feedbacks after validation:", feedbacks);
+
+        // Xử lý dữ liệu feedback
+        const feedbackStatusMap = {};
+        const feedbackDataMap = {};
+        const feedbackResponsesMap = {};
+
+        console.log("Processing feedbacks for each booking...");
+        for (const booking of sortedBookings) {
+          const feedback = feedbacks.find(f => f.bookingId === booking.bookingId) || {
+            feedbackStatus: "NOT_FEEDBACK",
+            rating: 0,
+            comment: "",
+          };
+
+          console.log(`Feedback for booking ${booking.bookingId}:`, feedback);
+
+          feedbackResponsesMap[booking.bookingId] = feedback;
+          const hasFeedback = feedback.feedbackStatus === "FEEDBACK_DONE";
+          feedbackStatusMap[booking.bookingId] = hasFeedback;
+
+          if (hasFeedback) {
+            feedbackDataMap[booking.bookingId] = {
+              rating: Math.min(Math.max(feedback.rating || 0, 0), 5),
+              comment: feedback.comment || "",
+            };
+          }
+        }
+
+        console.log("Feedback status map:", feedbackStatusMap);
+        console.log("Feedback data map:", feedbackDataMap);
+        console.log("Feedback responses map:", feedbackResponsesMap);
+
+        setFeedbackStatus(feedbackStatusMap);
+        setFeedbackData(feedbackDataMap);
+        setFeedbackResponses(feedbackResponsesMap);
+        setBookings(sortedBookings);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error("Error fetching bookings or feedbacks:", error);
         if (error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
           if (error.response.status === 401) {
             setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => navigate("/login"), 2000);
@@ -213,20 +239,19 @@ const MyBooking = () => {
             setErrorPopup("No bookings found.");
           } else {
             setErrorPopup(
-              error.response.data.message ||
-                "Failed to load bookings. Please try again."
+              error.response.data.message || "Failed to load bookings. Please try again."
             );
           }
         } else if (error.request) {
+          console.error("No response received (CORS or network issue):", error.request);
           setErrorPopup(
             "Unable to connect to server. CORS issue or server error. Please try again."
           );
         } else {
-          setErrorPopup(
-            error.message || "Failed to load bookings. Please try again."
-          );
+          console.error("Error message:", error.message);
+          setErrorPopup(error.message || "Failed to load bookings. Please try again.");
         }
-        setBookings([]); // Đặt bookings về mảng rỗng nếu có lỗi
+        setBookings([]);
       }
     };
 
@@ -298,11 +323,11 @@ const MyBooking = () => {
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-        const bookingDateFormatted = new Date(booking.bookingDate)
-          .toISOString()
-          .split("T")[0];
-        return bookingDateFormatted === searchDate;
-      })
+      const bookingDateFormatted = new Date(booking.bookingDate)
+        .toISOString()
+        .split("T")[0];
+      return bookingDateFormatted === searchDate;
+    })
     : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
@@ -317,7 +342,7 @@ const MyBooking = () => {
     const timeSlot = `${startTime}-${endDateTime.toTimeString().slice(0, 5)}`;
 
     return bookings.some((booking) => {
-      if (booking.status === "CANCELLED") return false; // Loại bỏ kiểm tra bookingId === 1
+      if (booking.status === "CANCELLED") return false;
       const existingDate = new Date(booking.bookingDate)
         .toISOString()
         .split("T")[0];
@@ -488,14 +513,9 @@ const MyBooking = () => {
         }
       );
 
-      const bookingData = Array.isArray(response.data)
-        ? response.data[0]
-        : response.data;
-      console.log(
-        "Full booking data from API:",
-        JSON.stringify(bookingData, null, 2)
-      );
+      const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
 
+      // Lấy thông tin services (giữ nguyên logic hiện tại)
       const storedServicesKey = `selectedServicesForBooking_${bookingId}`;
       const storedServices = localStorage.getItem(storedServicesKey);
       const storedServicesMap = new Map();
@@ -519,40 +539,14 @@ const MyBooking = () => {
       if (bookingData.serviceNames && Array.isArray(bookingData.serviceNames)) {
         services = bookingData.serviceNames.map((name, index) => {
           const storedService = storedServicesMap.get(name);
-
           const duration =
             bookingData.serviceDurations && bookingData.serviceDurations[name]
               ? Number(bookingData.serviceDurations[name])
               : storedService?.duration || 0;
-
-          const priceFromAPI =
+          const price =
             bookingData.servicePrices && bookingData.servicePrices[name]
               ? Number(bookingData.servicePrices[name])
-              : null;
-          const priceFromStored = storedService?.price;
-          let price;
-          if (priceFromAPI != null) {
-            price = priceFromAPI;
-          } else if (priceFromStored != null) {
-            price = priceFromStored;
-          } else if (
-            bookingData.totalPrice != null &&
-            Number(bookingData.totalPrice) > 0
-          ) {
-            price =
-              bookingData.serviceNames.length === 1
-                ? Number(bookingData.totalPrice)
-                : Number(bookingData.totalPrice) /
-                  (bookingData.serviceNames.length || 1);
-          } else {
-            price = 0;
-          }
-
-          console.log(
-            `Service ${
-              index + 1
-            }: name=${name}, duration=${duration}, price=${price}`
-          );
+              : storedService?.price || 0;
 
           return {
             id: index + 1,
@@ -561,16 +555,10 @@ const MyBooking = () => {
             price,
           };
         });
-      } else {
-        console.warn("No serviceNames found in bookingData:", bookingData);
       }
 
-      const specialistId =
-        bookingData.specialistId || booking.specialistId || null;
-      const specialistFromList = specialists.find(
-        (spec) => spec.userId === specialistId
-      );
-      const specialist = specialistFromList || {
+      const specialistId = bookingData.specialistId || booking.specialistId || null;
+      const specialist = specialists.find((spec) => spec.userId === specialistId) || {
         name: bookingData.specialistName || "Not assigned",
         userId: specialistId || 0,
         specialization: bookingData.specialization || "Skin Therapist",
@@ -596,40 +584,37 @@ const MyBooking = () => {
               },
             }
           );
-          console.log(
-            "Feedback response data:",
-            JSON.stringify(feedbackResponse.data, null, 2)
-          );
           feedbackResponseData = feedbackResponse.data;
-
           setFeedbackResponses((prev) => ({
             ...prev,
             [bookingId]: feedbackResponseData,
           }));
         } catch (feedbackError) {
-          console.error(
-            `Error fetching feedback for booking ${bookingId}:`,
-            feedbackError
-          );
-          feedbackResponseData = [];
+          console.error(`Error fetching feedback for booking ${bookingId}:`, feedbackError);
+          feedbackResponseData = { feedbackStatus: "NOT_FEEDBACK", rating: 0, comment: "" };
         }
       }
 
-      if (
-        Array.isArray(feedbackResponseData) &&
-        feedbackResponseData.length > 0
-      ) {
-        const feedbackData = feedbackResponseData[0];
+      const feedbackData = Array.isArray(feedbackResponseData)
+        ? feedbackResponseData[0]
+        : feedbackResponseData;
+      const hasFeedback = feedbackData?.feedbackStatus === "FEEDBACK_DONE";
+
+      if (hasFeedback && feedbackData) {
         feedback = {
           rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
           comment: feedbackData.comment || "",
         };
-        setFeedbackStatus((prev) => ({
-          ...prev,
-          [bookingId]: true,
-        }));
       }
-      setFeedbackData((prev) => ({ ...prev, [bookingId]: feedback }));
+
+      setFeedbackStatus((prev) => ({
+        ...prev,
+        [bookingId]: hasFeedback,
+      }));
+      setFeedbackData((prev) => ({
+        ...prev,
+        [bookingId]: feedback,
+      }));
 
       return {
         ...booking,
@@ -645,9 +630,9 @@ const MyBooking = () => {
       return null;
     }
   };
-  // Hàm định dạng giá tiền VND với dấu phân cách hàng nghìn
+
   const formatVND = (price) => {
-    return price.toLocaleString("vi-VN") + " ₫"; // Định dạng theo kiểu Việt Nam
+    return price.toLocaleString("vi-VN") + " ₫";
   };
 
   const closePopup = () => {
@@ -704,7 +689,7 @@ const MyBooking = () => {
       console.error("Error initiating payment:", error);
       setErrorPopup(
         error.response?.data.message ||
-          "Failed to initiate payment. Please try again."
+        "Failed to initiate payment. Please try again."
       );
     } finally {
       setIsPaying(false);
@@ -750,45 +735,15 @@ const MyBooking = () => {
         }
       );
 
-      console.log("Feedback post response:", response.data);
-
       if (response.status === 200 || response.status === 201) {
-        const feedbackResponse = await axios.get(
-          `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(
-          "Feedback fetch response:",
-          JSON.stringify(feedbackResponse.data, null, 2)
-        );
-
-        let updatedFeedback = {
+        const updatedFeedback = {
           rating: feedbackRating,
           comment: feedbackComment,
         };
-        if (
-          Array.isArray(feedbackResponse.data) &&
-          feedbackResponse.data.length > 0
-        ) {
-          const feedbackData = feedbackResponse.data[0];
-          updatedFeedback = {
-            rating: Math.min(
-              Math.max(feedbackData.rating || feedbackRating, 0),
-              5
-            ),
-            comment: feedbackData.comment || feedbackComment,
-          };
-        }
 
         setFeedbackStatus((prev) => ({
           ...prev,
-          [selectedBooking.bookingId]: true,
+          [selectedBooking.bookingId]: true, // Cập nhật thành đã feedback
         }));
         setFeedbackData((prev) => ({
           ...prev,
@@ -827,8 +782,7 @@ const MyBooking = () => {
       } else {
         setErrorPopup(
           error.response?.data.message ||
-            error.message ||
-            "Failed to submit feedback. Please try again or contact support."
+          "Failed to submit feedback. Please try again."
         );
       }
     } finally {
@@ -836,11 +790,106 @@ const MyBooking = () => {
     }
   };
 
+  const fetchSpecialistSchedule = async (specialistId, date) => {
+    if (!specialistId || !date) {
+      setSpecialistSchedule([]);
+      return;
+    }
+
+    setIsScheduleLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. Please login again.");
+
+      const response = await axios.get(
+        `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/schedules/${specialistId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+          params: { date }, // Pass the selected date as a query parameter
+        }
+      );
+
+      console.log("Specialist schedule response:", response.data);
+      if (Array.isArray(response.data)) {
+        setSpecialistSchedule(response.data);
+      } else {
+        throw new Error(
+          "Invalid response format: Expected an array of schedules"
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching specialist schedule:", error);
+      setErrorPopup("Failed to load specialist schedule. Please try again.");
+      setSpecialistSchedule([]);
+    } finally {
+      setIsScheduleLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedSpecialist && bookingDate) {
+      fetchSpecialistSchedule(selectedSpecialist, bookingDate);
+    } else {
+      setSpecialistSchedule([]);
+    }
+  }, [selectedSpecialist, bookingDate]);
+
+  const isTimeSlotAvailable = (time) => {
+    if (!bookingDate) return true;
+    const now = new Date();
+    const selectedDate = new Date(bookingDate);
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    if (!isToday) return true;
+
+    const [hour, minute] = time.split(":");
+    const selectedTime = new Date(bookingDate).setHours(hour, minute, 0, 0);
+    return selectedTime >= now.getTime();
+  };
+
+  // Inside the time picker:
+  {
+    timeSlots.map((time) => {
+      const isAvailable =
+        (!selectedSpecialist ||
+          specialistSchedule.some(
+            (slot) => slot.timeSlot === time && slot.availability
+          )) &&
+        isTimeSlotAvailable(time);
+      return (
+        <motion.button
+          key={time}
+          onClick={() => {
+            if (isAvailable) {
+              setStartTime(time);
+              setIsTimePickerOpen(false);
+            }
+          }}
+          disabled={!isAvailable}
+          className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${startTime === time
+            ? "bg-rose-600 text-white"
+            : !isAvailable
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+            }`}
+          whileHover={{ scale: !isAvailable ? 1 : 1.02 }}
+          whileTap={{ scale: !isAvailable ? 1 : 0.98 }}
+        >
+          {time} {!isAvailable && "(Unavailable)"}
+        </motion.button>
+      );
+    })
+  }
+
   const closeErrorPopup = () => setErrorPopup("");
   const handleOpenFeedback = (booking) => {
     setSelectedBooking(booking);
     setIsFeedbackPopupOpen(true);
   };
+
   useEffect(() => {
     const hasShownNotification = localStorage.getItem(
       "paymentNotificationShown"
@@ -864,14 +913,14 @@ const MyBooking = () => {
           isSuccess: true,
           show: true,
         });
-        localStorage.setItem("paymentNotificationShown", "true"); // Đánh dấu đã hiển thị
+        localStorage.setItem("paymentNotificationShown", "true");
       } else if (status === "failed" && !hasShownNotification) {
         setPaymentNotification({
           message: "Payment failed. Please try again.",
           isSuccess: false,
           show: true,
         });
-        localStorage.setItem("paymentNotificationShown", "true"); // Đánh dấu đã hiển thị
+        localStorage.setItem("paymentNotificationShown", "true");
       }
       setRefresh((prev) => !prev);
     }
@@ -879,7 +928,7 @@ const MyBooking = () => {
 
   const closePaymentNotification = () => {
     setPaymentNotification((prev) => ({ ...prev, show: false }));
-    localStorage.setItem("paymentNotificationShown", "true"); // Đánh dấu đã đóng thủ công
+    localStorage.setItem("paymentNotificationShown", "true");
   };
 
   const getStatusBadgeClass = (status) => {
@@ -915,10 +964,10 @@ const MyBooking = () => {
   const formatDate = (dateString) =>
     dateString
       ? new Date(dateString).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
@@ -986,26 +1035,25 @@ const MyBooking = () => {
         </motion.div>
 
         {paymentNotification.show && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
-            <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full">
-              <div className="flex flex-col items-center">
-                {paymentNotification.isSuccess ? (
-                  <CheckCircle className="w-12 h-12 text-green-600 mb-4" />
-                ) : (
-                  <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-                )}
-                <p className="text-lg font-medium text-gray-800 mb-6 text-center">
-                  {paymentNotification.message}
-                </p>
-                <button
-                  onClick={closePaymentNotification}
-                  className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                >
-                  Close
-                </button>
-              </div>
+          <motion.div
+            className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg ${paymentNotification.isSuccess
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-rose-50 text-rose-700 border border-rose-200"
+              }`}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex items-center">
+              {paymentNotification.isSuccess ? (
+                <CheckCircle className="w-5 h-5 mr-2" /> // Icon dấu tích khi thành công
+              ) : (
+                <AlertCircle className="w-5 h-5 mr-2" /> // Icon dấu X khi thất bại
+              )}
+              <span className="text-sm font-medium">{paymentNotification.message}</span>
             </div>
-          </div>
+          </motion.div>
         )}
 
         <AnimatePresence>
@@ -1066,7 +1114,7 @@ const MyBooking = () => {
                           </p>
                         </div>
                         <p className="font-semibold text-green-600">
-                          ${formatVND(service.price)}
+                          {formatVND(service.price)}
                         </p>
                       </motion.li>
                     ))}
@@ -1141,63 +1189,193 @@ const MyBooking = () => {
                   </div>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <Calendar className="w-4 h-4 inline mr-1" /> Booking Date
-                    </label>
-                    <input
-                      type="date"
-                      value={bookingDate}
-                      onChange={(e) => setBookingDate(e.target.value)}
-                      min={new Date().toISOString().split("T")[0]}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
-                    />
+                <div className="space-y-4 mb-4">
+                  {/* Row 1: Booking Date and Start Time */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Calendar className="w-4 h-4 inline mr-1" /> Booking
+                        Date
+                      </label>
+                      <motion.button
+                        type="button"
+                        onClick={() => setIsCalendarOpen((prev) => !prev)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-rose-500 flex justify-between items-center"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <span>{bookingDate || "Select a date"}</span>
+                        <Calendar className="w-5 h-5 text-gray-500" />
+                      </motion.button>
+                      <AnimatePresence>
+                        {isCalendarOpen && (
+                          <motion.div
+                            className="absolute z-10 mt-2"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                          >
+                            <CalendarMyBooking
+                              selectedDate={bookingDate}
+                              onDateChange={(date) => {
+                                setBookingDate(date);
+                                setIsCalendarOpen(false);
+                              }}
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Clock className="w-4 h-4 inline mr-1" /> Start Time
+                      </label>
+                      <motion.button
+                        type="button"
+                        onClick={() => setIsTimePickerOpen((prev) => !prev)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-rose-500 flex justify-between items-center"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <span>{startTime || "Select a start time"}</span>
+                        <Clock className="w-5 h-5 text-gray-500" />
+                      </motion.button>
+                      <AnimatePresence>
+                        {isTimePickerOpen && (
+                          <motion.div
+                            className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                          >
+                            <div className="p-2">
+                              {timeSlots.map((time) => {
+                                const isAvailable = specialistSchedule.some(
+                                  (slot) =>
+                                    slot.timeSlot === time && slot.availability
+                                );
+                                return (
+                                  <motion.button
+                                    key={time}
+                                    onClick={() => {
+                                      if (isAvailable || !selectedSpecialist) {
+                                        setStartTime(time);
+                                        setIsTimePickerOpen(false);
+                                      }
+                                    }}
+                                    disabled={
+                                      selectedSpecialist && !isAvailable
+                                    }
+                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${startTime === time
+                                      ? "bg-rose-600 text-white"
+                                      : selectedSpecialist && !isAvailable
+                                        ? "text-gray-400 cursor-not-allowed"
+                                        : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+                                      }`}
+                                    whileHover={{
+                                      scale:
+                                        selectedSpecialist && !isAvailable
+                                          ? 1
+                                          : 1.02,
+                                    }}
+                                    whileTap={{
+                                      scale:
+                                        selectedSpecialist && !isAvailable
+                                          ? 1
+                                          : 0.98,
+                                    }}
+                                  >
+                                    {time}{" "}
+                                    {selectedSpecialist &&
+                                      !isAvailable &&
+                                      "(Unavailable)"}
+                                  </motion.button>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <Clock className="w-4 h-4 inline mr-1" /> Start Time
-                    </label>
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      min="08:00"
-                      max="20:00"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <User className="w-4 h-4 inline mr-1" /> Specialist
-                      (Optional)
-                    </label>
-                    <select
-                      value={selectedSpecialist}
-                      onChange={(e) => setSelectedSpecialist(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
-                    >
-                      <option value="">Auto-assign</option>
-                      {specialists.map((specialist) => (
-                        <option
-                          key={specialist.userId}
-                          value={specialist.userId}
-                        >
-                          {specialist.name}
-                        </option>
-                      ))}
-                    </select>
+                  {/* Row 2: Specialist and Schedule */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <User className="w-4 h-4 inline mr-1" /> Specialist
+                        (Optional)
+                      </label>
+                      <select
+                        value={selectedSpecialist}
+                        onChange={(e) => setSelectedSpecialist(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                      >
+                        <option value="">Auto-assign</option>
+                        {specialists.map((specialist) => (
+                          <option
+                            key={specialist.userId}
+                            value={specialist.userId}
+                          >
+                            {specialist.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <Calendar className="w-4 h-4 inline mr-1" /> Specialist
+                        Schedule
+                      </label>
+                      {isScheduleLoading ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+                          <RefreshCw className="w-5 h-5 text-rose-600 animate-spin" />
+                          <span className="ml-2 text-gray-600">
+                            Loading schedule...
+                          </span>
+                        </div>
+                      ) : selectedSpecialist &&
+                        specialistSchedule.length > 0 ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto">
+                          {specialistSchedule.map((slot, index) => (
+                            <div
+                              key={index}
+                              className={`flex justify-between items-center py-1 px-2 rounded-md text-sm ${slot.availability
+                                ? "text-gray-700"
+                                : "text-gray-400"
+                                }`}
+                            >
+                              <span>{slot.timeSlot}</span>
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${slot.availability
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                                  }`}
+                              >
+                                {slot.availability
+                                  ? "Available"
+                                  : "Unavailable"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm">
+                          {selectedSpecialist
+                            ? "No schedule available for this date."
+                            : "Select a specialist to view their schedule."}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 <motion.button
                   onClick={handleConfirmBooking}
                   disabled={isBooking}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
-                    isBooking
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-rose-600 text-white hover:bg-rose-700"
-                  }`}
+                    className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-rose-600 text-white hover:bg-rose-700"
+                    }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -1260,8 +1438,8 @@ const MyBooking = () => {
         </motion.div>
 
         {filteredBookings.length === 0 &&
-        selectedServices.length === 0 &&
-        !confirmedBooking ? (
+          selectedServices.length === 0 &&
+          !confirmedBooking ? (
           <motion.div
             className="bg-white rounded-xl shadow-md p-8 text-center"
             variants={fadeIn}
@@ -1348,9 +1526,7 @@ const MyBooking = () => {
                           <div className="flex items-start">
                             <CreditCard className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-500">
-                                Total Price
-                              </p>
+                              <p className="text-sm text-gray-500">Total Price</p>
                               <p className="font-medium text-gray-800">
                                 {formatVND(booking.totalPrice) || "N/A"}
                               </p>
@@ -1404,17 +1580,17 @@ const MyBooking = () => {
                       >
                         <Eye className="w-4 h-4 mr-2" /> View Details
                       </motion.button>
-                      {booking.status === "COMPLETED" &&
-                        !feedbackStatus[booking.bookingId] && (
-                          <motion.button
-                            onClick={() => handleOpenFeedback(booking)}
-                            className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <MessageSquare className="w-4 h-4 mr-2" /> Feedback
-                          </motion.button>
-                        )}
+                      {/* Chỉ hiển thị nút Feedback nếu status là COMPLETED và chưa feedback */}
+                      {booking.status === "COMPLETED" && !feedbackStatus[booking.bookingId] && (
+                        <motion.button
+                          onClick={() => handleOpenFeedback(booking)}
+                          className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" /> Feedback
+                        </motion.button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -1530,14 +1706,14 @@ const MyBooking = () => {
                     {filteredBookings.findIndex(
                       (b) => b.bookingId === selectedBooking.bookingId
                     ) !== -1 && (
-                      <span className="text-lg font-semibold text-gray-800">
-                        Booking #
-                        {filteredBookings.length -
-                          filteredBookings.findIndex(
-                            (b) => b.bookingId === selectedBooking.bookingId
-                          )}
-                      </span>
-                    )}
+                        <span className="text-lg font-semibold text-gray-800">
+                          Booking #
+                          {filteredBookings.length -
+                            filteredBookings.findIndex(
+                              (b) => b.bookingId === selectedBooking.bookingId
+                            )}
+                        </span>
+                      )}
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(
                         selectedBooking.status
@@ -1666,11 +1842,10 @@ const MyBooking = () => {
                               {Array.from({ length: 5 }, (_, i) => (
                                 <span
                                   key={i}
-                                  className={`w-5 h-5 ${
-                                    i < bookingDetails.feedback.rating
-                                      ? "text-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
+                                  className={`w-5 h-5 ${i < bookingDetails.feedback.rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                                    }`}
                                 >
                                   ★
                                 </span>
@@ -1723,30 +1898,43 @@ const MyBooking = () => {
                           </p>
                         </div>
                       </motion.div>
-                      {bookingDetails.paymentStatus === "PENDING" &&
-                        selectedBooking.status !== "CANCELLED" && (
-                          <motion.button
-                            onClick={handlePayment}
-                            disabled={isPaying}
-                            className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
-                              isPaying
+                      {(bookingDetails.paymentStatus === "PENDING" ||
+                        bookingDetails.paymentStatus === "FAILED") && (
+                          <>
+                            {bookingDetails.paymentStatus === "FAILED" && (
+                              <motion.div
+                                className="mb-4 p-3 bg-rose-50 rounded-lg flex items-center"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                              >
+                                <AlertCircle className="w-5 h-5 text-rose-600 mr-2" />
+                                <p className="text-sm text-rose-700">
+                                  Payment failed. Please try again.
+                                </p>
+                              </motion.div>
+                            )}
+                            <motion.button
+                              onClick={handlePayment}
+                              disabled={isPaying}
+                              className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
                                 ? "bg-gray-400 text-white cursor-not-allowed"
                                 : "bg-rose-600 text-white hover:bg-rose-700"
-                            } mb-4`}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                          >
-                            {isPaying ? (
-                              <>
-                                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                <DollarSign className="w-5 h-5 mr-2" /> Pay Now
-                              </>
-                            )}
-                          </motion.button>
+                                } mb-4`}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                            >
+                              {isPaying ? (
+                                <>
+                                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Processing...
+                                </>
+                              ) : (
+                                <>
+                                  <DollarSign className="w-5 h-5 mr-2" /> Pay Now
+                                </>
+                              )}
+                            </motion.button>
+                          </>
                         )}
                     </>
                   )}
@@ -1772,7 +1960,7 @@ const MyBooking = () => {
 
                   <div className="space-y-3 mt-auto">
                     {selectedBooking.status === "COMPLETED" &&
-                      (feedbackStatus[selectedBooking.bookingId] === true ? (
+                      (feedbackStatus[selectedBooking.bookingId] ? (
                         <motion.div
                           className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg"
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -1851,11 +2039,10 @@ const MyBooking = () => {
                             onMouseLeave={() =>
                               setFeedbackRating(feedbackRating)
                             }
-                            className={`text-3xl cursor-pointer transition-colors duration-200 ${
-                              starValue <= feedbackRating
-                                ? "text-yellow-400"
-                                : "text-gray-300"
-                            }`}
+                            className={`text-3xl cursor-pointer transition-colors duration-200 ${starValue <= feedbackRating
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                              }`}
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.9 }}
                           >
