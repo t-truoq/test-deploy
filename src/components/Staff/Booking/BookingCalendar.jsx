@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  parseISO,
   format,
   addDays,
   startOfMonth,
@@ -12,7 +11,11 @@ import {
 } from "date-fns";
 import PropTypes from "prop-types";
 
-export function BookingCalendar({ appointments = [], onAppointmentSelect, selectedAppointmentId }) {
+export function BookingCalendar({
+  appointments = [],
+  onAppointmentSelect,
+  selectedAppointmentId,
+}) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState("day");
   const [calendarDays, setCalendarDays] = useState([]);
@@ -56,7 +59,7 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
       case "COMPLETED":
         return "bg-purple-500";
       case "IN_PROGRESS":
-        return "bg-blue-500"; 
+        return "bg-blue-500";
       default:
         return "bg-gray-500";
     }
@@ -73,7 +76,9 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
           <button
             onClick={() => setView("day")}
             className={`px-3 py-1 text-sm font-medium rounded-md ${
-              view === "day" ? "bg-pink-500 text-white" : "bg-white text-gray-700 border hover:bg-gray-50"
+              view === "day"
+                ? "bg-pink-500 text-white"
+                : "bg-white text-gray-700 border hover:bg-gray-50"
             }`}
           >
             Day
@@ -81,7 +86,9 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
           <button
             onClick={() => setView("week")}
             className={`px-3 py-1 text-sm font-medium rounded-md ${
-              view === "week" ? "bg-pink-500 text-white" : "bg-white text-gray-700 border hover:bg-gray-50"
+              view === "week"
+                ? "bg-pink-500 text-white"
+                : "bg-white text-gray-700 border hover:bg-gray-50"
             }`}
           >
             Week
@@ -108,7 +115,12 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
             </svg>
           </button>
           <span className="font-medium text-gray-800">
-            {view === "day" ? format(selectedDate, "MMMM d, yyyy") : `${format(selectedDate, "MMM d")} - ${format(addDays(selectedDate, 6), "MMM d, yyyy")}`}
+            {view === "day"
+              ? format(selectedDate, "MMMM d, yyyy")
+              : `${format(selectedDate, "MMM d")} - ${format(
+                  addDays(selectedDate, 6),
+                  "MMM d, yyyy"
+                )}`}
           </span>
           <button
             onClick={() => setSelectedDate((prev) => addDays(prev, 1))}
@@ -132,20 +144,26 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-        <div className="bg-white rounded-lg border shadow p-4 h-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0">
+        {/* Container cho calendar với chiều cao cố định */}
+        <div className="bg-white rounded-lg border shadow p-4 h-[400px] flex flex-col">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-gray-800">Calendar</h2>
-            <p className="text-sm text-gray-500">Select a date to view appointments</p>
+            <p className="text-sm text-gray-500">
+              Select a date to view appointments
+            </p>
           </div>
 
           <div className="grid grid-cols-7 gap-1 text-center mb-2">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day} className="text-xs font-medium text-gray-500">{day}</div>
+              <div key={day} className="text-xs font-medium text-gray-500">
+                {day}
+              </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          {/* Container cho các ngày với chiều cao cố định và overflow */}
+          <div className="grid grid-cols-7 gap-1 flex-1 overflow-auto">
             {calendarDays.map((day, i) => {
               if (!(day instanceof Date) || isNaN(day)) {
                 return (
@@ -161,7 +179,9 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
               const isSelected = isSameDay(day, selectedDate);
               const isCurrentMonth = isSameMonth(day, selectedDate);
               const hasAppointments = (appointments || []).some((apt) =>
-                apt.date instanceof Date && !isNaN(apt.date) ? isSameDay(apt.date, day) : false
+                apt.date instanceof Date && !isNaN(apt.date)
+                  ? isSameDay(apt.date, day)
+                  : false
               );
 
               return (
@@ -171,8 +191,16 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
                   className={`
                     h-10 w-full rounded-md flex items-center justify-center text-sm
                     ${!isCurrentMonth && "text-gray-300"}
-                    ${isToday(day) && !isSelected && "border border-pink-500 text-pink-500"}
-                    ${isSelected ? "bg-pink-500 text-white" : "hover:bg-gray-100"}
+                    ${
+                      isToday(day) &&
+                      !isSelected &&
+                      "border border-pink-500 text-pink-500"
+                    }
+                    ${
+                      isSelected
+                        ? "bg-pink-500 text-white"
+                        : "hover:bg-gray-100"
+                    }
                     ${hasAppointments && !isSelected && "font-bold"}
                   `}
                 >
@@ -183,16 +211,20 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border shadow p-4 h-full overflow-auto">
+        {/* Container cho appointments với chiều cao cố định */}
+        <div className="bg-white rounded-lg border shadow p-4 h-[400px] flex flex-col">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">Appointments</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Appointments
+            </h2>
             <p className="text-sm text-gray-500">
               {filteredAppointments.length} appointments for{" "}
               {view === "day" ? format(selectedDate, "MMMM d") : "the week"}
             </p>
           </div>
 
-          <div className="space-y-3">
+          {/* Container cho danh sách appointments với scroll */}
+          <div className="flex-1 overflow-auto space-y-3">
             {filteredAppointments.length > 0 ? (
               filteredAppointments.map((appointment) => (
                 <div
@@ -217,13 +249,16 @@ export function BookingCalendar({ appointments = [], onAppointmentSelect, select
                     </span>
                   </div>
                   <div className="text-sm text-gray-500 mb-1">
-                    {appointment.date instanceof Date && !isNaN(appointment.date)
+                    {appointment.date instanceof Date &&
+                    !isNaN(appointment.date)
                       ? format(appointment.date, "MMM d")
                       : "Invalid Date"}{" "}
                     • {appointment.time} • {appointment.duration} min
                   </div>
                   <div className="flex justify-between text-sm">
-                    <div className="text-gray-700">{appointment.service || "Unknown"}</div>
+                    <div className="text-gray-700">
+                      {appointment.service || "Unknown"}
+                    </div>
                     <div className="text-gray-500">
                       with {appointment.therapist || "Unknown"}
                     </div>

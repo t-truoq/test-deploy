@@ -2,20 +2,27 @@
 
 import axios from "axios";
 import { motion } from "framer-motion";
-import { EyeIcon, MoreVerticalIcon, XIcon } from "lucide-react";
+import {
+  XIcon,
+  Filter,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  ChevronDown,
+} from "lucide-react";
 import PropTypes from "prop-types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function ContactDashboard() {
   const [contacts, setContacts] = useState([]);
   const [toast, setToast] = useState(null);
   const [selectedContact, setSelectedContact] = useState(null);
-  const [statusEditContact, setStatusEditContact] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [confirmStatusChange, setConfirmStatusChange] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const dropdownRef = useRef(null);
-  const triggerRef = useRef(null);
+  const [dateFilter, setDateFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -35,7 +42,7 @@ export function ContactDashboard() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        "https://9592-118-69-70-166.ngrok-free.app/api/contact",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/contact",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -70,7 +77,7 @@ export function ContactDashboard() {
     }
     try {
       const response = await axios.put(
-        `https://9592-118-69-70-166.ngrok-free.app/api/contact/${id}/status?status=${status}`,
+        `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/contact/${id}/status?status=${status}`,
         null,
         {
           headers: {
@@ -93,7 +100,6 @@ export function ContactDashboard() {
         }'s status changed to ${status}.`,
         type: status === "CONTACTED" ? "success" : "info",
       });
-      setStatusEditContact(null);
     } catch (error) {
       console.error("Error updating status:", error);
       showToast({
@@ -124,6 +130,26 @@ export function ContactDashboard() {
     }
   };
 
+  // Filter contacts based on selected filters
+  const filteredContacts = contacts
+    .filter(
+      (contact) => statusFilter === "all" || contact.status === statusFilter
+    )
+    .sort((a, b) => {
+      if (dateFilter === "newest") {
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
+      if (dateFilter === "oldest") {
+        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      }
+      return 0;
+    });
+
+  const resetFilters = () => {
+    setDateFilter("all");
+    setStatusFilter("all");
+  };
+
   const ContactDetail = ({ contact, onClose }) => {
     return (
       <div className="space-y-4 p-6">
@@ -139,7 +165,7 @@ export function ContactDashboard() {
                 contact.status
               )} border`}
             >
-              {contact.status}
+              {contact.status.charAt(0) + contact.status.slice(1).toLowerCase()}
             </span>
           </div>
           <div>
@@ -200,105 +226,235 @@ export function ContactDashboard() {
   };
 
   const ContactList = () => {
-    const calculateDropdownPosition = (triggerElement) => {
-      if (!triggerElement) return;
-      const rect = triggerElement.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      const dropdownHeight = 160;
+    if (isLoading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center bg-white border-gray-100 p-8 rounded-xl shadow-lg border backdrop-blur-sm"
+          >
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                className="w-20 h-20 rounded-full border-4 border-[#3D021E] border-t-transparent"
+              />
+            </div>
+            <h3 className="text-xl text-[#3D021E] font-medium">
+              Loading contacts...
+            </h3>
+            <p className="text-gray-500 mt-2">
+              Please wait while we fetch your data
+            </p>
+          </motion.div>
+        </div>
+      );
+    }
 
-      if (spaceBelow >= dropdownHeight || spaceBelow > spaceAbove) {
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY,
-          left: rect.left - 160,
-        });
-      } else {
-        setDropdownPosition({
-          top: rect.top - dropdownHeight + window.scrollY,
-          left: rect.left - 160,
-        });
-      }
-    };
-
-    const toggleDropdown = (id, e) => {
-      if (dropdownOpen === id) {
-        setDropdownOpen(null);
-      } else {
-        setDropdownOpen(id);
-        calculateDropdownPosition(e.currentTarget);
-      }
-    };
-
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (
-          dropdownRef.current &&
-          !dropdownRef.current.contains(event.target) &&
-          triggerRef.current &&
-          !triggerRef.current.contains(event.target)
-        ) {
-          setDropdownOpen(null);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    useEffect(() => {
-      const handleScroll = () => {
-        if (dropdownOpen && triggerRef.current) {
-          calculateDropdownPosition(triggerRef.current);
-        }
-      };
-      window.addEventListener("scroll", handleScroll, true);
-      return () => window.removeEventListener("scroll", handleScroll, true);
-    }, [dropdownOpen]);
-
-    // Animation variants for the loading spinner and text
-    const spinnerVariants = {
-      initial: { opacity: 0, scale: 0.8 },
-      animate: {
-        opacity: 1,
-        scale: 1,
-        transition: {
-          duration: 0.5,
-          ease: "easeInOut",
-        },
-      },
-      exit: {
-        opacity: 0,
-        scale: 0.8,
-        transition: {
-          duration: 0.3,
-          ease: "easeInOut",
-        },
-      },
-    };
-
-    const textVariants = {
-      initial: { opacity: 0, y: 20 },
-      animate: {
-        opacity: 1,
-        y: 0,
-        transition: {
-          duration: 0.5,
-          ease: "easeInOut",
-          delay: 0.2,
-        },
-      },
-      exit: {
-        opacity: 0,
-        y: 20,
-        transition: {
-          duration: 0.3,
-          ease: "easeInOut",
-        },
-      },
-    };
+    if (contacts.length === 0) {
+      return (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="text-center py-8 text-gray-500">
+            No contacts found
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-6 border-gray-200 border-b">
+          <div className="flex flex-col md:flex-row justify-end gap-4">
+            {/* Filters (moved to the right) */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="text-sm text-[#3D021E] font-medium flex items-center gap-1">
+                <Filter className="w-4 h-4" />
+                Filters
+              </div>
+
+              {/* Date Filter */}
+              <div className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center justify-between gap-2 px-4 py-2 text-sm rounded-lg min-w-[140px] ${
+                    dateFilter !== "all"
+                      ? "text-[#3D021E] border-[#3D021E]"
+                      : "text-gray-700 border-gray-300"
+                  } bg-white border`}
+                  onClick={() => {
+                    setShowDateDropdown(!showDateDropdown);
+                    setShowStatusDropdown(false);
+                  }}
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {dateFilter === "all"
+                      ? "All Dates"
+                      : dateFilter === "newest"
+                      ? "Newest First"
+                      : "Oldest First"}
+                  </span>
+                  <ChevronDown className="w-4 h-4" />
+                </motion.button>
+
+                {showDateDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                  >
+                    <button
+                      className={`w-full text-left px-4 py-2 text-sm ${
+                        dateFilter === "all"
+                          ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                          : "text-gray-700"
+                      } hover:bg-[#F8F2F5]`}
+                      onClick={() => {
+                        setDateFilter("all");
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      All Dates
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-2 text-sm ${
+                        dateFilter === "newest"
+                          ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                          : "text-gray-700"
+                      } hover:bg-[#F8F2F5]`}
+                      onClick={() => {
+                        setDateFilter("newest");
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      Newest First
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-2 text-sm ${
+                        dateFilter === "oldest"
+                          ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                          : "text-gray-700"
+                      } hover:bg-[#F8F2F5]`}
+                      onClick={() => {
+                        setDateFilter("oldest");
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      Oldest First
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Status Filter */}
+              <div className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center justify-between gap-2 px-4 py-2 text-sm rounded-lg min-w-[140px] ${
+                    statusFilter !== "all"
+                      ? "text-[#3D021E] border-[#3D021E]"
+                      : "text-gray-700 border-gray-300"
+                  } bg-white border`}
+                  onClick={() => {
+                    setShowStatusDropdown(!showStatusDropdown);
+                    setShowDateDropdown(false);
+                  }}
+                >
+                  {statusFilter === "CONTACTED" ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : statusFilter === "PENDING" ? (
+                    <XCircle className="w-4 h-4" />
+                  ) : (
+                    <Filter className="w-4 h-4" />
+                  )}
+                  <span>
+                    {statusFilter === "all"
+                      ? "All Status"
+                      : statusFilter === "CONTACTED"
+                      ? "Contacted"
+                      : "Pending"}
+                  </span>
+                  <ChevronDown className="w-4 h-4" />
+                </motion.button>
+
+                {showStatusDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                  >
+                    <button
+                      className={`w-full text-left px-4 py-2 text-sm ${
+                        statusFilter === "all"
+                          ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                          : "text-gray-700"
+                      } hover:bg-[#F8F2F5]`}
+                      onClick={() => {
+                        setStatusFilter("all");
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      All Status
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-2 text-sm ${
+                        statusFilter === "CONTACTED"
+                          ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                          : "text-gray-700"
+                      } hover:bg-[#F8F2F5]`}
+                      onClick={() => {
+                        setStatusFilter("CONTACTED");
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Contacted
+                      </div>
+                    </button>
+                    <button
+                      className={`w-full text-left px-4 py-2 text-sm ${
+                        statusFilter === "PENDING"
+                          ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                          : "text-gray-700"
+                      } hover:bg-[#F8F2F5]`}
+                      onClick={() => {
+                        setStatusFilter("PENDING");
+                        setShowStatusDropdown(false);
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-yellow-500" />
+                        Pending
+                      </div>
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm text-[#3D021E] hover:text-[#4A0404] transition-colors font-medium"
+                onClick={resetFilters}
+              >
+                Reset
+              </motion.button>
+            </div>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white">
@@ -318,136 +474,63 @@ export function ContactDashboard() {
                 <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider">
-                  Actions
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="py-12">
-                    <motion.div
-                      variants={spinnerVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      className="flex justify-center items-center min-h-[300px]"
+              {filteredContacts.map((contact, index) => (
+                <tr
+                  key={contact.id}
+                  className={`hover:bg-gray-50 transition-colors duration-200 ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50/80"
+                  }`}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {contact.fullName}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{contact.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {contact.phoneNumber}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() =>
+                        setConfirmStatusChange({
+                          id: contact.id,
+                          newStatus:
+                            contact.status === "PENDING"
+                              ? "CONTACTED"
+                              : "PENDING",
+                          fullName: contact.fullName,
+                        })
+                      }
+                      className={`px-3 py-1 inline-flex text-xs font-medium rounded-full ${getStatusColor(
+                        contact.status
+                      )} focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-colors`}
                     >
-                      <motion.div
-                        className="text-center bg-white border-gray-100 p-8 rounded-xl shadow-lg border backdrop-blur-sm"
-                        variants={spinnerVariants}
-                      >
-                        <div className="relative w-20 h-20 mx-auto mb-6">
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{
-                              duration: 1.5,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
-                            className="w-20 h-20 rounded-full border-4 border-[#3D021E] border-t-transparent"
-                          />
-                        </div>
-                        <motion.h3
-                          variants={textVariants}
-                          className="text-xl text-[#3D021E] font-medium"
-                        >
-                          Loading contacts...
-                        </motion.h3>
-                        <motion.p
-                          variants={textVariants}
-                          className="text-gray-500 mt-2"
-                        >
-                          Please wait while we fetch your data
-                        </motion.p>
-                      </motion.div>
-                    </motion.div>
+                      {contact.status.charAt(0) +
+                        contact.status.slice(1).toLowerCase()}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(contact.createdAt)}
                   </td>
                 </tr>
-              ) : contacts.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-500">
-                    No contacts found
-                  </td>
-                </tr>
-              ) : (
-                contacts.map((contact) => (
-                  <motion.tr
-                    key={contact.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {contact.fullName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {contact.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {contact.phoneNumber}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => setStatusEditContact(contact)}
-                        className={`inline-flex px-4 py-2 text-sm font-medium rounded-lg ${getStatusColor(
-                          contact.status
-                        )} focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-colors`}
-                      >
-                        {contact.status}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(contact.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="relative">
-                        <button
-                          ref={dropdownOpen === contact.id ? triggerRef : null}
-                          onClick={(e) => toggleDropdown(contact.id, e)}
-                          className="text-gray-500 hover:text-[#3D021E] focus:outline-none transition-colors"
-                        >
-                          <MoreVerticalIcon className="h-5 w-5" />
-                        </button>
-                        {dropdownOpen === contact.id && (
-                          <div
-                            ref={dropdownRef}
-                            style={{
-                              position: "fixed",
-                              top: `${dropdownPosition.top}px`,
-                              left: `${dropdownPosition.left}px`,
-                            }}
-                            className="bg-white rounded-md shadow-lg border border-gray-200 z-50 w-48"
-                          >
-                            <div className="py-1">
-                              <button
-                                onClick={() => {
-                                  setSelectedContact(contact);
-                                  setDropdownOpen(null);
-                                }}
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left transition-colors"
-                              >
-                                <EyeIcon className="h-4 w-4 mr-2 text-[#3D021E]" />
-                                View Details
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-gray-200 bg-white border-t flex justify-between items-center">
+          <div className="text-sm text-gray-500">
+            Showing {filteredContacts.length} of {contacts.length} contacts
+          </div>
         </div>
       </div>
     );
@@ -463,10 +546,7 @@ export function ContactDashboard() {
         </div>
         <ContactList />
         {toast && (
-          <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 100 }}
+          <div
             className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg max-w-md z-50 border-l-4 ${
               toast.type === "success"
                 ? "bg-green-100 border-green-500"
@@ -492,16 +572,11 @@ export function ContactDashboard() {
                 <XIcon className="h-4 w-4" />
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {selectedContact && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          >
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-[#3D021E]">
@@ -519,59 +594,44 @@ export function ContactDashboard() {
                 onClose={() => setSelectedContact(null)}
               />
             </div>
-          </motion.div>
+          </div>
         )}
 
-        {statusEditContact && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          >
+        {confirmStatusChange && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
               <h3 className="text-lg font-semibold text-[#3D021E] mb-4">
-                Edit Contact Status
+                Confirm Status Change
               </h3>
               <p className="text-gray-600 mb-6">
-                Update the status for {statusEditContact.fullName}
+                Are you sure you want to change the status of{" "}
+                {confirmStatusChange.fullName} to{" "}
+                {confirmStatusChange.newStatus.charAt(0) +
+                  confirmStatusChange.newStatus.slice(1).toLowerCase()}
+                ?
               </p>
-              <div className="flex flex-wrap gap-3 mb-6">
+              <div className="flex justify-end gap-3">
                 <button
-                  className={`px-4 py-2 rounded-lg ${
-                    statusEditContact.status === "PENDING"
-                      ? "bg-yellow-500 text-white"
-                      : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                  } transition-colors`}
                   onClick={() => {
-                    handleStatusChange(statusEditContact.id, "PENDING");
+                    handleStatusChange(
+                      confirmStatusChange.id,
+                      confirmStatusChange.newStatus
+                    );
+                    setConfirmStatusChange(null);
                   }}
+                  className="px-4 py-2 bg-[#3D021E] text-white rounded-lg hover:bg-[#4A0404] transition-colors"
                 >
-                  PENDING
+                  Confirm
                 </button>
                 <button
-                  className={`px-4 py-2 rounded-lg ${
-                    statusEditContact.status === "CONTACTED"
-                      ? "bg-green-500 text-white"
-                      : "bg-green-100 text-green-800 hover:bg-green-200"
-                  } transition-colors`}
-                  onClick={() => {
-                    handleStatusChange(statusEditContact.id, "CONTACTED");
-                  }}
-                >
-                  CONTACTED
-                </button>
-              </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setStatusEditContact(null)}
+                  onClick={() => setConfirmStatusChange(null)}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   Cancel
                 </button>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

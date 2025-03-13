@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 import axios from "axios";
 import {
   Calendar,
@@ -45,7 +50,8 @@ const MyBooking = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [bookingDetails, setBookingDetails] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
-  const [isPaymentSuccessPopupOpen, setIsPaymentSuccessPopupOpen] = useState(false);
+  const [isPaymentSuccessPopupOpen, setIsPaymentSuccessPopupOpen] =
+    useState(false);
   const [isFeedbackPopupOpen, setIsFeedbackPopupOpen] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackComment, setFeedbackComment] = useState("");
@@ -86,11 +92,19 @@ const MyBooking = () => {
   };
 
   useEffect(() => {
-    const storedServiceIds = localStorage.getItem("selectedServiceIdsForBooking");
-    console.log("Retrieved selectedServiceIds from localStorage:", storedServiceIds);
+    const storedServiceIds = localStorage.getItem(
+      "selectedServiceIdsForBooking"
+    );
+    console.log(
+      "Retrieved selectedServiceIds from localStorage:",
+      storedServiceIds
+    );
 
     const storedServices = localStorage.getItem("selectedServicesForBooking");
-    console.log("Retrieved selectedServices from localStorage:", storedServices);
+    console.log(
+      "Retrieved selectedServices from localStorage:",
+      storedServices
+    );
     if (storedServices) {
       try {
         const parsedServices = JSON.parse(storedServices);
@@ -100,7 +114,10 @@ const MyBooking = () => {
           setSelectedServices([]);
         }
       } catch (error) {
-        console.error("Error parsing selectedServices from localStorage:", error);
+        console.error(
+          "Error parsing selectedServices from localStorage:",
+          error
+        );
         setSelectedServices([]);
       }
     }
@@ -111,7 +128,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9592-118-69-70-166.ngrok-free.app/api/bookings/user",
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -135,7 +152,7 @@ const MyBooking = () => {
           for (const booking of sortedBookings) {
             try {
               const feedbackResponse = await axios.get(
-                `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
+                `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -144,11 +161,16 @@ const MyBooking = () => {
                   },
                 }
               );
-              console.log(`Feedback response for booking ${booking.bookingId}:`, feedbackResponse.data);
+              console.log(
+                `Feedback response for booking ${booking.bookingId}:`,
+                feedbackResponse.data
+              );
 
               feedbackResponsesMap[booking.bookingId] = feedbackResponse.data;
 
-              const hasFeedback = Array.isArray(feedbackResponse.data) && feedbackResponse.data.length > 0;
+              const hasFeedback =
+                Array.isArray(feedbackResponse.data) &&
+                feedbackResponse.data.length > 0;
               feedbackStatusMap[booking.bookingId] = hasFeedback;
 
               if (hasFeedback) {
@@ -159,7 +181,10 @@ const MyBooking = () => {
                 };
               }
             } catch (error) {
-              console.error(`Error fetching feedback for booking ${booking.bookingId}:`, error);
+              console.error(
+                `Error fetching feedback for booking ${booking.bookingId}:`,
+                error
+              );
               feedbackStatusMap[booking.bookingId] = false;
               feedbackResponsesMap[booking.bookingId] = [];
             }
@@ -170,7 +195,9 @@ const MyBooking = () => {
           setFeedbackResponses(feedbackResponsesMap);
           setBookings(sortedBookings);
         } else {
-          throw new Error("Invalid response format: Expected an array of bookings");
+          throw new Error(
+            "Invalid response format: Expected an array of bookings"
+          );
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -179,16 +206,25 @@ const MyBooking = () => {
             setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => navigate("/login"), 2000);
           } else if (error.response.status === 403) {
-            setErrorPopup("You do not have permission to access your bookings.");
+            setErrorPopup(
+              "You do not have permission to access your bookings."
+            );
           } else if (error.response.status === 404) {
             setErrorPopup("No bookings found.");
           } else {
-            setErrorPopup(error.response.data.message || "Failed to load bookings. Please try again.");
+            setErrorPopup(
+              error.response.data.message ||
+                "Failed to load bookings. Please try again."
+            );
           }
         } else if (error.request) {
-          setErrorPopup("Unable to connect to server. CORS issue or server error. Please try again.");
+          setErrorPopup(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
-          setErrorPopup(error.message || "Failed to load bookings. Please try again.");
+          setErrorPopup(
+            error.message || "Failed to load bookings. Please try again."
+          );
         }
         setBookings([]); // Đặt bookings về mảng rỗng nếu có lỗi
       }
@@ -200,7 +236,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9592-118-69-70-166.ngrok-free.app/api/users/specialists/active",
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -214,7 +250,9 @@ const MyBooking = () => {
         if (Array.isArray(response.data)) {
           setSpecialists(response.data);
         } else {
-          throw new Error("Invalid response format: Expected an array of specialists");
+          throw new Error(
+            "Invalid response format: Expected an array of specialists"
+          );
         }
       } catch (error) {
         console.error("Error fetching specialists:", error);
@@ -223,7 +261,9 @@ const MyBooking = () => {
       }
     };
 
-    Promise.all([fetchBookings(), fetchSpecialists()]).finally(() => setLoading(false));
+    Promise.all([fetchBookings(), fetchSpecialists()]).finally(() =>
+      setLoading(false)
+    );
   }, [navigate, refresh]);
 
   useEffect(() => {
@@ -258,20 +298,29 @@ const MyBooking = () => {
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-      const bookingDateFormatted = new Date(booking.bookingDate).toISOString().split("T")[0];
-      return bookingDateFormatted === searchDate;
-    })
+        const bookingDateFormatted = new Date(booking.bookingDate)
+          .toISOString()
+          .split("T")[0];
+        return bookingDateFormatted === searchDate;
+      })
     : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
-    const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
+    const totalDuration = services.reduce(
+      (sum, service) => sum + service.duration,
+      0
+    );
     const startDateTime = new Date(`${bookingDate}T${startTime}:00`);
-    const endDateTime = new Date(startDateTime.getTime() + totalDuration * 60000);
+    const endDateTime = new Date(
+      startDateTime.getTime() + totalDuration * 60000
+    );
     const timeSlot = `${startTime}-${endDateTime.toTimeString().slice(0, 5)}`;
 
     return bookings.some((booking) => {
       if (booking.status === "CANCELLED") return false; // Loại bỏ kiểm tra bookingId === 1
-      const existingDate = new Date(booking.bookingDate).toISOString().split("T")[0];
+      const existingDate = new Date(booking.bookingDate)
+        .toISOString()
+        .split("T")[0];
       const existingTimeSlot = booking.timeSlot;
       return existingDate === bookingDate && existingTimeSlot === timeSlot;
     });
@@ -314,7 +363,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://9592-118-69-70-166.ngrok-free.app/api/bookings",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -340,7 +389,10 @@ const MyBooking = () => {
         services: [...selectedServices],
         bookingDate,
         startTime,
-        totalPrice: selectedServices.reduce((sum, service) => sum + service.price, 0),
+        totalPrice: selectedServices.reduce(
+          (sum, service) => sum + service.price,
+          0
+        ),
       });
 
       setSelectedServices([]);
@@ -352,7 +404,9 @@ const MyBooking = () => {
       setErrorPopup("");
     } catch (error) {
       console.error("Error creating booking:", error);
-      const errorMessage = error.response?.data.message || "Failed to create booking. Please try again.";
+      const errorMessage =
+        error.response?.data.message ||
+        "Failed to create booking. Please try again.";
       const errorCode = error.response?.data.errorCode;
 
       switch (errorCode) {
@@ -367,7 +421,9 @@ const MyBooking = () => {
           setErrorPopup("Too many services selected. Maximum limit exceeded.");
           break;
         case "TIME_SLOT_OUTSIDE_WORKING_HOURS":
-          setErrorPopup("Selected time is outside working hours (8:00 - 20:00).");
+          setErrorPopup(
+            "Selected time is outside working hours (8:00 - 20:00)."
+          );
           break;
         case "BOOKING_DATE_IN_PAST":
           setErrorPopup("Booking date cannot be in the past.");
@@ -422,7 +478,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.get(
-        `https://9592-118-69-70-166.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -432,8 +488,13 @@ const MyBooking = () => {
         }
       );
 
-      const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
-      console.log("Full booking data from API:", JSON.stringify(bookingData, null, 2));
+      const bookingData = Array.isArray(response.data)
+        ? response.data[0]
+        : response.data;
+      console.log(
+        "Full booking data from API:",
+        JSON.stringify(bookingData, null, 2)
+      );
 
       const storedServicesKey = `selectedServicesForBooking_${bookingId}`;
       const storedServices = localStorage.getItem(storedServicesKey);
@@ -474,16 +535,24 @@ const MyBooking = () => {
             price = priceFromAPI;
           } else if (priceFromStored != null) {
             price = priceFromStored;
-          } else if (bookingData.totalPrice != null && Number(bookingData.totalPrice) > 0) {
+          } else if (
+            bookingData.totalPrice != null &&
+            Number(bookingData.totalPrice) > 0
+          ) {
             price =
               bookingData.serviceNames.length === 1
                 ? Number(bookingData.totalPrice)
-                : Number(bookingData.totalPrice) / (bookingData.serviceNames.length || 1);
+                : Number(bookingData.totalPrice) /
+                  (bookingData.serviceNames.length || 1);
           } else {
             price = 0;
           }
 
-          console.log(`Service ${index + 1}: name=${name}, duration=${duration}, price=${price}`);
+          console.log(
+            `Service ${
+              index + 1
+            }: name=${name}, duration=${duration}, price=${price}`
+          );
 
           return {
             id: index + 1,
@@ -496,15 +565,21 @@ const MyBooking = () => {
         console.warn("No serviceNames found in bookingData:", bookingData);
       }
 
-      const specialistId = bookingData.specialistId || booking.specialistId || null;
-      const specialistFromList = specialists.find((spec) => spec.userId === specialistId);
+      const specialistId =
+        bookingData.specialistId || booking.specialistId || null;
+      const specialistFromList = specialists.find(
+        (spec) => spec.userId === specialistId
+      );
       const specialist = specialistFromList || {
         name: bookingData.specialistName || "Not assigned",
         userId: specialistId || 0,
         specialization: bookingData.specialization || "Skin Therapist",
       };
 
-      const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
+      const totalDuration = services.reduce(
+        (sum, service) => sum + service.duration,
+        0
+      );
 
       let feedback = { rating: 0, comment: "" };
       let feedbackResponseData = feedbackResponses[bookingId];
@@ -512,7 +587,7 @@ const MyBooking = () => {
       if (!feedbackResponseData) {
         try {
           const feedbackResponse = await axios.get(
-            `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
+            `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -521,7 +596,10 @@ const MyBooking = () => {
               },
             }
           );
-          console.log("Feedback response data:", JSON.stringify(feedbackResponse.data, null, 2));
+          console.log(
+            "Feedback response data:",
+            JSON.stringify(feedbackResponse.data, null, 2)
+          );
           feedbackResponseData = feedbackResponse.data;
 
           setFeedbackResponses((prev) => ({
@@ -529,12 +607,18 @@ const MyBooking = () => {
             [bookingId]: feedbackResponseData,
           }));
         } catch (feedbackError) {
-          console.error(`Error fetching feedback for booking ${bookingId}:`, feedbackError);
+          console.error(
+            `Error fetching feedback for booking ${bookingId}:`,
+            feedbackError
+          );
           feedbackResponseData = [];
         }
       }
 
-      if (Array.isArray(feedbackResponseData) && feedbackResponseData.length > 0) {
+      if (
+        Array.isArray(feedbackResponseData) &&
+        feedbackResponseData.length > 0
+      ) {
         const feedbackData = feedbackResponseData[0];
         feedback = {
           rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),
@@ -595,7 +679,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://9592-118-69-70-166.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -612,11 +696,16 @@ const MyBooking = () => {
         localStorage.setItem("lastPaidBookingId", selectedBooking.bookingId);
         window.location.href = response.data.result;
       } else {
-        setErrorPopup("Payment URL not received from server or payment creation failed.");
+        setErrorPopup(
+          "Payment URL not received from server or payment creation failed."
+        );
       }
     } catch (error) {
       console.error("Error initiating payment:", error);
-      setErrorPopup(error.response?.data.message || "Failed to initiate payment. Please try again.");
+      setErrorPopup(
+        error.response?.data.message ||
+          "Failed to initiate payment. Please try again."
+      );
     } finally {
       setIsPaying(false);
     }
@@ -650,7 +739,7 @@ const MyBooking = () => {
       };
 
       const response = await axios.post(
-        "https://9592-118-69-70-166.ngrok-free.app/api/feedbacks",
+        "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {
@@ -665,7 +754,7 @@ const MyBooking = () => {
 
       if (response.status === 200 || response.status === 201) {
         const feedbackResponse = await axios.get(
-          `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
+          `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -674,13 +763,25 @@ const MyBooking = () => {
             },
           }
         );
-        console.log("Feedback fetch response:", JSON.stringify(feedbackResponse.data, null, 2));
+        console.log(
+          "Feedback fetch response:",
+          JSON.stringify(feedbackResponse.data, null, 2)
+        );
 
-        let updatedFeedback = { rating: feedbackRating, comment: feedbackComment };
-        if (Array.isArray(feedbackResponse.data) && feedbackResponse.data.length > 0) {
+        let updatedFeedback = {
+          rating: feedbackRating,
+          comment: feedbackComment,
+        };
+        if (
+          Array.isArray(feedbackResponse.data) &&
+          feedbackResponse.data.length > 0
+        ) {
           const feedbackData = feedbackResponse.data[0];
           updatedFeedback = {
-            rating: Math.min(Math.max(feedbackData.rating || feedbackRating, 0), 5),
+            rating: Math.min(
+              Math.max(feedbackData.rating || feedbackRating, 0),
+              5
+            ),
             comment: feedbackData.comment || feedbackComment,
           };
         }
@@ -713,7 +814,10 @@ const MyBooking = () => {
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      if (error.response?.status === 400 && error.response?.data.message === "feedback already exist") {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data.message === "feedback already exist"
+      ) {
         setErrorPopup("You have already submitted feedback for this booking.");
         setFeedbackStatus((prev) => ({
           ...prev,
@@ -723,8 +827,8 @@ const MyBooking = () => {
       } else {
         setErrorPopup(
           error.response?.data.message ||
-          error.message ||
-          "Failed to submit feedback. Please try again or contact support."
+            error.message ||
+            "Failed to submit feedback. Please try again or contact support."
         );
       }
     } finally {
@@ -738,7 +842,9 @@ const MyBooking = () => {
     setIsFeedbackPopupOpen(true);
   };
   useEffect(() => {
-    const hasShownNotification = localStorage.getItem("paymentNotificationShown");
+    const hasShownNotification = localStorage.getItem(
+      "paymentNotificationShown"
+    );
     if (hasShownNotification) {
       setPaymentNotification((prev) => ({ ...prev, show: false }));
     }
@@ -808,7 +914,11 @@ const MyBooking = () => {
 
   const formatDate = (dateString) =>
     dateString
-      ? new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+      ? new Date(dateString).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
       : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
@@ -817,7 +927,9 @@ const MyBooking = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 mx-auto text-rose-600 animate-spin" />
-          <p className="mt-4 text-lg font-medium text-gray-700">Loading your bookings...</p>
+          <p className="mt-4 text-lg font-medium text-gray-700">
+            Loading your bookings...
+          </p>
         </div>
       </div>
     );
@@ -839,12 +951,18 @@ const MyBooking = () => {
         >
           <ol className="flex items-center space-x-2 text-sm">
             <li>
-              <Link to="/" className="text-gray-600 hover:text-rose-600 flex items-center">
+              <Link
+                to="/"
+                className="text-gray-600 hover:text-rose-600 flex items-center"
+              >
                 <Home className="w-4 h-4 mr-1" /> Home
               </Link>
             </li>
             <li>
-              <Link to="/services" className="text-gray-600 hover:text-rose-600 flex items-center">
+              <Link
+                to="/services"
+                className="text-gray-600 hover:text-rose-600 flex items-center"
+              >
                 <ChevronRight className="w-4 h-4 mr-1" /> Services
               </Link>
             </li>
@@ -862,7 +980,9 @@ const MyBooking = () => {
           transition={{ delay: 0.2 }}
         >
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Bookings</h1>
-          <p className="text-gray-600">View and manage all your service appointments</p>
+          <p className="text-gray-600">
+            View and manage all your service appointments
+          </p>
         </motion.div>
 
         {paymentNotification.show && (
@@ -890,11 +1010,19 @@ const MyBooking = () => {
 
         <AnimatePresence>
           {confirmedBooking && (
-            <motion.div className="mb-8" variants={slideUp} initial="initial" animate="animate" exit="exit">
+            <motion.div
+              className="mb-8"
+              variants={slideUp}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
               <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                 <div className="flex items-center mb-4">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                  <h2 className="text-xl font-semibold text-gray-900">Booking Confirmed</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Booking Confirmed
+                  </h2>
                 </div>
                 <motion.div
                   className="bg-green-50 rounded-lg p-4 mb-4"
@@ -906,14 +1034,18 @@ const MyBooking = () => {
                     <Calendar className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-500">Booking Date</p>
-                      <p className="font-medium text-gray-800">{formatDate(confirmedBooking.bookingDate)}</p>
+                      <p className="font-medium text-gray-800">
+                        {formatDate(confirmedBooking.bookingDate)}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start mb-2">
                     <Clock className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-500">Start Time</p>
-                      <p className="font-medium text-gray-800">{formatTime(confirmedBooking.startTime)}</p>
+                      <p className="font-medium text-gray-800">
+                        {formatTime(confirmedBooking.startTime)}
+                      </p>
                     </div>
                   </div>
                   <ul className="divide-y divide-green-100">
@@ -926,16 +1058,24 @@ const MyBooking = () => {
                         transition={{ delay: 0.3 + idx * 0.1 }}
                       >
                         <div>
-                          <p className="font-medium text-gray-800">{service.name}</p>
-                          <p className="text-sm text-gray-600">{service.duration} minutes</p>
+                          <p className="font-medium text-gray-800">
+                            {service.name}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {service.duration} minutes
+                          </p>
                         </div>
-                        <p className="font-semibold text-green-600">${formatVND(service.price)}</p>
+                        <p className="font-semibold text-green-600">
+                          ${formatVND(service.price)}
+                        </p>
                       </motion.li>
                     ))}
                   </ul>
                   <div className="mt-3 pt-3 border-t border-green-100 flex justify-between">
                     <p className="font-medium text-gray-800">Total</p>
-                    <p className="font-semibold text-green-600">{formatVND(confirmedBooking.totalPrice)}</p>
+                    <p className="font-semibold text-green-600">
+                      {formatVND(confirmedBooking.totalPrice)}
+                    </p>
                   </div>
                 </motion.div>
               </div>
@@ -945,11 +1085,19 @@ const MyBooking = () => {
 
         <AnimatePresence>
           {selectedServices.length > 0 && (
-            <motion.div className="mb-8" variants={slideUp} initial="initial" animate="animate" exit="exit">
+            <motion.div
+              className="mb-8"
+              variants={slideUp}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
               <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                 <div className="flex items-center mb-4">
                   <Package className="w-5 h-5 text-rose-600 mr-2" />
-                  <h2 className="text-xl font-semibold text-gray-900">Selected Services</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Selected Services
+                  </h2>
                 </div>
                 <motion.div
                   className="bg-rose-50 rounded-lg p-4 mb-4"
@@ -967,17 +1115,28 @@ const MyBooking = () => {
                         transition={{ delay: 0.2 + idx * 0.1 }}
                       >
                         <div>
-                          <p className="font-medium text-gray-800">{service.name}</p>
-                          <p className="text-sm text-gray-600">{service.duration} minutes</p>
+                          <p className="font-medium text-gray-800">
+                            {service.name}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {service.duration} minutes
+                          </p>
                         </div>
-                        <p className="font-semibold text-rose-600">{formatVND(service.price)}</p>
+                        <p className="font-semibold text-rose-600">
+                          {formatVND(service.price)}
+                        </p>
                       </motion.li>
                     ))}
                   </ul>
                   <div className="mt-3 pt-3 border-t border-rose-100 flex justify-between">
                     <p className="font-medium text-gray-800">Total</p>
                     <p className="font-semibold text-rose-600">
-                      {formatVND(selectedServices.reduce((sum, service) => sum + service.price, 0))}
+                      {formatVND(
+                        selectedServices.reduce(
+                          (sum, service) => sum + service.price,
+                          0
+                        )
+                      )}
                     </p>
                   </div>
                 </motion.div>
@@ -1010,7 +1169,8 @@ const MyBooking = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <User className="w-4 h-4 inline mr-1" /> Specialist (Optional)
+                      <User className="w-4 h-4 inline mr-1" /> Specialist
+                      (Optional)
                     </label>
                     <select
                       value={selectedSpecialist}
@@ -1019,7 +1179,10 @@ const MyBooking = () => {
                     >
                       <option value="">Auto-assign</option>
                       {specialists.map((specialist) => (
-                        <option key={specialist.userId} value={specialist.userId}>
+                        <option
+                          key={specialist.userId}
+                          value={specialist.userId}
+                        >
                           {specialist.name}
                         </option>
                       ))}
@@ -1030,8 +1193,11 @@ const MyBooking = () => {
                 <motion.button
                   onClick={handleConfirmBooking}
                   disabled={isBooking}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking ? "bg-gray-400 text-white cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"
-                    }`}
+                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
+                    isBooking
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-rose-600 text-white hover:bg-rose-700"
+                  }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -1052,11 +1218,19 @@ const MyBooking = () => {
           )}
         </AnimatePresence>
 
-        <motion.div className="mb-8" variants={fadeIn} initial="initial" animate="animate" transition={{ delay: 0.3 }}>
+        <motion.div
+          className="mb-8"
+          variants={fadeIn}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: 0.3 }}
+        >
           <div className="bg-white p-6 rounded-xl shadow-md">
             <div className="flex items-center mb-4">
               <Calendar className="w-5 h-5 text-rose-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">Filter by Date</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Filter by Date
+              </h2>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-grow">
@@ -1085,7 +1259,9 @@ const MyBooking = () => {
           </div>
         </motion.div>
 
-        {filteredBookings.length === 0 && selectedServices.length === 0 && !confirmedBooking ? (
+        {filteredBookings.length === 0 &&
+        selectedServices.length === 0 &&
+        !confirmedBooking ? (
           <motion.div
             className="bg-white rounded-xl shadow-md p-8 text-center"
             variants={fadeIn}
@@ -1094,8 +1270,12 @@ const MyBooking = () => {
             transition={{ delay: 0.4 }}
           >
             <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-medium text-gray-800 mb-2">No bookings found</h3>
-            <p className="text-gray-600 mb-6">You don't have any bookings yet.</p>
+            <h3 className="text-xl font-medium text-gray-800 mb-2">
+              No bookings found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              You don't have any bookings yet.
+            </p>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 to="/services"
@@ -1106,7 +1286,12 @@ const MyBooking = () => {
             </motion.div>
           </motion.div>
         ) : (
-          <motion.div className="space-y-6" variants={staggerContainer} initial="initial" animate="animate">
+          <motion.div
+            className="space-y-6"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+          >
             {filteredBookings.map((booking, index) => {
               const displayNumber = filteredBookings.length - index;
               return (
@@ -1122,13 +1307,16 @@ const MyBooking = () => {
                   }}
                   whileHover={{
                     y: -5,
-                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                    boxShadow:
+                      "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                     <div className="flex-grow">
                       <div className="flex items-center mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900 mr-3">Booking #{displayNumber}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900 mr-3">
+                          Booking #{displayNumber}
+                        </h3>
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(
                             booking.status
@@ -1143,27 +1331,37 @@ const MyBooking = () => {
                             <Calendar className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
                               <p className="text-sm text-gray-500">Date</p>
-                              <p className="font-medium text-gray-800">{formatDate(booking.bookingDate)}</p>
+                              <p className="font-medium text-gray-800">
+                                {formatDate(booking.bookingDate)}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-start">
                             <Clock className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
                               <p className="text-sm text-gray-500">Time slot</p>
-                              <p className="font-medium text-gray-800">{formatTime(booking.timeSlot)}</p>
+                              <p className="font-medium text-gray-800">
+                                {formatTime(booking.timeSlot)}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-start">
                             <CreditCard className="w-5 h-5 text-gray-500 mr-2 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-500">Total Price</p>
-                              <p className="font-medium text-gray-800">{formatVND(booking.totalPrice) || "N/A"}</p>
+                              <p className="text-sm text-gray-500">
+                                Total Price
+                              </p>
+                              <p className="font-medium text-gray-800">
+                                {formatVND(booking.totalPrice) || "N/A"}
+                              </p>
                             </div>
                           </div>
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-gray-500">Payment Status</p>
+                            <p className="text-sm text-gray-500">
+                              Payment Status
+                            </p>
                             <span
                               className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPaymentBadgeClass(
                                 booking.paymentStatus
@@ -1174,7 +1372,9 @@ const MyBooking = () => {
                           </div>
                           {booking.checkInTime && (
                             <div>
-                              <p className="text-sm text-gray-500">Check-in Time</p>
+                              <p className="text-sm text-gray-500">
+                                Check-in Time
+                              </p>
                               <p className="font-medium text-gray-800">
                                 {new Date(booking.checkInTime).toLocaleString()}
                               </p>
@@ -1182,9 +1382,13 @@ const MyBooking = () => {
                           )}
                           {booking.checkOutTime && (
                             <div>
-                              <p className="text-sm text-gray-500">Check-out Time</p>
+                              <p className="text-sm text-gray-500">
+                                Check-out Time
+                              </p>
                               <p className="font-medium text-gray-800">
-                                {new Date(booking.checkOutTime).toLocaleString()}
+                                {new Date(
+                                  booking.checkOutTime
+                                ).toLocaleString()}
                               </p>
                             </div>
                           )}
@@ -1200,16 +1404,17 @@ const MyBooking = () => {
                       >
                         <Eye className="w-4 h-4 mr-2" /> View Details
                       </motion.button>
-                      {booking.status === "COMPLETED" && !feedbackStatus[booking.bookingId] && (
-                        <motion.button
-                          onClick={() => handleOpenFeedback(booking)}
-                          className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <MessageSquare className="w-4 h-4 mr-2" /> Feedback
-                        </motion.button>
-                      )}
+                      {booking.status === "COMPLETED" &&
+                        !feedbackStatus[booking.bookingId] && (
+                          <motion.button
+                            onClick={() => handleOpenFeedback(booking)}
+                            className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-2" /> Feedback
+                          </motion.button>
+                        )}
                     </div>
                   </div>
                 </motion.div>
@@ -1234,7 +1439,9 @@ const MyBooking = () => {
               >
                 <div className="flex flex-col items-center">
                   <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-                  <p className="text-lg font-medium text-gray-800 mb-6 text-center">{errorPopup}</p>
+                  <p className="text-lg font-medium text-gray-800 mb-6 text-center">
+                    {errorPopup}
+                  </p>
                   <motion.button
                     onClick={closeErrorPopup}
                     className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
@@ -1271,7 +1478,9 @@ const MyBooking = () => {
                   >
                     <CheckCircle className="w-12 h-12 text-green-600 mb-4" />
                   </motion.div>
-                  <p className="text-lg font-medium text-gray-800 mb-6 text-center">Payment Successful!</p>
+                  <p className="text-lg font-medium text-gray-800 mb-6 text-center">
+                    Payment Successful!
+                  </p>
                   <p className="text-sm text-gray-600 mb-6 text-center">
                     Your booking has been successfully paid. Thank you!
                   </p>
@@ -1305,7 +1514,9 @@ const MyBooking = () => {
               >
                 <div className="w-full md:w-2/3 p-6 overflow-y-auto">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Booking Details</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Booking Details
+                    </h2>
                     <motion.button
                       onClick={closePopup}
                       className="text-gray-500 hover:text-rose-600"
@@ -1316,11 +1527,15 @@ const MyBooking = () => {
                     </motion.button>
                   </div>
                   <div className="flex flex-wrap items-center gap-3 mb-6">
-                    {filteredBookings.findIndex((b) => b.bookingId === selectedBooking.bookingId) !== -1 && (
+                    {filteredBookings.findIndex(
+                      (b) => b.bookingId === selectedBooking.bookingId
+                    ) !== -1 && (
                       <span className="text-lg font-semibold text-gray-800">
                         Booking #
                         {filteredBookings.length -
-                          filteredBookings.findIndex((b) => b.bookingId === selectedBooking.bookingId)}
+                          filteredBookings.findIndex(
+                            (b) => b.bookingId === selectedBooking.bookingId
+                          )}
                       </span>
                     )}
                     <span
@@ -1342,14 +1557,18 @@ const MyBooking = () => {
                         <Calendar className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-600">Date</p>
-                          <p className="font-medium text-gray-900">{formatDate(selectedBooking.bookingDate)}</p>
+                          <p className="font-medium text-gray-900">
+                            {formatDate(selectedBooking.bookingDate)}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start">
                         <Clock className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-600">Time</p>
-                          <p className="font-medium text-gray-900">{formatTime(selectedBooking.timeSlot)}</p>
+                          <p className="font-medium text-gray-900">
+                            {formatTime(selectedBooking.timeSlot)}
+                          </p>
                         </div>
                       </div>
                       {bookingDetails.specialist && (
@@ -1360,22 +1579,29 @@ const MyBooking = () => {
                             <p className="font-medium text-gray-900">
                               {bookingDetails.specialist.name || "Not assigned"}
                             </p>
-                            <p className="text-xs text-gray-500">{bookingDetails.specialist.specialization}</p>
+                            <p className="text-xs text-gray-500">
+                              {bookingDetails.specialist.specialization}
+                            </p>
                           </div>
                         </div>
                       )}
                       <div className="flex items-start">
                         <Timer className="w-5 h-5 text-rose-600 mr-2 mt-0.5" />
                         <div>
-                          <p className="text-sm text-gray-600">Total Duration</p>
-                          <p className="font-medium text-gray-900">{bookingDetails.totalDuration} minutes</p>
+                          <p className="text-sm text-gray-600">
+                            Total Duration
+                          </p>
+                          <p className="font-medium text-gray-900">
+                            {bookingDetails.totalDuration} minutes
+                          </p>
                         </div>
                       </div>
                     </div>
                   </motion.div>
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                      <Package className="w-5 h-5 text-rose-600 mr-2" /> Services
+                      <Package className="w-5 h-5 text-rose-600 mr-2" />{" "}
+                      Services
                     </h3>
                     <motion.div
                       className="bg-white border border-gray-200 rounded-xl overflow-hidden"
@@ -1394,14 +1620,19 @@ const MyBooking = () => {
                           >
                             <div className="flex justify-between items-start">
                               <div>
-                                <h4 className="font-medium text-gray-900">{service.name || `Service #${index + 1}`}</h4>
+                                <h4 className="font-medium text-gray-900">
+                                  {service.name || `Service #${index + 1}`}
+                                </h4>
                                 <p className="text-sm text-gray-600 flex items-center mt-1">
-                                  <Timer className="w-4 h-4 mr-1 text-gray-400" /> {service.duration || 0} minutes
+                                  <Timer className="w-4 h-4 mr-1 text-gray-400" />{" "}
+                                  {service.duration || 0} minutes
                                 </p>
                               </div>
                               <div className="text-right">
                                 <p className="font-semibold text-rose-600">
-                                  {formatVND(service.price) ? formatVND(service.price) : "0.00"}
+                                  {formatVND(service.price)
+                                    ? formatVND(service.price)
+                                    : "0.00"}
                                 </p>
                               </div>
                             </div>
@@ -1410,50 +1641,60 @@ const MyBooking = () => {
                       </ul>
                       <div className="bg-gray-50 p-4 flex justify-between items-center border-t border-gray-200">
                         <p className="font-medium text-gray-800">Total</p>
-                        <p className="font-bold text-rose-600 text-lg">{formatVND(selectedBooking.totalPrice)}</p>
+                        <p className="font-bold text-rose-600 text-lg">
+                          {formatVND(selectedBooking.totalPrice)}
+                        </p>
                       </div>
                     </motion.div>
                   </div>
-                  {bookingDetails.feedback && bookingDetails.feedback.rating > 0 && (
-                    <motion.div
-                      className="mb-6 bg-teal-50 rounded-xl p-5"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                        <MessageSquare className="w-5 h-5 text-teal-600 mr-2" /> Your Feedback
-                      </h3>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-sm text-gray-600">Rating</p>
-                          <div className="flex items-center">
-                            {Array.from({ length: 5 }, (_, i) => (
-                              <span
-                                key={i}
-                                className={`w-5 h-5 ${i < bookingDetails.feedback.rating ? "text-yellow-400" : "text-gray-300"
-                                  }`}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        {bookingDetails.feedback.comment && (
+                  {bookingDetails.feedback &&
+                    bookingDetails.feedback.rating > 0 && (
+                      <motion.div
+                        className="mb-6 bg-teal-50 rounded-xl p-5"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                          <MessageSquare className="w-5 h-5 text-teal-600 mr-2" />{" "}
+                          Your Feedback
+                        </h3>
+                        <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-gray-600">Comment</p>
-                            <p className="font-medium text-gray-900">{bookingDetails.feedback.comment}</p>
+                            <p className="text-sm text-gray-600">Rating</p>
+                            <div className="flex items-center">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <span
+                                  key={i}
+                                  className={`w-5 h-5 ${
+                                    i < bookingDetails.feedback.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
+                          {bookingDetails.feedback.comment && (
+                            <div>
+                              <p className="text-sm text-gray-600">Comment</p>
+                              <p className="font-medium text-gray-900">
+                                {bookingDetails.feedback.comment}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
                 </div>
                 <div className="w-full md:w-1/3 bg-gray-50 p-6 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
                   {selectedBooking.status !== "CANCELLED" && (
                     <>
                       <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" /> Payment
+                        <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" />{" "}
+                        Payment
                       </h3>
                       <motion.div
                         className="bg-white rounded-xl shadow-sm p-4 mb-6"
@@ -1477,31 +1718,36 @@ const MyBooking = () => {
                         </div>
                         <div className="flex justify-between items-center pt-2 border-t border-gray-200">
                           <p className="font-medium text-gray-800">Total</p>
-                          <p className="font-bold text-rose-600">{formatVND(selectedBooking.totalPrice)}</p>
+                          <p className="font-bold text-rose-600">
+                            {formatVND(selectedBooking.totalPrice)}
+                          </p>
                         </div>
                       </motion.div>
-                      {bookingDetails.paymentStatus === "PENDING" && selectedBooking.status !== "CANCELLED" && (
-                        <motion.button
-                          onClick={handlePayment}
-                          disabled={isPaying}
-                          className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
-                            ? "bg-gray-400 text-white cursor-not-allowed"
-                            : "bg-rose-600 text-white hover:bg-rose-700"
+                      {bookingDetails.paymentStatus === "PENDING" &&
+                        selectedBooking.status !== "CANCELLED" && (
+                          <motion.button
+                            onClick={handlePayment}
+                            disabled={isPaying}
+                            className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
+                              isPaying
+                                ? "bg-gray-400 text-white cursor-not-allowed"
+                                : "bg-rose-600 text-white hover:bg-rose-700"
                             } mb-4`}
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                        >
-                          {isPaying ? (
-                            <>
-                              <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Processing...
-                            </>
-                          ) : (
-                            <>
-                              <DollarSign className="w-5 h-5 mr-2" /> Pay Now
-                            </>
-                          )}
-                        </motion.button>
-                      )}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                          >
+                            {isPaying ? (
+                              <>
+                                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                <DollarSign className="w-5 h-5 mr-2" /> Pay Now
+                              </>
+                            )}
+                          </motion.button>
+                        )}
                     </>
                   )}
                   {selectedBooking.status === "CANCELLED" && (
@@ -1513,22 +1759,28 @@ const MyBooking = () => {
                     >
                       <div className="flex items-center">
                         <XCircle className="w-5 h-5 text-rose-600 mr-2" />
-                        <h3 className="text-lg font-semibold text-rose-700">Booking Cancelled</h3>
+                        <h3 className="text-lg font-semibold text-rose-700">
+                          Booking Cancelled
+                        </h3>
                       </div>
-                      <p className="text-gray-600 mt-2">This booking has been cancelled and no payment is required.</p>
+                      <p className="text-gray-600 mt-2">
+                        This booking has been cancelled and no payment is
+                        required.
+                      </p>
                     </motion.div>
                   )}
 
                   <div className="space-y-3 mt-auto">
-                    {selectedBooking.status === "COMPLETED" && (
-                      feedbackStatus[selectedBooking.bookingId] === true ? (
+                    {selectedBooking.status === "COMPLETED" &&
+                      (feedbackStatus[selectedBooking.bookingId] === true ? (
                         <motion.div
                           className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg"
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.2 }}
                         >
-                          <MessageSquare className="w-4 h-4 mr-2" /> Thank you for your feedback
+                          <MessageSquare className="w-4 h-4 mr-2" /> Thank you
+                          for your feedback
                         </motion.div>
                       ) : (
                         <motion.button
@@ -1539,8 +1791,7 @@ const MyBooking = () => {
                         >
                           <MessageSquare className="w-4 h-4 mr-2" /> Feedback
                         </motion.button>
-                      )
-                    )}
+                      ))}
                     <motion.button
                       onClick={closePopup}
                       className="w-full flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
@@ -1571,7 +1822,9 @@ const MyBooking = () => {
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">Submit Feedback</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Submit Feedback
+                  </h2>
                   <motion.button
                     onClick={() => setIsFeedbackPopupOpen(false)}
                     className="text-gray-500 hover:text-rose-600"
@@ -1583,7 +1836,9 @@ const MyBooking = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Rating (1-5)
+                    </label>
                     <div className="flex items-center space-x-1">
                       {Array.from({ length: 5 }, (_, index) => {
                         const starValue = index + 1;
@@ -1593,9 +1848,14 @@ const MyBooking = () => {
                             type="button"
                             onClick={() => setFeedbackRating(starValue)}
                             onMouseEnter={() => setFeedbackRating(starValue)}
-                            onMouseLeave={() => setFeedbackRating(feedbackRating)}
-                            className={`text-3xl cursor-pointer transition-colors duration-200 ${starValue <= feedbackRating ? "text-yellow-400" : "text-gray-300"
-                              }`}
+                            onMouseLeave={() =>
+                              setFeedbackRating(feedbackRating)
+                            }
+                            className={`text-3xl cursor-pointer transition-colors duration-200 ${
+                              starValue <= feedbackRating
+                                ? "text-yellow-400"
+                                : "text-gray-300"
+                            }`}
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.9 }}
                           >
@@ -1608,18 +1868,20 @@ const MyBooking = () => {
                       {feedbackRating === 0
                         ? "Select a rating"
                         : feedbackRating === 1
-                          ? "1 - Poor"
-                          : feedbackRating === 2
-                            ? "2 - Fair"
-                            : feedbackRating === 3
-                              ? "3 - Good"
-                              : feedbackRating === 4
-                                ? "4 - Very Good"
-                                : "5 - Excellent"}
+                        ? "1 - Poor"
+                        : feedbackRating === 2
+                        ? "2 - Fair"
+                        : feedbackRating === 3
+                        ? "3 - Good"
+                        : feedbackRating === 4
+                        ? "4 - Very Good"
+                        : "5 - Excellent"}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Comment
+                    </label>
                     <textarea
                       value={feedbackComment}
                       onChange={(e) => setFeedbackComment(e.target.value)}
@@ -1631,16 +1893,18 @@ const MyBooking = () => {
                   <motion.button
                     onClick={handleSubmitFeedback}
                     disabled={isSubmittingFeedback}
-                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isSubmittingFeedback
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-rose-600 text-white hover:bg-rose-700"
-                      }`}
+                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
+                      isSubmittingFeedback
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-rose-600 text-white hover:bg-rose-700"
+                    }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
                     {isSubmittingFeedback ? (
                       <>
-                        <RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Submitting...
+                        <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
+                        Submitting...
                       </>
                     ) : (
                       "Submit Feedback"

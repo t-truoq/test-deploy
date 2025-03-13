@@ -11,7 +11,7 @@ export default function SpecialistShowcase() {
   const [error, setError] = useState(null);
   const [selectedSpecialist, setSelectedSpecialist] = useState(null); // State để quản lý popup
   const baseUrl =
-    "https://9592-118-69-70-166.ngrok-free.app";
+    "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
 
   useEffect(() => {
     const fetchSpecialists = async () => {
@@ -90,10 +90,10 @@ export default function SpecialistShowcase() {
 
   const handleViewAllDoctors = () => {
     navigate("/specialist"); // Điều hướng đến trang SpecialistPage
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   if (loading) {

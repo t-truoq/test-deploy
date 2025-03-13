@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   AlertCircle,
   BarChart4,
@@ -15,27 +15,16 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 // Hàm parse payment_time từ định dạng API
 const parsePaymentTime = (timeString) => {
   if (!timeString || timeString === "N/A") return "N/A";
-  // API trả về định dạng: "2025-03-02 16:55:38.787579"
-  // Chuyển thành định dạng mà new Date() có thể parse
-  const date = new Date(timeString.replace(" ", "T") + "Z"); // Thêm 'T' và 'Z' để parse đúng
+  const date = new Date(timeString.replace(" ", "T") + "Z");
   return date.toLocaleString();
 };
 
 const BASE_URL =
-  "https://9592-118-69-70-166.ngrok-free.app/api/v1/vnpay";
+  "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);
@@ -46,7 +35,6 @@ export default function PaymentStaff() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-  const [showStats, setShowStats] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -67,13 +55,10 @@ export default function PaymentStaff() {
           maxRedirects: 5,
         });
 
-        console.log("API Response:", response.data);
-
         if (!response.data || !Array.isArray(response.data)) {
           throw new Error("Invalid or empty response from payments API");
         }
 
-        // Ánh xạ dữ liệu từ API, sử dụng đúng tên cột (id thay vì payment_id)
         const paymentData = response.data.map((payment) => ({
           paymentId: payment.paymentId || "N/A",
           amount: payment.amount ? Number(payment.amount) : 0,
@@ -158,11 +143,6 @@ export default function PaymentStaff() {
   const failedCount = filteredPayments.filter(
     (payment) => payment.status === "FAILED"
   ).length;
-
-  const chartData = [
-    { name: "Success", value: successCount, color: "#10B981" },
-    { name: "Failed", value: failedCount, color: "#EF4444" },
-  ];
 
   const resetFilters = () => {
     setDateFilter("all");
@@ -258,148 +238,88 @@ export default function PaymentStaff() {
         </div>
 
         {/* Stats Cards */}
-        <AnimatePresence>
-          {showStats && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
-            >
-              {/* Total Payments Card */}
-              <motion.div
-                whileHover={{ y: -5 }}
-                className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Payments</p>
-                    <h3 className="text-2xl font-bold mt-1 text-gray-900">
-                      {filteredPayments.length}
-                    </h3>
-                  </div>
-                  <div className="p-3 rounded-full bg-[#F8F2F5] text-[#3D021E]">
-                    <BarChart4 className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                      <span className="text-xs text-gray-500">Success</span>
-                    </div>
-                    <span className="text-xs font-medium text-gray-900">
-                      {successCount}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <span className="text-xs text-gray-500">Failed</span>
-                    </div>
-                    <span className="text-xs font-medium text-gray-900">
-                      {failedCount}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Total Amount Card */}
-              <motion.div
-                whileHover={{ y: -5 }}
-                className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Amount</p>
-                    <h3 className="text-2xl font-bold mt-1 text-gray-900">
-                      $
-                      {totalAmount.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </h3>
-                  </div>
-                  <div className="p-3 rounded-full bg-[#F8F2F5] text-[#3D021E]">
-                    <Download className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: `${
-                          (successCount / filteredPayments.length) * 100
-                        }%`,
-                      }}
-                      transition={{ duration: 1, delay: 0.2 }}
-                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
-                    />
-                  </div>
-                  <div className="flex justify-between mt-2">
-                    <span className="text-xs text-gray-500">Success Rate</span>
-                    <span className="text-xs font-medium text-gray-900">
-                      {filteredPayments.length > 0
-                        ? `${Math.round(
-                            (successCount / filteredPayments.length) * 100
-                          )}%`
-                        : "0%"}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Chart Card */}
-              <motion.div
-                whileHover={{ y: -5 }}
-                className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
-              >
-                <p className="text-sm text-gray-500">Payment Status</p>
-                <div className="h-[140px] mt-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData}
-                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12, fill: "#6B7280" }}
-                      />
-                      <YAxis hide={true} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "white",
-                          borderColor: "#E5E7EB",
-                          borderRadius: "0.5rem",
-                          color: "black",
-                        }}
-                      />
-                      <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                        {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Toggle Stats Button */}
-        <div className="flex justify-center mb-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowStats(!showStats)}
-            className="text-sm px-4 py-2 rounded-full bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Total Payments Card */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
           >
-            {showStats ? "Hide Statistics" : "Show Statistics"}
-          </motion.button>
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-500">Total Payments</p>
+                <h3 className="text-2xl font-bold mt-1 text-gray-900">
+                  {filteredPayments.length}
+                </h3>
+              </div>
+              <div className="p-3 rounded-full bg-[#F8F2F5] text-[#3D021E]">
+                <BarChart4 className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                  <span className="text-xs text-gray-500">Success</span>
+                </div>
+                <span className="text-xs font-medium text-gray-900">
+                  {successCount}
+                </span>
+              </div>
+              <div className="flex justify-between items-center mt-2">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-xs text-gray-500">Failed</span>
+                </div>
+                <span className="text-xs font-medium text-gray-900">
+                  {failedCount}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Total Amount Card */}
+          <motion.div
+            whileHover={{ y: -5 }}
+            className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-500">Total Amount</p>
+                <h3 className="text-2xl font-bold mt-1 text-gray-900">
+                  $
+                  {totalAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </h3>
+              </div>
+              <div className="p-3 rounded-full bg-[#F8F2F5] text-[#3D021E]">
+                <Download className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${(successCount / filteredPayments.length) * 100}%`,
+                  }}
+                  transition={{ duration: 1, delay: 0.2 }}
+                  className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
+                />
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-gray-500">Success Rate</span>
+                <span className="text-xs font-medium text-gray-900">
+                  {filteredPayments.length > 0
+                    ? `${Math.round(
+                        (successCount / filteredPayments.length) * 100
+                      )}%`
+                    : "0%"}
+                </span>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Main Content */}
@@ -458,57 +378,55 @@ export default function PaymentStaff() {
                     <ChevronDown className="w-4 h-4" />
                   </motion.button>
 
-                  <AnimatePresence>
-                    {showDateDropdown && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                  {showDateDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                    >
+                      <button
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          dateFilter === "all"
+                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                            : "text-gray-700"
+                        } hover:bg-[#F8F2F5]`}
+                        onClick={() => {
+                          setDateFilter("all");
+                          setShowDateDropdown(false);
+                        }}
                       >
-                        <button
-                          className={`w-full text-left px-4 py-2 text-sm ${
-                            dateFilter === "all"
-                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                              : "text-gray-700"
-                          } hover:bg-[#F8F2F5]`}
-                          onClick={() => {
-                            setDateFilter("all");
-                            setShowDateDropdown(false);
-                          }}
-                        >
-                          All Dates
-                        </button>
-                        <button
-                          className={`w-full text-left px-4 py-2 text-sm ${
-                            dateFilter === "newest"
-                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                              : "text-gray-700"
-                          } hover:bg-[#F8F2F5]`}
-                          onClick={() => {
-                            setDateFilter("newest");
-                            setShowDateDropdown(false);
-                          }}
-                        >
-                          Newest First
-                        </button>
-                        <button
-                          className={`w-full text-left px-4 py-2 text-sm ${
-                            dateFilter === "oldest"
-                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                              : "text-gray-700"
-                          } hover:bg-[#F8F2F5]`}
-                          onClick={() => {
-                            setDateFilter("oldest");
-                            setShowDateDropdown(false);
-                          }}
-                        >
-                          Oldest First
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        All Dates
+                      </button>
+                      <button
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          dateFilter === "newest"
+                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                            : "text-gray-700"
+                        } hover:bg-[#F8F2F5]`}
+                        onClick={() => {
+                          setDateFilter("newest");
+                          setShowDateDropdown(false);
+                        }}
+                      >
+                        Newest First
+                      </button>
+                      <button
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          dateFilter === "oldest"
+                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                            : "text-gray-700"
+                        } hover:bg-[#F8F2F5]`}
+                        onClick={() => {
+                          setDateFilter("oldest");
+                          setShowDateDropdown(false);
+                        }}
+                      >
+                        Oldest First
+                      </button>
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Status Filter */}
@@ -543,63 +461,61 @@ export default function PaymentStaff() {
                     <ChevronDown className="w-4 h-4" />
                   </motion.button>
 
-                  <AnimatePresence>
-                    {showStatusDropdown && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                  {showStatusDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                    >
+                      <button
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          statusFilter === "all"
+                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                            : "text-gray-700"
+                        } hover:bg-[#F8F2F5]`}
+                        onClick={() => {
+                          setStatusFilter("all");
+                          setShowStatusDropdown(false);
+                        }}
                       >
-                        <button
-                          className={`w-full text-left px-4 py-2 text-sm ${
-                            statusFilter === "all"
-                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                              : "text-gray-700"
-                          } hover:bg-[#F8F2F5]`}
-                          onClick={() => {
-                            setStatusFilter("all");
-                            setShowStatusDropdown(false);
-                          }}
-                        >
-                          All Status
-                        </button>
-                        <button
-                          className={`w-full text-left px-4 py-2 text-sm ${
-                            statusFilter === "SUCCESS"
-                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                              : "text-gray-700"
-                          } hover:bg-[#F8F2F5]`}
-                          onClick={() => {
-                            setStatusFilter("SUCCESS");
-                            setShowStatusDropdown(false);
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                            Success
-                          </div>
-                        </button>
-                        <button
-                          className={`w-full text-left px-4 py-2 text-sm ${
-                            statusFilter === "FAILED"
-                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                              : "text-gray-700"
-                          } hover:bg-[#F8F2F5]`}
-                          onClick={() => {
-                            setStatusFilter("FAILED");
-                            setShowStatusDropdown(false);
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <XCircle className="w-4 h-4 text-red-500" />
-                            Failed
-                          </div>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        All Status
+                      </button>
+                      <button
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          statusFilter === "SUCCESS"
+                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                            : "text-gray-700"
+                        } hover:bg-[#F8F2F5]`}
+                        onClick={() => {
+                          setStatusFilter("SUCCESS");
+                          setShowStatusDropdown(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          Success
+                        </div>
+                      </button>
+                      <button
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          statusFilter === "FAILED"
+                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                            : "text-gray-700"
+                        } hover:bg-[#F8F2F5]`}
+                        onClick={() => {
+                          setStatusFilter("FAILED");
+                          setShowStatusDropdown(false);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <XCircle className="w-4 h-4 text-red-500" />
+                          Failed
+                        </div>
+                      </button>
+                    </motion.div>
+                  )}
                 </div>
 
                 <motion.button

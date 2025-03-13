@@ -1,7 +1,7 @@
-import { Star, MapPin } from "lucide-react"
-import { services } from "../../../data/about/feedbackServices"
-import { feedbacks } from "../../../data/about/feedbackFeedback"
-import { address } from "../../../data/about/feedbackAddress"
+import { Star, MapPin } from "lucide-react";
+import { services } from "../../../data/about/feedbackServices";
+import { feedbacks } from "../../../data/about/feedbackFeedback";
+import { address } from "../../../data/about/feedbackAddress";
 
 const AboutFeedback = () => {
   return (
@@ -27,7 +27,9 @@ const AboutFeedback = () => {
 
         {/* Feedback */}
         <div className="space-y-8 p-6 md:p-8 lg:p-10 border border-gray-100 rounded-lg shadow-sm bg-[#F9FAFB] hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-auto">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">Customer Feedback</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">
+            Customer Feedback
+          </h2>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {feedbacks.map((feedback, index) => (
               <div
@@ -36,10 +38,15 @@ const AboutFeedback = () => {
               >
                 <div className="flex text-yellow-400">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 md:w-5 md:h-5 fill-current flex-shrink-0" />
+                    <Star
+                      key={i}
+                      className="w-4 h-4 md:w-5 md:h-5 fill-current flex-shrink-0"
+                    />
                   ))}
                 </div>
-                <p className="text-gray-600 italic text-base md:text-lg">"{feedback.content}"</p>
+                <p className="text-gray-600 italic text-base md:text-lg">
+                  "{feedback.content}"
+                </p>
                 <p className="text-sm md:text-base text-gray-500">
                   {feedback.name}, {feedback.age} years old
                 </p>
@@ -50,7 +57,9 @@ const AboutFeedback = () => {
 
         {/* Branches */}
         <div className="space-y-8 p-6 md:p-8 lg:p-10 border border-gray-100 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-auto">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">Our Locations</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">
+            Our Locations
+          </h2>
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {address.map((branch, index) => (
               <div
@@ -60,19 +69,22 @@ const AboutFeedback = () => {
                 <div className="flex justify-center">
                   <MapPin className="w-6 h-6 md:w-8 md:h-8 text-gray-600 flex-shrink-0" />
                 </div>
-                <h3 className="font-medium text-gray-800 text-lg md:text-xl">Beautya {branch.city}</h3>
-                <p className="text-gray-600 text-sm md:text-base">{branch.address}</p>
+                <h3 className="font-medium text-gray-800 text-lg md:text-xl">
+                  Beautya {branch.city}
+                </h3>
+                <p className="text-gray-600 text-sm md:text-base">
+                  {branch.address}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default AboutFeedback
-
+export default AboutFeedback;
 
 // import { useState, useEffect } from "react";
 // import { Star, MapPin } from "lucide-react";
@@ -90,7 +102,7 @@ export default AboutFeedback
 //       try {
 
 //         const response = await axios.get(
-//           "https://9592-118-69-70-166.ngrok-free.app/api/quiz/recommended-services",
+//           "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/quiz/recommended-services",
 //           {
 //             headers: {
 //               "ngrok-skip-browser-warning": "true", // Bỏ warning của ngrok

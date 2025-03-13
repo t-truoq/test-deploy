@@ -299,7 +299,7 @@ const SpecialistPage = () => {
         // }
 
         const response = await axios.get(
-          "https://9592-118-69-70-166.ngrok-free.app/api/users/specialists/active",
+          "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               // Authorization: `Bearer ${token}`,
