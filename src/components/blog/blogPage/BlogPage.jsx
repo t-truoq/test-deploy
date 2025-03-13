@@ -485,7 +485,6 @@
 
 // export default BlogPage;
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -510,8 +509,6 @@ const BlogPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const postsPerPage = 7;
-
-  
 
   // Khởi tạo dữ liệu tĩnh
   useEffect(() => {
@@ -539,7 +536,10 @@ const BlogPage = () => {
   }, [searchTerm, selectedCategory]);
 
   // Get unique categories from blogs
-  const categories = ["All", ...new Set(staticBlogs.map((blog) => blog.category))];
+  const categories = [
+    "All",
+    ...new Set(staticBlogs.map((blog) => blog.category)),
+  ];
 
   // Pagination logic
   const indexOfLastPost = currentPage * postsPerPage;
@@ -651,7 +651,7 @@ const BlogPage = () => {
       </div>
 
       <main className="max-w-[1920px] w-full h-auto mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {filteredBlogs.length === 0 ? (
+        {filteredBlogs.length === 0 ? (
           <div className="text-center py-16 w-full h-auto">
             <h2 className="text-2xl font-bold text-gray-700 mb-4">
               No articles found
@@ -801,7 +801,8 @@ const BlogPage = () => {
                         if (
                           number === 1 ||
                           number === totalPages ||
-                          (number >= currentPage - 1 && number <= currentPage + 1)
+                          (number >= currentPage - 1 &&
+                            number <= currentPage + 1)
                         ) {
                           return (
                             <button
@@ -819,7 +820,8 @@ const BlogPage = () => {
                         }
                         if (
                           (number === 2 && currentPage > 3) ||
-                          (number === totalPages - 1 && currentPage < totalPages - 2)
+                          (number === totalPages - 1 &&
+                            currentPage < totalPages - 2)
                         ) {
                           return (
                             <span
@@ -835,7 +837,9 @@ const BlogPage = () => {
                     )}
                   </div>
                   <button
-                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                    onClick={() =>
+                      paginate(Math.min(totalPages, currentPage + 1))
+                    }
                     disabled={currentPage === totalPages}
                     className="p-2 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
@@ -851,7 +855,9 @@ const BlogPage = () => {
       {/* Newsletter Section with Enhanced Design */}
       <section className="bg-gradient-to-r from-[#3D021E] to-[#A10550] text-white py-16 w-full h-auto">
         <div className="max-w-[1920px] w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4 drop-shadow-lg">Stay Updated</h2>
+          <h2 className="text-3xl font-bold mb-4 drop-shadow-lg">
+            Stay Updated
+          </h2>
           <p className="text-pink-100 mb-8 max-w-2xl mx-auto leading-relaxed">
             Subscribe to our newsletter for exclusive spa tips, special offers,
             and the latest wellness trends.

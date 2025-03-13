@@ -51,7 +51,8 @@ const MyBooking = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [bookingDetails, setBookingDetails] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
-  const [isPaymentSuccessPopupOpen, setIsPaymentSuccessPopupOpen] = useState(false);
+  const [isPaymentSuccessPopupOpen, setIsPaymentSuccessPopupOpen] =
+    useState(false);
   const [isFeedbackPopupOpen, setIsFeedbackPopupOpen] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackComment, setFeedbackComment] = useState("");
@@ -231,7 +232,9 @@ const MyBooking = () => {
             setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => navigate("/login"), 2000);
           } else if (error.response.status === 403) {
-            setErrorPopup("You do not have permission to access your bookings.");
+            setErrorPopup(
+              "You do not have permission to access your bookings."
+            );
           } else if (error.response.status === 404) {
             setErrorPopup("No bookings found.");
           } else {
@@ -561,7 +564,10 @@ const MyBooking = () => {
         specialization: bookingData.specialization || "Skin Therapist",
       };
 
-      const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
+      const totalDuration = services.reduce(
+        (sum, service) => sum + service.duration,
+        0
+      );
 
       let feedback = { rating: 0, comment: "" };
       let feedbackResponseData = feedbackResponses[bookingId];
@@ -1292,7 +1298,6 @@ const MyBooking = () => {
                       </AnimatePresence>
                     </div>
                   </div>
-
                   {/* Row 2: Specialist and Schedule */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -1367,7 +1372,7 @@ const MyBooking = () => {
                 <motion.button
                   onClick={handleConfirmBooking}
                   disabled={isBooking}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking
+                    className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : "bg-rose-600 text-white hover:bg-rose-700"
                     }`}
@@ -1530,7 +1535,9 @@ const MyBooking = () => {
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-gray-500">Payment Status</p>
+                            <p className="text-sm text-gray-500">
+                              Payment Status
+                            </p>
                             <span
                               className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPaymentBadgeClass(
                                 booking.paymentStatus
@@ -1541,7 +1548,9 @@ const MyBooking = () => {
                           </div>
                           {booking.checkInTime && (
                             <div>
-                              <p className="text-sm text-gray-500">Check-in Time</p>
+                              <p className="text-sm text-gray-500">
+                                Check-in Time
+                              </p>
                               <p className="font-medium text-gray-800">
                                 {new Date(booking.checkInTime).toLocaleString()}
                               </p>
@@ -1549,9 +1558,13 @@ const MyBooking = () => {
                           )}
                           {booking.checkOutTime && (
                             <div>
-                              <p className="text-sm text-gray-500">Check-out Time</p>
+                              <p className="text-sm text-gray-500">
+                                Check-out Time
+                              </p>
                               <p className="font-medium text-gray-800">
-                                {new Date(booking.checkOutTime).toLocaleString()}
+                                {new Date(
+                                  booking.checkOutTime
+                                ).toLocaleString()}
                               </p>
                             </div>
                           )}
@@ -1855,7 +1868,8 @@ const MyBooking = () => {
                   {selectedBooking.status !== "CANCELLED" && (
                     <>
                       <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" /> Payment
+                        <CreditCardIcon className="w-5 h-5 text-rose-600 mr-2" />{" "}
+                        Payment
                       </h3>
                       <motion.div
                         className="bg-white rounded-xl shadow-sm p-4 mb-6"
@@ -1953,7 +1967,8 @@ const MyBooking = () => {
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.2 }}
                         >
-                          <MessageSquare className="w-4 h-4 mr-2" /> Thank you for your feedback
+                          <MessageSquare className="w-4 h-4 mr-2" /> Thank you
+                          for your feedback
                         </motion.div>
                       ) : (
                         <motion.button
@@ -2040,14 +2055,14 @@ const MyBooking = () => {
                       {feedbackRating === 0
                         ? "Select a rating"
                         : feedbackRating === 1
-                          ? "1 - Poor"
-                          : feedbackRating === 2
-                            ? "2 - Fair"
-                            : feedbackRating === 3
-                              ? "3 - Good"
-                              : feedbackRating === 4
-                                ? "4 - Very Good"
-                                : "5 - Excellent"}
+                        ? "1 - Poor"
+                        : feedbackRating === 2
+                        ? "2 - Fair"
+                        : feedbackRating === 3
+                        ? "3 - Good"
+                        : feedbackRating === 4
+                        ? "4 - Very Good"
+                        : "5 - Excellent"}
                     </p>
                   </div>
                   <div>
@@ -2065,10 +2080,11 @@ const MyBooking = () => {
                   <motion.button
                     onClick={handleSubmitFeedback}
                     disabled={isSubmittingFeedback}
-                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isSubmittingFeedback
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-rose-600 text-white hover:bg-rose-700"
-                      }`}
+                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
+                      isSubmittingFeedback
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-rose-600 text-white hover:bg-rose-700"
+                    }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >

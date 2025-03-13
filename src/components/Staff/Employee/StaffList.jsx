@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { MoreHorizontal, Search } from "lucide-react";
+import { motion } from "framer-motion";
+import { Search, XIcon } from "lucide-react";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -34,9 +34,10 @@ const STATUS_API_URL =
 export function StaffList() {
   const [staff, setStaff] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [toast, setToast] = useState(null); // Toast state
+  const [confirmStatusChange, setConfirmStatusChange] = useState(null); // New state for confirmation modal
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,6 +87,12 @@ export function StaffList() {
       setError(
         error.message || "Failed to load specialists. Please try again."
       );
+      showToast({
+        title: "Error",
+        message:
+          error.message || "Failed to load specialists. Please try again.",
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -97,12 +104,6 @@ export function StaffList() {
     }
 
     const apiStatus = newStatus === "active" ? "ACTIVE" : "INACTIVE";
-    const confirmed = window.confirm(
-      `Are you sure you want to change the status to ${newStatus}?`
-    );
-
-    if (!confirmed) return;
-
     try {
       const token = getAuthToken();
       if (!token) {
@@ -137,9 +138,23 @@ export function StaffList() {
             : member
         )
       );
+
+      // Show toast on successful status update
+      const memberName = staff.find(
+        (member) => member.userId === specialistId
+      ).name;
+      showToast({
+        title: "Status Updated",
+        message: `${memberName}'s status changed to ${newStatus}.`,
+        type: newStatus === "active" ? "success" : "info",
+      });
     } catch (error) {
       console.error("Error updating status:", error);
-      alert(error.message || "Failed to update status. Please try again.");
+      showToast({
+        title: "Error",
+        message: error.message || "Failed to update status. Please try again.",
+        type: "error",
+      });
       if (error.message.includes("Unauthorized")) {
         handleLogout();
       }
@@ -180,6 +195,12 @@ export function StaffList() {
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
+  };
+
+  // Function to show toast notification
+  const showToast = (toastData) => {
+    setToast(toastData);
+    setTimeout(() => setToast(null), 3000); // Hide toast after 3 seconds
   };
 
   if (isLoading) {
@@ -325,9 +346,6 @@ export function StaffList() {
                   <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider">
-                    Actions
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -366,10 +384,14 @@ export function StaffList() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() =>
-                          toggleStatus(
-                            member.userId,
-                            member.status === "active" ? "inactive" : "active"
-                          )
+                          setConfirmStatusChange({
+                            userId: member.userId,
+                            newStatus:
+                              member.status === "active"
+                                ? "inactive"
+                                : "active",
+                            name: member.name,
+                          })
                         }
                         className={`px-3 py-1 inline-flex text-xs font-medium rounded-full ${getStatusColor(
                           member.status
@@ -379,50 +401,86 @@ export function StaffList() {
                           member.status.slice(1)}
                       </button>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="relative">
-                        <button
-                          onClick={() =>
-                            setDropdownOpen(
-                              dropdownOpen === member.userId
-                                ? null
-                                : member.userId
-                            )
-                          }
-                          className="text-gray-500 hover:text-[#3D021E] focus:outline-none transition-colors"
-                        >
-                          <MoreHorizontal className="h-5 w-5" />
-                        </button>
-                        <AnimatePresence>
-                          {dropdownOpen === member.userId && (
-                            <motion.div
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
-                            >
-                              <div className="py-1" role="menu">
-                                <button
-                                  onClick={() =>
-                                    navigate(`/staff/${member.userId}`)
-                                  }
-                                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                                  role="menuitem"
-                                >
-                                  View Details
-                                </button>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </td>
                   </motion.tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* Toast Notification */}
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg max-w-md z-50 border-l-4 ${
+              toast.type === "success"
+                ? "bg-green-100 border-green-500"
+                : toast.type === "error"
+                ? "bg-red-100 border-red-500"
+                : "bg-blue-100 border-blue-500"
+            }`}
+          >
+            <div className="flex items-start">
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-gray-900">
+                  {toast.title}
+                </h3>
+                <div className="mt-1 text-sm text-gray-700">
+                  {toast.message}
+                </div>
+              </div>
+              <button
+                onClick={() => setToast(null)}
+                className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-full p-1.5"
+              >
+                <span className="sr-only">Close</span>
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Confirmation Modal */}
+        {confirmStatusChange && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+              <h3 className="text-lg font-semibold text-[#3D021E] mb-4">
+                Confirm Status Change
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to change the status of{" "}
+                {confirmStatusChange.name} to {confirmStatusChange.newStatus}?
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    toggleStatus(
+                      confirmStatusChange.userId,
+                      confirmStatusChange.newStatus
+                    );
+                    setConfirmStatusChange(null);
+                  }}
+                  className="px-4 py-2 bg-[#3D021E] text-white rounded-lg hover:bg-[#4A0404] transition-colors"
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={() => setConfirmStatusChange(null)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

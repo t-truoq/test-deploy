@@ -87,7 +87,10 @@ export default function Newsletter() {
 
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl mx-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4 max-w-xl mx-auto"
+          >
             <input
               type="text"
               name="fullName"

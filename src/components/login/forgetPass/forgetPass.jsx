@@ -188,7 +188,6 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-
         `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/forgotPassword/verifyMail/${email}`,
 
         {}, // Backend có thể không yêu cầu body, gửi body rỗng
@@ -251,7 +250,6 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-
         `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
 
         {},
@@ -329,7 +327,6 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-
         `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/forgotPassword/changePassword/${email}`,
 
         {

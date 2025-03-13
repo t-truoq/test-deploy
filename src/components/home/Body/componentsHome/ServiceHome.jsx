@@ -92,7 +92,7 @@ export default function ServiceHome() {
                   {service.name}
                 </h3>
                 <p className="text-gray-700 mb-4 text-lg">
-                {service.price.toLocaleString("vi-VN", {
+                  {service.price.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}{" "}
