@@ -35,7 +35,7 @@ const parsePaymentTime = (timeString) => {
 };
 
 const BASE_URL =
-  "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/v1/vnpay";
+  "https://9592-118-69-70-166.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);

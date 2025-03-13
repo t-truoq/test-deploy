@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const BASE_URL =
-  "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings"; // Replace with valid ngrok URL
+  "https://9592-118-69-70-166.ngrok-free.app/api/bookings"; // Replace with valid ngrok URL
 
 export default function OrderlistAdmin() {
   const [orders, setOrders] = useState([]);

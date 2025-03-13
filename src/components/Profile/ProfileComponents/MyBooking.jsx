@@ -111,7 +111,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings/user",
+          "https://9592-118-69-70-166.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -135,7 +135,7 @@ const MyBooking = () => {
           for (const booking of sortedBookings) {
             try {
               const feedbackResponse = await axios.get(
-                `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
+                `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${booking.bookingId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -200,7 +200,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/users/specialists/active",
+          "https://9592-118-69-70-166.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -314,7 +314,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings",
+        "https://9592-118-69-70-166.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -422,7 +422,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.get(
-        `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://9592-118-69-70-166.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -512,7 +512,7 @@ const MyBooking = () => {
       if (!feedbackResponseData) {
         try {
           const feedbackResponse = await axios.get(
-            `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
+            `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -595,7 +595,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://9592-118-69-70-166.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -650,7 +650,7 @@ const MyBooking = () => {
       };
 
       const response = await axios.post(
-        "https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks",
+        "https://9592-118-69-70-166.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {
@@ -665,7 +665,7 @@ const MyBooking = () => {
 
       if (response.status === 200 || response.status === 201) {
         const feedbackResponse = await axios.get(
-          `https://9ee6-2405-4802-8132-b860-a51b-6c41-f6c4-bde2.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
+          `https://9592-118-69-70-166.ngrok-free.app/api/feedbacks/booking/${selectedBooking.bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
