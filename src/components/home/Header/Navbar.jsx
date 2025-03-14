@@ -70,9 +70,29 @@ const Navbar = () => {
   const [language, setLanguage] = useState("en");
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
-  const [showLanguages, setShowLanguages] = useState(false); // State cho language dropdown
-  const baseUrl =
-    "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app";
+  const [showLanguages, setShowLanguages] = useState(false);
+  const baseUrl = "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app";
+
+  const handleBlogPage = () => {
+    navigate(`/blog`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleAboutPage = () => {
+    navigate(`/about`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleHomePage = () => {
+    navigate(`/`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleSpecialistPage = () => {
+    navigate(`/specialist`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleServicesPage = () => {
+    navigate(`/services`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Check login status and fetch user profile
   useEffect(() => {
@@ -179,7 +199,7 @@ const Navbar = () => {
         const token = localStorage.getItem("token");
         if (!token) {
           setErrorNotifications(
-            "No authentication token found. Please log in."
+            "Please log in before check notifications."
           );
           setLoadingNotifications(false);
           return;
@@ -246,7 +266,7 @@ const Navbar = () => {
         }
         setErrorNotifications(
           error.message ||
-            "Failed to fetch notifications. Check server or network."
+            "Check your network again !"
         );
       } finally {
         setLoadingNotifications(false);
@@ -316,22 +336,20 @@ const Navbar = () => {
       addGoogleTranslateScript();
     }
 
-    // Điều chỉnh padding-top cho body khi thanh Google Translate hiển thị
     const adjustBodyPadding = () => {
       const translateBanner = document.querySelector(".goog-te-banner-frame");
       if (translateBanner) {
-        const bannerHeight = translateBanner.offsetHeight || 40; // Chiều cao mặc định nếu không lấy được
+        const bannerHeight = translateBanner.offsetHeight || 40;
         document.body.style.paddingTop = `${bannerHeight}px`;
       }
     };
 
-    // Quan sát DOM để phát hiện khi thanh Google Translate được thêm vào
     const observer = new MutationObserver((mutations) => {
       mutations.forEach(() => {
         const translateBanner = document.querySelector(".goog-te-banner-frame");
         if (translateBanner) {
           adjustBodyPadding();
-          observer.disconnect(); // Ngắt kết nối sau khi điều chỉnh
+          observer.disconnect();
         }
       });
     });
@@ -340,7 +358,7 @@ const Navbar = () => {
 
     return () => {
       observer.disconnect();
-      document.body.style.paddingTop = "0px"; // Reset padding khi component unmount
+      document.body.style.paddingTop = "0px";
     };
   }, []);
 
@@ -351,7 +369,7 @@ const Navbar = () => {
       translateElement.dispatchEvent(new Event("change"));
     }
     setLanguage(lang);
-    localStorage.setItem("selectedLanguage", lang); // Lưu ngôn ngữ đã chọn
+    localStorage.setItem("selectedLanguage", lang);
   };
 
   const toggleSidebar = () => setShowSidebar(!showSidebar);
@@ -389,7 +407,7 @@ const Navbar = () => {
         style={{ zIndex: 1000 }}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2" onClick={handleHomePage}>
             <img
               src="home/logo/logo.webp"
               alt="Beauty Logo"
@@ -411,66 +429,36 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden lg:flex lg:items-center lg:space-x-10">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-pink-600 border-b-2 border-pink-600"
-                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                }`
-              }
+            <button
+              onClick={handleHomePage}
+              className="text-base font-medium transition-colors text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
             >
               Home
-            </NavLink>
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                `text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-pink-600 border-b-2 border-pink-600"
-                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                }`
-              }
+            </button>
+            <button
+              onClick={handleAboutPage}
+              className="text-base font-medium transition-colors text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
             >
               About
-            </NavLink>
-            <NavLink
-              to="/blog"
-              className={({ isActive }) =>
-                `text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-pink-600 border-b-2 border-pink-600"
-                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                }`
-              }
+            </button>
+            <button
+              onClick={handleBlogPage}
+              className="text-base font-medium transition-colors text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
             >
               Blog
-            </NavLink>
-            <NavLink
-              to="/specialist"
-              className={({ isActive }) =>
-                `text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-pink-600 border-b-2 border-pink-600"
-                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                }`
-              }
+            </button>
+            <button
+              onClick={handleSpecialistPage}
+              className="text-base font-medium transition-colors text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
             >
               Specialist
-            </NavLink>
-            <NavLink
-              to="/services"
-              className={({ isActive }) =>
-                `text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-pink-600 border-b-2 border-pink-600"
-                    : "text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
-                }`
-              }
+            </button>
+            <button
+              onClick={handleServicesPage}
+              className="text-base font-medium transition-colors text-gray-700 hover:text-pink-600 hover:border-b-2 hover:border-pink-600"
             >
               Services
-            </NavLink>
+            </button>
           </div>
 
           <div className="hidden lg:flex lg:items-center lg:space-x-8">
@@ -650,71 +638,51 @@ const Navbar = () => {
         style={{ zIndex: 999 }}
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 w-full">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full ${
-                isActive
-                  ? "text-pink-600 bg-pink-50"
-                  : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
-              }`
-            }
-            onClick={() => setShowMobileMenu(false)}
+          <button
+            onClick={() => {
+              handleHomePage();
+              setShowMobileMenu(false);
+            }}
+            className="block px-3 py-3 rounded-md text-base font-medium w-full text-gray-700 hover:text-pink-600 hover:bg-pink-50"
           >
             Home
-          </NavLink>
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full ${
-                isActive
-                  ? "text-pink-600 bg-pink-50"
-                  : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
-              }`
-            }
-            onClick={() => setShowMobileMenu(false)}
+          </button>
+          <button
+            onClick={() => {
+              handleAboutPage();
+              setShowMobileMenu(false);
+            }}
+            className="block px-3 py-3 rounded-md text-base font-medium w-full text-gray-700 hover:text-pink-600 hover:bg-pink-50"
           >
             About
-          </NavLink>
-          <NavLink
-            to="/blog"
-            className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full ${
-                isActive
-                  ? "text-pink-600 bg-pink-50"
-                  : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
-              }`
-            }
-            onClick={() => setShowMobileMenu(false)}
+          </button>
+          <button
+            onClick={() => {
+              handleBlogPage();
+              setShowMobileMenu(false);
+            }}
+            className="block px-3 py-3 rounded-md text-base font-medium w-full text-gray-700 hover:text-pink-600 hover:bg-pink-50"
           >
             Blog
-          </NavLink>
-          <NavLink
-            to="/specialist"
-            className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full ${
-                isActive
-                  ? "text-pink-600 bg-pink-50"
-                  : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
-              }`
-            }
-            onClick={() => setShowMobileMenu(false)}
+          </button>
+          <button
+            onClick={() => {
+              handleSpecialistPage();
+              setShowMobileMenu(false);
+            }}
+            className="block px-3 py-3 rounded-md text-base font-medium w-full text-gray-700 hover:text-pink-600 hover:bg-pink-50"
           >
             Specialist
-          </NavLink>
-          <NavLink
-            to="/services"
-            className={({ isActive }) =>
-              `block px-3 py-3 rounded-md text-base font-medium w-full ${
-                isActive
-                  ? "text-pink-600 bg-pink-50"
-                  : "text-gray-700 hover:text-pink-600 hover:bg-pink-50"
-              }`
-            }
-            onClick={() => setShowMobileMenu(false)}
+          </button>
+          <button
+            onClick={() => {
+              handleServicesPage();
+              setShowMobileMenu(false);
+            }}
+            className="block px-3 py-3 rounded-md text-base font-medium w-full text-gray-700 hover:text-pink-600 hover:bg-pink-50"
           >
             Services
-          </NavLink>
+          </button>
           <div className="px-3 py-3 w-full">
             <div className="flex flex-col space-y-2 w-full">
               <span className="text-sm font-medium text-gray-500">
@@ -920,7 +888,7 @@ const Navbar = () => {
   );
 };
 
-// Add animation styles (moved to CSS file or styled-components for better React integration)
+// Add animation styles
 const styles = `
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
@@ -930,9 +898,5 @@ const styles = `
     animation: fadeIn 0.3s ease-out forwards;
   }
 `;
-
-// Thay bằng cách thêm CSS vào file riêng hoặc dùng styled-components
-// Ví dụ: Tạo file styles.css và import
-// import './styles.css';
 
 export default Navbar;

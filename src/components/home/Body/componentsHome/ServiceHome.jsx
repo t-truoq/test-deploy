@@ -34,10 +34,10 @@ export default function ServiceHome() {
       } catch (err) {
         console.error("Error fetching services:", err);
         if (err.response?.status === 404) {
-          setError("Không tìm thấy dịch vụ.");
+          setError("Cannot find services");
         } else {
           setError(
-            err.response?.data?.message || "Không thể tải danh sách dịch vụ"
+            err.response?.data?.message || "Unable to load service list"
           );
         }
         setLoading(false);
@@ -56,7 +56,7 @@ export default function ServiceHome() {
   };
 
   if (loading) {
-    return <div className="text-center py-12 text-xl">Đang tải dịch vụ...</div>;
+    return <div className="text-center py-12 text-xl">Loading services...</div>;
   }
 
   if (error) {
@@ -69,7 +69,7 @@ export default function ServiceHome() {
     <div className="w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {services.map((service) => {
-          // Lấy URL ảnh từ mảng images (ảnh đầu tiên nếu có)
+          // Get image URL from the images array (first image if available)
           const imageUrl =
             service.images && service.images.length > 0
               ? service.images[0].url
@@ -82,7 +82,7 @@ export default function ServiceHome() {
             >
               <div className="aspect-[4/3] w-full overflow-hidden">
                 <img
-                  src={imageUrl} // Sử dụng imageUrl đã tính toán
+                  src={imageUrl} // Use computed imageUrl
                   alt={service.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
