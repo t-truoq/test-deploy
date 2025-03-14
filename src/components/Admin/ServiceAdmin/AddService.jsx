@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import axios from "axios"; // Thay vì import từ api.js, dùng axios trực tiếp
 
 const BASE_URL =
-  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services"; // Thêm link ngrok trước endpoint
+  "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services"; // Thêm link ngrok trước endpoint
 
 const AddServiceModal = ({ onAddService, onClose }) => {
   const [formData, setFormData] = useState({

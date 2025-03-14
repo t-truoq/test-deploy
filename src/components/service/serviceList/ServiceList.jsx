@@ -418,7 +418,7 @@ const ServiceList = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/recommended-services",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -468,7 +468,7 @@ const ServiceList = () => {
     const fetchAllServices = async () => {
       try {
         const response = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -521,7 +521,7 @@ const ServiceList = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/recommended-services",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/recommended-services",
           {
             headers: {
               Authorization: `Bearer ${token}`,

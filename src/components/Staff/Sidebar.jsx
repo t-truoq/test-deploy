@@ -26,7 +26,7 @@ export default function AppSidebar() {
           icon: FileText,
           path: "/staff/paymentmanagement",
         },
-        { name: "Clients", icon: Users, path: "/staff/clients" },
+        { name: "Customers", icon: Users, path: "/staff/clients" },
         { name: "Skin therapist", icon: Users, path: "/staff/skintherapist" },
         { name: "Contact", icon: Contact, path: "/staff/contact" },
         {

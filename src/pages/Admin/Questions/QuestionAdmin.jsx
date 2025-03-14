@@ -1,10 +1,11 @@
 import Header from "../../../components/Admin/HeaderAdmin/Header";
+import QuestionDashboard from "../../../components/Admin/QuestionManagement/QuestionDashboard";
 import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
-import { Staffs } from "../../../components/Admin/Staff/Staff";
 
-const StaffsManagement = () => {
+const QuestionAdmin = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar giữ nguyên và luôn cố định khi cuộn */}
       <div className="sticky top-0 h-screen">
         <Sidebar />
       </div>
@@ -16,15 +17,17 @@ const StaffsManagement = () => {
           </div>
         </div>
 
-        <main className="p-6">
-          <div className="mb-6">
-            <h1 className="mb text-2xl font-semibold text-gray-900">Staffs</h1>
+        <main className="p-2">
+          <div className="px-5">
+            <h1 className="mb text-2xl font-semibold text-gray-900">
+              Questions Management
+            </h1>
           </div>
-          <Staffs />
+          <QuestionDashboard />
         </main>
       </div>
     </div>
   );
 };
 
-export default StaffsManagement;
+export default QuestionAdmin;

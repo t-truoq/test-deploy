@@ -10,10 +10,8 @@ function HomeAdmin() {
         <Sidebar />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1">
-        <div className="flex">
-          {/* Header */}
+      <div className="flex-1 overflow-auto">
+        <div className="flex border-b border-gray-200">
           <div className="flex-1">
             <Header />
           </div>

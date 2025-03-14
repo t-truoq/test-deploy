@@ -42,7 +42,7 @@ export function ContactDashboard() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/contact",
+        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/contact",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ export function ContactDashboard() {
     }
     try {
       const response = await axios.put(
-        `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/contact/${id}/status?status=${status}`,
+        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/contact/${id}/status?status=${status}`,
         null,
         {
           headers: {

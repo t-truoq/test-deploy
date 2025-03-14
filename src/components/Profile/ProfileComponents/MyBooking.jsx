@@ -152,7 +152,7 @@ const MyBooking = () => {
         // Lấy danh sách bookings
         console.log("Fetching bookings from /api/bookings/user...");
         const bookingsResponse = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/user",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -181,7 +181,7 @@ const MyBooking = () => {
         // Lấy toàn bộ feedback trong một lần gọi
         console.log("Fetching feedbacks from /api/feedbacks...");
         const feedbackResponse = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -279,7 +279,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/specialists/active",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -410,7 +410,7 @@ const MyBooking = () => {
       console.log("isCancelling updated to true for bookingId:", bookingId);
 
       const response = await axios.post(
-        `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -503,7 +503,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings",
+        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -618,7 +618,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.get(
-        `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -695,7 +695,7 @@ const MyBooking = () => {
       if (!feedbackResponseData) {
         try {
           const feedbackResponse = await axios.get(
-            `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
+            `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -801,7 +801,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/v1/vnpay/create-payment",
+        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -870,7 +870,7 @@ const MyBooking = () => {
       };
 
       const response = await axios.post(
-        "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks",
+        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {
@@ -974,7 +974,7 @@ const MyBooking = () => {
       if (!token) throw new Error("No token found. Please login again.");
 
       const response = await axios.get(
-        `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/schedules/${specialistId}`,
+        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/schedules/${specialistId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

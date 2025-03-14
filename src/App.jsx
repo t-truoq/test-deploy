@@ -171,6 +171,8 @@ import StaffsManagement from "./pages/Admin/StaffsManagment/StaffsManagement";
 import SkinTherapistsManagement from "./pages/Admin/SkinTherapistsManagement/SkinTherapistsManagement";
 import ContactManagment from "./pages/Staff/ContactManagment";
 import Payment from "./pages/Staff/Payment";
+import FeedBackViewDetail from "./components/Staff/Feedback/FeedBackViewDetail";
+import QuestionAdmin from "./pages/Admin/Questions/QuestionAdmin";
 
 function App() {
   const location = useLocation();
@@ -187,6 +189,7 @@ function App() {
     "/admin/skintherapisttmanagement",
     "/admin/paymentmanagement",
     "/admin/feedback",
+    "/admin/questions",
     "/staff/home",
     "/staff/appointments",
     "/staff/schedule",
@@ -195,6 +198,7 @@ function App() {
     "/staff/contact",
     "/staff/paymentmanagement",
     "/staff/feedback",
+    "/staff/feedback/:id",
     "/skintherapist/home",
     "/skintherapist/feedback",
     "/skintherapist/profile",
@@ -214,7 +218,8 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/services/:id" element={<ServiceDetail />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<LoginPage />} /> {/* Đảm bảo route này */}
+            <Route path="/login" element={<LoginPage />} />{" "}
+            {/* Đảm bảo route này */}
             <Route path="/forgetpass" element={<ForgetPassword />} />
             <Route path="/profile" element={<SidebarProfile />} />
             <Route path="/wishlist" element={<Wishlist />} />
@@ -225,10 +230,23 @@ function App() {
             <Route path="/admin/home" element={<HomeAdmin />} />
             <Route path="/admin/services" element={<ServicesAdmin />} />
             <Route path="/admin/orderlists" element={<OrderListAdmin />} />
-            <Route path="/admin/customersmanagement" element={<CustomersManagement />} />
-            <Route path="/admin/staffsmanagement" element={<StaffsManagement />} />
-            <Route path="/admin/skintherapisttmanagement" element={<SkinTherapistsManagement />} />
-            <Route path="/admin/paymentmanagement" element={<PaymentManagement />} />
+            <Route path="/admin/questions" element={<QuestionAdmin />} />
+            <Route
+              path="/admin/customersmanagement"
+              element={<CustomersManagement />}
+            />
+            <Route
+              path="/admin/staffsmanagement"
+              element={<StaffsManagement />}
+            />
+            <Route
+              path="/admin/skintherapisttmanagement"
+              element={<SkinTherapistsManagement />}
+            />
+            <Route
+              path="/admin/paymentmanagement"
+              element={<PaymentManagement />}
+            />
             <Route path="/admin/feedback" element={<FeedbackManagement />} />
             {/* Staff router */}
             <Route path="/staff/home" element={<HomeStaff />} />
@@ -237,10 +255,17 @@ function App() {
             <Route path="/staff/skintherapist" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
             <Route path="/staff/feedback" element={<FeedbackStaff />} />
+            <Route
+              path="/staff/feedback/:id"
+              element={<FeedBackViewDetail />}
+            />
             <Route path="/staff/contact" element={<ContactManagment />} />
             <Route path="/staff/paymentmanagement" element={<Payment />} />
             {/* Skin therapist router */}
-            <Route path="/skintherapist/home" element={<HomeSkinTheorapist />} />
+            <Route
+              path="/skintherapist/home"
+              element={<HomeSkinTheorapist />}
+            />
             <Route path="/skintherapist/feedback" element={<FeedbackSK />} />
             <Route path="/skintherapist/profile" element={<ProfilePage />} />
           </Routes>
