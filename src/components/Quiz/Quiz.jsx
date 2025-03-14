@@ -19,7 +19,7 @@ const Quiz = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error("No token found. Please login again.");
+          throw new Error("Please login before doing quiz !");
         }
 
         // Gọi API để lấy câu hỏi và đáp án
