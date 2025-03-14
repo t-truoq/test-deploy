@@ -5,7 +5,7 @@ import { Printer, Send, Filter, ChevronDown } from "lucide-react";
 import axios from "axios";
 
 const BASE_URL =
-  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/v1/vnpay";
+  "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);

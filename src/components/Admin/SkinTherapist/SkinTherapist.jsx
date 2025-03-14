@@ -5,7 +5,7 @@ import { Search, MoreHorizontal } from "lucide-react";
 import { Edit } from "./Edit";
 
 const API_URL =
-  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users";
+  "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users";
 
 export function SkinTherapist() {
   const [clients, setClients] = useState([]);
@@ -43,7 +43,7 @@ export function SkinTherapist() {
       }
 
       const mappedClients = data.result
-        .filter((user) => user.role === "SPECIALIST") // Filter only SPECIALIST role
+        .filter((user) => user.role === "SPECIALIST")
         .map((user) => ({
           id: user.userId.toString(),
           name: user.name,
@@ -52,8 +52,6 @@ export function SkinTherapist() {
           address: user.address || "N/A",
           role: user.role,
           status: user.status || "active",
-          createdAt: new Date(user.createdAt).toLocaleDateString(),
-          updatedAt: new Date(user.updatedAt).toLocaleDateString(),
           visits: 0,
         }));
 
@@ -144,12 +142,6 @@ export function SkinTherapist() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created At
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Updated At
-                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -189,12 +181,6 @@ export function SkinTherapist() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {client.role}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {client.createdAt}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {client.updatedAt}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="relative">

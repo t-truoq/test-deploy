@@ -17,11 +17,6 @@ const CustomersManagement = () => {
         </div>
 
         <main className="p-6">
-          <div className="mb-6">
-            <h1 className="mb text-2xl font-semibold text-gray-900">
-              Customers
-            </h1>
-          </div>
           <Customers />
         </main>
       </div>

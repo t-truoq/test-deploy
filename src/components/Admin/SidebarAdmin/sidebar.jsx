@@ -9,6 +9,7 @@ import {
   FileText,
   LogOut,
   MessageCircleWarning,
+  FileQuestion,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -30,6 +31,7 @@ export default function Sidebar() {
     { name: "Services", icon: ListChecks, path: "/admin/services" },
     { name: "Order Lists", icon: ClipboardList, path: "/admin/orderlists" },
     { name: "Feedback", icon: MessageCircleWarning, path: "/admin/feedback" },
+    { name: "Questions", icon: FileQuestion, path: "/admin/questions" },
   ];
 
   const pages = [

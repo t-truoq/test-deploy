@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import axios from "axios"; // Dùng axios trực tiếp
 
 const BASE_URL =
-  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services"; // Base URL với ngrok
+  "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services"; // Base URL với ngrok
 
 const EditServiceModal = ({ service, onEditService, onClose }) => {
   const [formData, setFormData] = useState({

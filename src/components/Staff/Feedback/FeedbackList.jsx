@@ -1,18 +1,68 @@
-import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
+"use client";
+
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
+import { MoreHorizontal, Search } from "lucide-react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function FeedbackList({ filter }) {
   const navigate = useNavigate();
-  const [selectedFeedback, setSelectedFeedback] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [responseText, setResponseText] = useState("");
   const [feedbackItems, setFeedbackItems] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(null);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchClients = async () => {
+    try {
+      const response = await fetch(
+        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const text = await response.text();
+      const data = JSON.parse(text);
+
+      if (data.code !== 0) {
+        throw new Error(data.msg || "API returned an error");
+      }
+
+      const mappedClients = data.result
+        .filter((user) => user.role === "CUSTOMER")
+        .map((user) => ({
+          id: user.userId.toString(),
+          name: user.name || `Khách hàng ID: ${user.userId}`,
+          email: user.email || "Email không khả dụng",
+          phone: user.phone || "N/A",
+          address: user.address || "N/A",
+        }));
+
+      console.log("Fetched Clients:", mappedClients);
+      return mappedClients;
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+      setError(
+        (prev) => prev || "Không thể tải dữ liệu khách hàng. Vui lòng thử lại."
+      );
+      return [];
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Vui lòng đăng nhập để xem phản hồi");
@@ -21,45 +71,72 @@ export default function FeedbackList({ filter }) {
       }
 
       try {
-        // Cấu hình headers với token và ngrok-skip-browser-warning
+        const fetchedClients = await fetchClients();
+        setClients(fetchedClients);
+
         const headers = {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
           "Content-Type": "application/json",
         };
 
-        // Gọi API feedbacks
         const feedbackResponse = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks",
-          { headers }
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/feedbacks",
+          {
+            headers,
+          }
         );
 
-        // Log dữ liệu để kiểm tra
-        console.log("Feedback Response:", feedbackResponse.data);
+        console.log("Raw Feedback Response:", feedbackResponse.data);
 
-        // Kiểm tra xem dữ liệu có phải JSON không
-        if (
-          typeof feedbackResponse.data === "string" &&
-          feedbackResponse.data.startsWith("<!DOCTYPE")
-        ) {
-          setError(
-            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
+        if (!Array.isArray(feedbackResponse.data)) {
+          throw new Error(
+            "Dữ liệu phản hồi không phải là mảng. Vui lòng kiểm tra API."
           );
-          return;
         }
 
-        // Ánh xạ dữ liệu phản hồi (tạm thời không dùng customers và specialists)
-        const mappedData = feedbackResponse.data.map((item) => ({
-          id: item.feedbackId,
-          customer: `Khách hàng ID: ${item.customerId}`, // Thay vì tên, dùng ID nếu không có API customers
-          email: "Email không khả dụng", // Cần API customers để lấy email
-          avatar: "/placeholder.svg?height=40&width=40",
-          service: `Dịch vụ ID: ${item.specialistId}`, // Thay vì tên dịch vụ, dùng ID nếu không có API specialists
-          message: item.comment,
-          rating: item.rating,
-          date: item.createdAt.split("T")[0],
-          response: item.response || "",
-        }));
+        const mappedData = feedbackResponse.data
+          .map((item) => {
+            if (
+              !item.feedbackId ||
+              !item.customerId ||
+              !item.specialistId ||
+              !item.rating ||
+              !item.createdAt
+            ) {
+              console.warn("Dữ liệu feedback thiếu trường quan trọng:", item);
+              return null;
+            }
+
+            const client = fetchedClients.find(
+              (c) => c.id === item.customerId.toString()
+            );
+            console.log(
+              `Mapping customerId ${item.customerId} to client:`,
+              client
+            );
+
+            return {
+              id: item.feedbackId,
+              customer:
+                item.customerName ||
+                (client ? client.name : `Khách hàng ID: ${item.customerId}`),
+              email: client ? client.email : "Email không khả dụng",
+              avatar: "/placeholder.svg?height=40&width=40",
+              service: item.specialistName
+                ? `${item.specialistName} (ID: ${item.specialistId})`
+                : `Dịch vụ ID: ${item.specialistId}`,
+              message: item.comment || "",
+              rating: item.rating || 0,
+              date: item.createdAt ? item.createdAt.split("T")[0] : "N/A",
+              bookingId: item.bookingId || "N/A",
+              feedbackStatus: item.feedbackStatus || "N/A",
+              specialistId: item.specialistId,
+              customerId: item.customerId,
+              createdAt: item.createdAt,
+            };
+          })
+          .filter((item) => item !== null);
 
         setFeedbackItems(mappedData);
       } catch (err) {
@@ -68,17 +145,13 @@ export default function FeedbackList({ filter }) {
           setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
           localStorage.removeItem("token");
           navigate("/signin");
-        } else if (
-          err.response?.data &&
-          typeof err.response.data === "string" &&
-          err.response.data.startsWith("<!DOCTYPE")
-        ) {
-          setError(
-            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
-          );
         } else {
-          setError("Không thể tải dữ liệu phản hồi. Vui lòng thử lại.");
+          setError(
+            "Không thể tải dữ liệu phản hồi. Vui lòng kiểm tra API hoặc thử lại."
+          );
         }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -107,31 +180,12 @@ export default function FeedbackList({ filter }) {
       ));
   };
 
-  const handleFeedbackClick = (item) => {
-    setSelectedFeedback(item);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedFeedback(null);
-  };
-
-  useEffect(() => {
-    if (selectedFeedback) {
-      setResponseText(selectedFeedback.response || "");
-    }
-  }, [selectedFeedback]);
-
-  const handleSaveResponse = () => {
-    const updatedItems = feedbackItems.map((item) => {
-      if (item.id === selectedFeedback.id) {
-        return { ...item, response: responseText };
-      }
-      return item;
-    });
-    setFeedbackItems(updatedItems);
-    closeModal();
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   const filteredItems =
@@ -139,157 +193,222 @@ export default function FeedbackList({ filter }) {
       ? feedbackItems
       : feedbackItems.filter((item) => item.rating === filter);
 
-  return (
-    <>
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-          {error}
-        </div>
-      )}
-      <div className="space-y-4">
-        {filteredItems.length === 0 ? (
-          <div className="bg-white rounded-lg shadow border border-gray-200">
-            <div className="p-6 text-center text-gray-500">
-              Không tìm thấy phản hồi nào phù hợp với bộ lọc đã chọn.
-            </div>
+  const searchedItems = filteredItems.filter(
+    (item) =>
+      item.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center bg-white border-gray-100 p-8 rounded-xl shadow-lg border backdrop-blur-sm"
+        >
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="w-20 h-20 rounded-full border-4 border-[#3D021E] border-t-transparent"
+            />
           </div>
-        ) : (
-          filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-lg shadow border border-gray-200 cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => handleFeedbackClick(item)}
+          <h3 className="text-xl text-[#3D021E] font-medium">
+            Loading feedback...
+          </h3>
+          <p className="text-gray-500 mt-2">
+            Please wait while we fetch your data
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white border-gray-200 p-6 rounded-xl shadow-xl max-w-md w-full text-center border"
+        >
+          <div className="w-20 h-20 mx-auto mb-6 text-[#3D021E]">
+            <svg
+              className="h-20 w-20"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <div className="p-6">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                      <img
-                        src={item.avatar || "/placeholder.svg"}
-                        alt={item.customer}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{item.customer}</h3>
-                      <p className="text-sm text-gray-500">{item.email}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500">{item.date}</span>
-                </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-[#3D021E] mb-2">{error}</h2>
+          <div className="mt-2">
+            {error.includes("đăng nhập") ? (
+              <button
+                onClick={() => navigate("/signin")}
+                className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+              >
+                Login
+              </button>
+            ) : (
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
-                <div className="mt-4">
-                  <div className="flex items-center gap-1 mb-2">
-                    {renderStars(item.rating)}
-                  </div>
-                  <p className="text-sm font-medium"> {item.service}</p>
-                  <p className="mt-2 text-sm">{item.message}</p>
+  if (!searchedItems.length) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white border-gray-200 p-6 rounded-xl shadow-xl max-w-md w-full text-center border">
+          <h2 className="text-2xl font-bold text-[#3D021E] mb-2">
+            No feedback found
+          </h2>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-                  {item.response && (
-                    <div className="mt-4 pl-4 border-l-2 border-primary/20">
-                      <p className="text-sm font-medium">
-                        Phản hồi của chúng tôi:
-                      </p>
-                      <p className="text-sm text-gray-500">{item.response}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <button className="text-xs px-3 py-1 text-gray-600 hover:bg-gray-100 rounded">
-                    {item.response ? "Chỉnh sửa phản hồi" : "Phản hồi"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+  return (
+    <div className="p-6 bg-white rounded-xl shadow-lg">
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by customer or email..."
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300 bg-gray-50"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
 
-      {showModal && selectedFeedback && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-[600px] max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  Phản hồi từ {selectedFeedback.customer}
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div className="p-4 space-y-4">
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-sm font-medium">Dịch vụ</p>
-                  <p className="text-sm">{selectedFeedback.service}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Ngày</p>
-                  <p className="text-sm">{selectedFeedback.date}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Đánh giá</p>
-                  <div className="flex items-center gap-1">
-                    {renderStars(selectedFeedback.rating)}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Customer
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Specialist
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Rating
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {searchedItems.map((item) => (
+              <motion.tr
+                key={item.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="hover:bg-gray-50 transition-colors duration-200"
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3D021E] to-[#6D0F3D] flex items-center justify-center text-white text-sm font-medium">
+                      {getInitials(item.customer)}
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900">
+                        {item.customer}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium">Phản hồi</p>
-                <p className="text-sm mt-1 p-3 bg-gray-100 rounded-md">
-                  {selectedFeedback.message}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium">Phản hồi của chúng tôi</p>
-                <textarea
-                  placeholder="Nhập phản hồi của bạn tại đây..."
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  rows={4}
-                  value={responseText}
-                  onChange={(e) => setResponseText(e.target.value)}
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleSaveResponse}
-                className="px-4 py-2 bg-[#4A0404] hover:bg-[#3A0303] text-white rounded-md transition-colors"
-              >
-                Lưu phản hồi
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {item.email}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {item.service}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    {renderStars(item.rating)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {item.date}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="relative">
+                    <button
+                      onClick={() =>
+                        setDropdownOpen(
+                          dropdownOpen === item.id ? null : item.id
+                        )
+                      }
+                      className="text-gray-500 hover:text-[#3D021E] focus:outline-none transition-colors"
+                    >
+                      <MoreHorizontal className="h-5 w-5" />
+                    </button>
+                    <AnimatePresence>
+                      {dropdownOpen === item.id && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+                        >
+                          <div className="py-1" role="menu">
+                            <button
+                              onClick={() =>
+                                navigate(`/staff/feedback/${item.id}`, {
+                                  state: { feedback: item },
+                                })
+                              }
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              role="menuitem"
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 

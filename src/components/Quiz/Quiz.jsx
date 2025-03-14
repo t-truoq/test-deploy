@@ -24,7 +24,7 @@ const Quiz = () => {
 
         // Gọi API để lấy câu hỏi và đáp án
         const response = await axios.get(
-          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/questions-with-answers",
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/questions-with-answers",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ const Quiz = () => {
       });
 
       const response = await axios.post(
-        "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/submit",
+        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/quiz/submit",
         submissionData,
         {
           headers: {

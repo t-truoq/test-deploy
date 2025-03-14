@@ -1,23 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Thêm axios để gọi API
 import {
+  AlertCircle,
   Bell,
+  Calendar,
   ChevronDown,
-  User,
-  KeyRound,
   History,
+  KeyRound,
   LogOut,
   Settings,
-  Calendar,
+  User,
   UserCircle,
-  AlertCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function SKHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState({
+    name: "Loading...",
+    role: "Loading...",
+  }); // Default to loading states
+  const [error, setError] = useState(""); // State để lưu lỗi nếu có
   const navigate = useNavigate();
 
   // Xử lý click ngoài để đóng dropdown
@@ -32,22 +38,82 @@ export function SKHeader() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Gọi API để lấy thông tin người dùng từ token
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No token found. Please log in.");
+        navigate("/");
+        return;
+      }
+
+      try {
+        console.log("Fetching user profile with token:", token);
+        const response = await axios.get(
+          "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
+
+        console.log("User profile response:", response.data);
+
+        if (response.data) {
+          const { name, role } = response.data; // Directly access name and role from response.data
+          setUserInfo({
+            name: name || "User",
+            role: role || "Guest",
+          });
+        } else {
+          setError("Failed to fetch user profile: Invalid response data.");
+          console.log("Invalid response data:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        if (error.response) {
+          console.log("Error response:", error.response.data);
+          console.log("Status:", error.response.status);
+          setError(
+            error.response.data.message ||
+              `Failed to fetch user profile (Status: ${error.response.status})`
+          );
+          if (error.response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            navigate("/");
+          }
+        } else if (error.request) {
+          console.log("No response received:", error.request);
+          setError(
+            "Cannot connect to the server. Please check if the server is running."
+          );
+        } else {
+          console.log("Error setting up request:", error.message);
+          setError("An unexpected error occurred. Please try again.");
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
   // Hàm xử lý logout
   const handleLogout = () => {
-    // Xóa token và thông tin người dùng khỏi localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // Điều hướng về trang home chưa đăng nhập (ví dụ: "/")
     navigate("/");
   };
 
   // Hàm điều hướng cho các mục khác
   const handleNavigation = (path) => {
     if (path === "/logout") {
-      handleLogout(); // Gọi hàm logout nếu path là /logout
+      handleLogout();
     } else {
-      navigate(path); // Điều hướng bình thường cho các path khác
+      navigate(path);
     }
   };
 
@@ -55,6 +121,9 @@ export function SKHeader() {
     <header className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2">
       {/* Notifications and Profile */}
       <div className="flex items-center gap-6">
+        {/* Hiển thị lỗi nếu có */}
+        {error && <div className="text-red-500 text-sm mr-4">{error}</div>}
+
         {/* Notifications Dropdown */}
         <div className="relative">
           <button
@@ -62,7 +131,7 @@ export function SKHeader() {
             onClick={(e) => {
               e.stopPropagation();
               setIsNotificationOpen(!isNotificationOpen);
-              setIsDropdownOpen(false); // Đóng dropdown khác
+              setIsDropdownOpen(false);
             }}
           >
             <Bell className="h-5 w-5 text-gray-600" />
@@ -142,14 +211,16 @@ export function SKHeader() {
             onClick={(e) => {
               e.stopPropagation();
               setIsDropdownOpen(!isDropdownOpen);
-              setIsNotificationOpen(false); // Đóng dropdown khác
+              setIsNotificationOpen(false);
             }}
           >
             <div className="flex flex-col items-end">
               <span className="text-sm font-medium text-gray-900">
-                Thanh Tam chim be
+                {userInfo.name} {/* Hiển thị tên người dùng từ API */}
               </span>
-              <span className="text-xs text-gray-500">Skin therapist</span>
+              <span className="text-xs text-gray-500">
+                {userInfo.role} {/* Hiển thị vai trò từ API */}
+              </span>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-500" />
           </button>

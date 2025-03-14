@@ -10,7 +10,7 @@ import AddServiceModal from "../../../components/Admin/ServiceAdmin/AddService";
 import EditServiceModal from "../../../components/Admin/ServiceAdmin/EditService";
 
 const BASE_URL =
-  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services";
+  "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services";
 
 const ServicesAdmin = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
