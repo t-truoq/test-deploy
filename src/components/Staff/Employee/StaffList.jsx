@@ -27,9 +27,9 @@ export const StaffMemberPropType = PropTypes.shape({
 });
 
 const API_URL =
-  "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists";
+  "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists";
 const STATUS_API_URL =
-  "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists";
+  "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists";
 
 export function StaffList() {
   const [staff, setStaff] = useState([]);

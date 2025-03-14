@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_BASE_URL = "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
+const API_BASE_URL = "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
 
 // Hook để fetch bookings
 export const useFetchBookings = (refresh, navigate, setErrorPopup) => {

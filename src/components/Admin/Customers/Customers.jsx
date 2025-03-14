@@ -5,7 +5,7 @@ import { Search, MoreHorizontal } from "lucide-react";
 import { Edit } from "./Edit";
 
 const API_URL =
-  "https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users";
+  "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users";
 
 export function Customers() {
   const [clients, setClients] = useState([]);

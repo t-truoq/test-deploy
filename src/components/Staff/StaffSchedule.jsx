@@ -24,7 +24,7 @@ export function StaffSchedule() {
       try {
         const [schedulesResponse, servicesResponse] = await Promise.all([
           axios.get(
-            `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/schedules/busy`,
+            `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/schedules/busy`,
             {
               headers: {
                 "ngrok-skip-browser-warning": "true",
@@ -32,7 +32,7 @@ export function StaffSchedule() {
             }
           ),
           axios.get(
-            `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/services`,
+            `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/services`,
             {
               headers: {
                 "ngrok-skip-browser-warning": "true",
@@ -123,7 +123,7 @@ export function StaffSchedule() {
         JSON.stringify(bookingRequest, null, 2)
       );
       const response = await axios.post(
-        `https://2477-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/guest`,
+        `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/guest`,
         bookingRequest,
         {
           headers: {
