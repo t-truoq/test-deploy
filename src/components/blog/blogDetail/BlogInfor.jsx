@@ -43,7 +43,7 @@
 //         };
 
 //         const response = await axios.get(
-//           `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/blogs/${id}`,
+//           `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/blogs/${id}`,
 //           { headers }
 //         );
 
@@ -123,7 +123,7 @@
 //         };
 
 //         const response = await axios.get(
-//           "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/blogs",
+//           "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/blogs",
 //           { headers }
 //         );
 

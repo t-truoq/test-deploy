@@ -15,19 +15,35 @@ const fillMissingData = (specialist) => {
   };
 
   const descriptions = [
-    `Specialist ${specialist.name || "Unknown"} is part of our expert team with a passion for beauty.`,
-    `Meet ${specialist.name || "Unknown"}, a dedicated professional in our beauty services.`,
-    `${specialist.name || "Unknown"} brings expertise and care to our specialist team.`,
-    `Discover the skills of ${specialist.name || "Unknown"}, a valued member of our crew.`,
+    `Specialist ${
+      specialist.name || "Unknown"
+    } is part of our expert team with a passion for beauty.`,
+    `Meet ${
+      specialist.name || "Unknown"
+    }, a dedicated professional in our beauty services.`,
+    `${
+      specialist.name || "Unknown"
+    } brings expertise and care to our specialist team.`,
+    `Discover the skills of ${
+      specialist.name || "Unknown"
+    }, a valued member of our crew.`,
   ];
   const randomDescription =
     descriptions[getRandomNumber(0, descriptions.length - 1)];
 
   const abouts = [
-    `${specialist.name || "This specialist"} has years of experience in transforming skin health with personalized care and advanced techniques.`,
-    `With a deep passion for beauty, ${specialist.name || "this specialist"} specializes in creating tailored skincare routines for every client.`,
-    `${specialist.name || "This expert"} is renowned for their innovative approach to beauty treatments and client satisfaction.`,
-    `Dedicated to excellence, ${specialist.name || "this professional"} combines science and art to enhance your natural glow.`,
+    `${
+      specialist.name || "This specialist"
+    } has years of experience in transforming skin health with personalized care and advanced techniques.`,
+    `With a deep passion for beauty, ${
+      specialist.name || "this specialist"
+    } specializes in creating tailored skincare routines for every client.`,
+    `${
+      specialist.name || "This expert"
+    } is renowned for their innovative approach to beauty treatments and client satisfaction.`,
+    `Dedicated to excellence, ${
+      specialist.name || "this professional"
+    } combines science and art to enhance your natural glow.`,
   ];
   const randomAbout = abouts[getRandomNumber(0, abouts.length - 1)];
 
@@ -39,12 +55,11 @@ const fillMissingData = (specialist) => {
   const randomEmail = `${(specialist.name || "specialist")
     .toLowerCase()
     .replace(/\s+/g, "")}${getRandomNumber(1, 999)}@example.com`;
-  const randomAddress = `${getRandomNumber(
-    1,
-    999
-  )} ${["Nguyen Van Cu", "Le Loi", "Tran Hung Dao", "Pham Ngu Lao"][
-    getRandomNumber(0, 3)
-  ]}, District ${getRandomNumber(1, 10)}, Ho Chi Minh City`;
+  const randomAddress = `${getRandomNumber(1, 999)} ${
+    ["Nguyen Van Cu", "Le Loi", "Tran Hung Dao", "Pham Ngu Lao"][
+      getRandomNumber(0, 3)
+    ]
+  }, District ${getRandomNumber(1, 10)}, Ho Chi Minh City`;
 
   return {
     id: specialist.id || specialist.userId || Date.now(),
@@ -69,7 +84,8 @@ export default function SpecialistShowcase() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedSpecialist, setSelectedSpecialist] = useState(null);
-  const baseUrl = "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
+  const baseUrl =
+    "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app";
 
   useEffect(() => {
     const fetchSpecialists = async () => {
@@ -220,7 +236,7 @@ export default function SpecialistShowcase() {
           >
             View All Doctors
           </button>
-        </div>  
+        </div>
 
         {selectedSpecialist && (
           <SpecialistDetail

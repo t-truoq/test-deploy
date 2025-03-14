@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_BASE_URL = "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
+const API_BASE_URL =
+  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app";
 
 // Hook để fetch bookings
 export const useFetchBookings = (refresh, navigate, setErrorPopup) => {
@@ -52,7 +53,8 @@ export const useFetchBookings = (refresh, navigate, setErrorPopup) => {
               );
               feedbackResponsesMap[booking.bookingId] = feedbackResponse.data;
               const hasFeedback =
-                Array.isArray(feedbackResponse.data) && feedbackResponse.data.length > 0;
+                Array.isArray(feedbackResponse.data) &&
+                feedbackResponse.data.length > 0;
               feedbackStatusMap[booking.bookingId] = hasFeedback;
 
               if (hasFeedback) {
@@ -63,7 +65,10 @@ export const useFetchBookings = (refresh, navigate, setErrorPopup) => {
                 };
               }
             } catch (error) {
-              console.error(`Error fetching feedback for booking ${booking.bookingId}:`, error);
+              console.error(
+                `Error fetching feedback for booking ${booking.bookingId}:`,
+                error
+              );
               feedbackStatusMap[booking.bookingId] = false;
               feedbackResponsesMap[booking.bookingId] = [];
             }
@@ -75,7 +80,9 @@ export const useFetchBookings = (refresh, navigate, setErrorPopup) => {
           setBookings(sortedBookings);
           console.log("Bookings updated:", sortedBookings); // Log sau khi cập nhật
         } else {
-          throw new Error("Invalid response format: Expected an array of bookings");
+          throw new Error(
+            "Invalid response format: Expected an array of bookings"
+          );
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -85,16 +92,25 @@ export const useFetchBookings = (refresh, navigate, setErrorPopup) => {
             setErrorPopup("Unauthorized: Please login again.");
             setTimeout(() => navigate("/login"), 2000);
           } else if (error.response.status === 403) {
-            setErrorPopup("You do not have permission to access your bookings.");
+            setErrorPopup(
+              "You do not have permission to access your bookings."
+            );
           } else if (error.response.status === 404) {
             setErrorPopup("No bookings found.");
           } else {
-            setErrorPopup(error.response.data.message || "Failed to load bookings. Please try again.");
+            setErrorPopup(
+              error.response.data.message ||
+                "Failed to load bookings. Please try again."
+            );
           }
         } else if (error.request) {
-          setErrorPopup("Unable to connect to server. CORS issue or server error. Please try again.");
+          setErrorPopup(
+            "Unable to connect to server. CORS issue or server error. Please try again."
+          );
         } else {
-          setErrorPopup(error.message || "Failed to load bookings. Please try again.");
+          setErrorPopup(
+            error.message || "Failed to load bookings. Please try again."
+          );
         }
         setBookings([]);
       }
@@ -124,18 +140,23 @@ export const useFetchSpecialists = (setErrorPopup) => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found. Please login again.");
 
-        const response = await axios.get(`${API_BASE_URL}/api/users/specialists/active`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/users/specialists/active`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (Array.isArray(response.data)) {
           setSpecialists(response.data);
         } else {
-          throw new Error("Invalid response format: Expected an array of specialists");
+          throw new Error(
+            "Invalid response format: Expected an array of specialists"
+          );
         }
       } catch (error) {
         console.error("Error fetching specialists:", error);
@@ -151,7 +172,11 @@ export const useFetchSpecialists = (setErrorPopup) => {
 };
 
 // Hook để fetch specialist schedule
-export const useFetchSpecialistSchedule = (specialistId, date, setErrorPopup) => {
+export const useFetchSpecialistSchedule = (
+  specialistId,
+  date,
+  setErrorPopup
+) => {
   const [specialistSchedule, setSpecialistSchedule] = useState([]);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
 
@@ -167,19 +192,24 @@ export const useFetchSpecialistSchedule = (specialistId, date, setErrorPopup) =>
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found. Please login again.");
 
-        const response = await axios.get(`${API_BASE_URL}/api/schedules/${specialistId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-          params: { date },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/schedules/${specialistId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+            params: { date },
+          }
+        );
 
         if (Array.isArray(response.data)) {
           setSpecialistSchedule(response.data);
         } else {
-          throw new Error("Invalid response format: Expected an array of schedules");
+          throw new Error(
+            "Invalid response format: Expected an array of schedules"
+          );
         }
       } catch (error) {
         console.error("Error fetching specialist schedule:", error);
@@ -222,15 +252,20 @@ export const fetchBookingDetails = async (
       return null;
     }
 
-    const response = await axios.get(`${API_BASE_URL}/api/bookings/${bookingId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "true",
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.get(
+      `${API_BASE_URL}/api/bookings/${bookingId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const bookingData = Array.isArray(response.data) ? response.data[0] : response.data;
+    const bookingData = Array.isArray(response.data)
+      ? response.data[0]
+      : response.data;
 
     const storedServicesKey = `selectedServicesForBooking_${bookingId}`;
     const storedServices = localStorage.getItem(storedServicesKey);
@@ -271,11 +306,15 @@ export const fetchBookingDetails = async (
           price = priceFromAPI;
         } else if (priceFromStored != null) {
           price = priceFromStored;
-        } else if (bookingData.totalPrice != null && Number(bookingData.totalPrice) > 0) {
+        } else if (
+          bookingData.totalPrice != null &&
+          Number(bookingData.totalPrice) > 0
+        ) {
           price =
             bookingData.serviceNames.length === 1
               ? Number(bookingData.totalPrice)
-              : Number(bookingData.totalPrice) / (bookingData.serviceNames.length || 1);
+              : Number(bookingData.totalPrice) /
+                (bookingData.serviceNames.length || 1);
         } else {
           price = 0;
         }
@@ -289,15 +328,21 @@ export const fetchBookingDetails = async (
       });
     }
 
-    const specialistId = bookingData.specialistId || booking.specialistId || null;
-    const specialistFromList = specialists.find((spec) => spec.userId === specialistId);
+    const specialistId =
+      bookingData.specialistId || booking.specialistId || null;
+    const specialistFromList = specialists.find(
+      (spec) => spec.userId === specialistId
+    );
     const specialist = specialistFromList || {
       name: bookingData.specialistName || "Not assigned",
       userId: specialistId || 0,
       specialization: bookingData.specialization || "Skin Therapist",
     };
 
-    const totalDuration = services.reduce((sum, service) => sum + service.duration, 0);
+    const totalDuration = services.reduce(
+      (sum, service) => sum + service.duration,
+      0
+    );
 
     let feedback = { rating: 0, comment: "" };
     let feedbackResponseData = feedbackResponses[bookingId];
@@ -321,12 +366,18 @@ export const fetchBookingDetails = async (
           [bookingId]: feedbackResponseData,
         }));
       } catch (feedbackError) {
-        console.error(`Error fetching feedback for booking ${bookingId}:`, feedbackError);
+        console.error(
+          `Error fetching feedback for booking ${bookingId}:`,
+          feedbackError
+        );
         feedbackResponseData = [];
       }
     }
 
-    if (Array.isArray(feedbackResponseData) && feedbackResponseData.length > 0) {
+    if (
+      Array.isArray(feedbackResponseData) &&
+      feedbackResponseData.length > 0
+    ) {
       const feedbackData = feedbackResponseData[0];
       feedback = {
         rating: Math.min(Math.max(feedbackData.rating || 0, 0), 5),

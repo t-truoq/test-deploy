@@ -24,24 +24,18 @@ export function StaffSchedule() {
       try {
         const [schedulesResponse, servicesResponse] = await Promise.all([
           axios.get(
-            `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/schedules/busy`,
+            `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/schedules/busy`,
             {
-              headers: {
-                "ngrok-skip-browser-warning": "true",
-              },
+              headers: { "ngrok-skip-browser-warning": "true" },
             }
           ),
           axios.get(
-            `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/services`,
+            `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services`,
             {
-              headers: {
-                "ngrok-skip-browser-warning": "true",
-              },
+              headers: { "ngrok-skip-browser-warning": "true" },
             }
           ),
         ]);
-        console.log("Schedules data:", schedulesResponse.data);
-        console.log("Services data:", servicesResponse.data);
         const schedulesData = Array.isArray(schedulesResponse.data)
           ? schedulesResponse.data
           : [];
@@ -79,8 +73,34 @@ export function StaffSchedule() {
     );
   };
 
+  const isTimeSlotAvailable = (startTime) => {
+    if (!selectedDate || !selectedStaffId || !startTime) return true;
+
+    const busySlots = getBusySlotsForStaffAndDay(selectedStaffId, selectedDate);
+    const totalDuration = selectedServices.reduce(
+      (sum, service) => sum + (service?.duration || 60),
+      0
+    );
+
+    const slotStart = parseISO(
+      `${format(selectedDate, "yyyy-MM-dd")}T${startTime}`
+    );
+    const slotEnd = new Date(slotStart);
+    slotEnd.setMinutes(slotEnd.getMinutes() + totalDuration);
+
+    return !busySlots.some((busy) => {
+      const [busyStart, busyEnd] = busy.timeSlot.split("-");
+      const busyStartTime = parseISO(`${busy.date}T${busyStart}`);
+      const busyEndTime = parseISO(`${busy.date}T${busyEnd}`);
+      return (
+        (slotStart >= busyStartTime && slotStart < busyEndTime) ||
+        (slotEnd > busyStartTime && slotEnd <= busyEndTime) ||
+        (slotStart <= busyStartTime && slotEnd >= busyEndTime)
+      );
+    });
+  };
+
   const handleCreateBooking = async () => {
-    console.log("handleCreateBooking triggered");
     if (
       !selectedStaffId ||
       selectedServices.length === 0 ||
@@ -89,21 +109,16 @@ export function StaffSchedule() {
       !customerName ||
       !customerEmail
     ) {
-      console.log("Missing fields:", {
-        selectedStaffId,
-        selectedServices,
-        selectedDate,
-        selectedTime,
-        customerName,
-        customerEmail,
-      });
-      alert("Please fill in all required fields.");
+      alert(
+        "Please fill in all required fields, including at least one service."
+      );
       return;
     }
 
-    if (selectedServices.length > 3) {
-      console.log("Too many services selected:", selectedServices.length);
-      alert("A booking can only include up to 3 services.");
+    if (!isTimeSlotAvailable(selectedTime)) {
+      alert(
+        "The selected time slot is not available. Please choose another time."
+      );
       return;
     }
 
@@ -118,20 +133,11 @@ export function StaffSchedule() {
     };
 
     try {
-      console.log(
-        "Booking request to be sent:",
-        JSON.stringify(bookingRequest, null, 2)
-      );
       const response = await axios.post(
-        `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/bookings/guest`,
+        `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/guest`,
         bookingRequest,
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
+        { headers: { "ngrok-skip-browser-warning": "true" } }
       );
-      console.log("Response received:", response.data);
       setBusySchedules((prev) => [
         ...prev,
         {
@@ -153,80 +159,29 @@ export function StaffSchedule() {
       setCustomerEmail("");
       setCustomerPhone("");
     } catch (error) {
-      console.error("Error creating booking:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-        config: error.config,
-      });
+      console.error("Error creating booking:", error);
       alert("Failed to create booking. Please try again.");
     }
   };
 
   const openModal = (staffId, date) => {
-    console.log("Opening modal for staff:", staffId, "date:", date);
     setSelectedStaffId(staffId);
     setSelectedDate(date);
     setIsModalOpen(true);
-  };
-
-  const availableTimeSlots = () => {
-    const baseSlots = [
-      "09:00",
-      "10:00",
-      "11:00",
-      "12:00",
-      "13:00",
-      "14:00",
-      "15:00",
-      "16:00",
-      "17:00",
-    ];
-    if (!selectedDate || !selectedStaffId) return baseSlots;
-
-    const busySlots = getBusySlotsForStaffAndDay(selectedStaffId, selectedDate);
-    const totalDuration = selectedServices.reduce(
-      (sum, service) => sum + (service?.duration || 60),
-      0
-    );
-
-    return baseSlots.filter((slot) => {
-      const slotStart = parseISO(
-        `${format(selectedDate, "yyyy-MM-dd")}T${slot}`
-      );
-      const slotEnd = new Date(slotStart);
-      slotEnd.setMinutes(slotEnd.getMinutes() + totalDuration);
-
-      return !busySlots.some((busy) => {
-        const [busyStart, busyEnd] = busy.timeSlot.split("-");
-        const busyStartTime = parseISO(`${busy.date}T${busyStart}`);
-        const busyEndTime = parseISO(`${busy.date}T${busyEnd}`);
-        return (
-          (slotStart >= busyStartTime && slotStart < busyEndTime) ||
-          (slotEnd > busyStartTime && slotEnd <= busyEndTime) ||
-          (slotStart <= busyStartTime && slotEnd >= busyEndTime)
-        );
-      });
-    });
   };
 
   const handleServiceChange = (serviceId) => {
     const service = services.find(
       (s) => s.serviceId === Number.parseInt(serviceId)
     );
-    if (!service) {
-      console.error(`Service with serviceId ${serviceId} not found`);
-      return;
-    }
+    if (!service) return;
 
     if (selectedServices.some((s) => s.serviceId === service.serviceId)) {
       setSelectedServices(
         selectedServices.filter((s) => s.serviceId !== service.serviceId)
       );
-    } else if (selectedServices.length < 3) {
-      setSelectedServices([...selectedServices, service]);
     } else {
-      alert("You can only select up to 3 services per booking.");
+      setSelectedServices([...selectedServices, service]);
     }
   };
 
@@ -348,7 +303,7 @@ export function StaffSchedule() {
               />
             </div>
             <div className="mb-4">
-              <label className="block mb-2">Select Services (max 3):</label>
+              <label className="block mb-2">Select Services:</label>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {services.map((service) => (
                   <div key={service.serviceId} className="flex items-center">
@@ -370,19 +325,17 @@ export function StaffSchedule() {
             </div>
             {selectedServices.length > 0 && (
               <div className="mb-4">
-                <label className="block mb-2">Select Start Time:</label>
-                <select
+                <label className="block mb-2">Enter Start Time:</label>
+                <input
+                  type="time"
                   className="w-full p-2 border rounded"
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
-                >
-                  <option value="">Choose a time</option>
-                  {availableTimeSlots().map((slot) => (
-                    <option key={slot} value={slot}>
-                      {slot}
-                    </option>
-                  ))}
-                </select>
+                  min="09:00"
+                  max="17:00"
+                  step="1800" // Bước nhảy 30 phút
+                  required
+                />
               </div>
             )}
             <div className="flex justify-between">

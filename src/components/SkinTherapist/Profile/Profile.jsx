@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 
 const BASE_URL =
-  "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/profile";
+  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/profile";
 
 // Dữ liệu mặc định cho các trường không có trong API
 const defaultProfessionalInfo = {
