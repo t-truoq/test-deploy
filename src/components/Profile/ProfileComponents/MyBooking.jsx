@@ -61,8 +61,6 @@ const MyBooking = () => {
   const [feedbackData, setFeedbackData] = useState({});
   const [feedbackResponses, setFeedbackResponses] = useState({});
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-  const [specialistSchedule, setSpecialistSchedule] = useState([]);
-  const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const [isCancelling, setIsCancelling] = useState({}); // Object để lưu trạng thái hủy theo bookingId
   const [paymentNotification, setPaymentNotification] = useState({
     message: "",
@@ -75,6 +73,8 @@ const MyBooking = () => {
     isSuccess: false,
     show: false,
   });
+  const [specialistBusyTimes, setSpecialistBusyTimes] = useState([]);
+  const [allSpecialistBusyTimes, setAllSpecialistBusyTimes] = useState({});
 
   // Generate time slots (08:00 to 20:00, 30-minute intervals)
   const timeSlots = [];
@@ -252,7 +252,7 @@ const MyBooking = () => {
           } else {
             setErrorPopup(
               error.response.data.message ||
-                "Failed to load bookings. Please try again."
+              "Failed to load bookings. Please try again."
             );
           }
         } else if (error.request) {
@@ -341,11 +341,11 @@ const MyBooking = () => {
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-        const bookingDateFormatted = new Date(booking.bookingDate)
-          .toISOString()
-          .split("T")[0];
-        return bookingDateFormatted === searchDate;
-      })
+      const bookingDateFormatted = new Date(booking.bookingDate)
+        .toISOString()
+        .split("T")[0];
+      return bookingDateFormatted === searchDate;
+    })
     : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
@@ -368,6 +368,119 @@ const MyBooking = () => {
       return existingDate === bookingDate && existingTimeSlot === timeSlot;
     });
   };
+
+  const fetchSpecialistBusyTimes = async (specialistId, date) => {
+    if (!date) {
+      setSpecialistBusyTimes([]);
+      setAllSpecialistBusyTimes({});
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. Please login again.");
+
+      if (specialistId) {
+        const response = await axios.get(
+          `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/schedules/${specialistId}/busy`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+            params: { date },
+          }
+        );
+
+        console.log("Full response data from API for specialist", specialistId, ":", response.data);
+
+        if (Array.isArray(response.data)) {
+          const busyTimeRanges = response.data
+            .filter((item) => {
+              const itemDate = new Date(item.date).toISOString().split("T")[0];
+              return itemDate === date;
+            })
+            .map((item) => {
+              const [startTime, endTime] = item.timeSlot.split("-");
+              return { startTime, endTime };
+            });
+
+          console.log("Filtered busy time ranges for specialist", specialistId, ":", busyTimeRanges);
+          setSpecialistBusyTimes(busyTimeRanges);
+          setAllSpecialistBusyTimes((prev) => ({
+            ...prev,
+            [specialistId]: busyTimeRanges,
+          }));
+        } else {
+          throw new Error("Invalid response format: Expected an array");
+        }
+      } else {
+        const busyTimesMap = {};
+        for (const specialist of specialists) {
+          try {
+            const response = await axios.get(
+              `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/schedules/${specialist.userId}/busy`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "ngrok-skip-browser-warning": "true",
+                  "Content-Type": "application/json",
+                },
+                params: { date },
+              }
+            );
+
+            console.log(`Full response data for specialist ${specialist.userId}:`, response.data);
+
+            if (Array.isArray(response.data)) {
+              const busyTimeRanges = response.data
+                .filter((item) => {
+                  const itemDate = new Date(item.date).toISOString().split("T")[0];
+                  return itemDate === date;
+                })
+                .map((item) => {
+                  const [startTime, endTime] = item.timeSlot.split("-");
+                  return { startTime, endTime };
+                });
+
+              busyTimesMap[specialist.userId] = busyTimeRanges;
+            } else {
+              busyTimesMap[specialist.userId] = [];
+            }
+          } catch (error) {
+            console.error(`Error fetching busy times for specialist ${specialist.userId}:`, error);
+            busyTimesMap[specialist.userId] = [];
+          }
+        }
+
+        console.log("All specialist busy times for date", date, ":", busyTimesMap);
+        setAllSpecialistBusyTimes(busyTimesMap);
+        setSpecialistBusyTimes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching specialist busy times:", error);
+      if (error.response && error.response.status === 404) {
+        setErrorPopup("Specialist schedule not found. Please try another specialist.");
+      } else {
+        setErrorPopup("Failed to load specialist busy times. Please try again.");
+      }
+      if (specialistId) {
+        setSpecialistBusyTimes([]);
+      } else {
+        setAllSpecialistBusyTimes({});
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (bookingDate) {
+      fetchSpecialistBusyTimes(selectedSpecialist, bookingDate);
+    } else {
+      setSpecialistBusyTimes([]);
+      setAllSpecialistBusyTimes({});
+    }
+  }, [selectedSpecialist, bookingDate, specialists]); // Thêm specialists vào dependency để cập nhật khi danh sách specialists thay đổi
 
   const handleCancelBooking = async (bookingId) => {
     console.log("Starting cancellation for bookingId:", bookingId);
@@ -490,7 +603,7 @@ const MyBooking = () => {
     }
 
     const bookingData = {
-      specialistId: selectedSpecialist ? Number(selectedSpecialist) : null,
+      specialistId: selectedSpecialist ? Number(selectedSpecialist) : null, // Gửi null nếu không chọn
       bookingDate,
       startTime,
       serviceIds: selectedServices.map((service) => Number(service.serviceId)),
@@ -962,53 +1075,63 @@ const MyBooking = () => {
     }
   };
 
-  const fetchSpecialistSchedule = async (specialistId, date) => {
-    if (!specialistId || !date) {
-      setSpecialistSchedule([]);
-      return;
-    }
-
-    setIsScheduleLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found. Please login again.");
-
-      const response = await axios.get(
-        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/schedules/${specialistId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-          params: { date }, // Pass the selected date as a query parameter
-        }
-      );
-
-      console.log("Specialist schedule response:", response.data);
-      if (Array.isArray(response.data)) {
-        setSpecialistSchedule(response.data);
-      } else {
-        throw new Error(
-          "Invalid response format: Expected an array of schedules"
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching specialist schedule:", error);
-      setErrorPopup("Failed to load specialist schedule. Please try again.");
-      setSpecialistSchedule([]);
-    } finally {
-      setIsScheduleLoading(false);
-    }
+  // Hàm chuyển thời gian dạng "HH:mm" thành phút
+  const timeToMinutes = (time) => {
+    const [hour, minute] = time.split(":").map(Number);
+    return hour * 60 + minute;
   };
 
-  useEffect(() => {
-    if (selectedSpecialist && bookingDate) {
-      fetchSpecialistSchedule(selectedSpecialist, bookingDate);
-    } else {
-      setSpecialistSchedule([]);
+  // Hàm chuyển phút thành thời gian dạng "HH:mm"
+  const minutesToTime = (minutes) => {
+    const hour = Math.floor(minutes / 60).toString().padStart(2, "0");
+    const minute = (minutes % 60).toString().padStart(2, "0");
+    return `${hour}:${minute}`;
+  };
+
+  // Hàm kiểm tra xem có specialist nào rảnh không
+  const isAnySpecialistAvailable = (time, totalDuration) => {
+    if (!bookingDate || totalDuration === 0 || specialists.length === 0) return { available: true };
+
+    const startMinutes = timeToMinutes(time);
+    const endMinutes = startMinutes + totalDuration;
+
+    if (selectedSpecialist) {
+      for (const busyRange of specialistBusyTimes) {
+        const busyStartMinutes = timeToMinutes(busyRange.startTime);
+        const busyEndMinutes = timeToMinutes(busyRange.endTime);
+
+        if (
+          (startMinutes > busyStartMinutes && startMinutes < busyEndMinutes) || // Bắt đầu trong khoảng bận (không bao gồm thời gian kết thúc)
+          (endMinutes > busyStartMinutes && endMinutes <= busyEndMinutes) || // Kết thúc trong khoảng bận
+          (startMinutes <= busyStartMinutes && endMinutes > busyStartMinutes) // Bao phủ hoặc bắt đầu trước và kết thúc sau khoảng bận
+        ) {
+          return {
+            available: false,
+            conflict: `Time slot ${time} to ${minutesToTime(endMinutes)} conflicts with busy range ${busyRange.startTime}-${busyRange.endTime}`,
+          };
+        }
+      }
+      return { available: true };
     }
-  }, [selectedSpecialist, bookingDate]);
+
+    // Khi không chọn specialist, kiểm tra tất cả specialists
+    return specialists.some((specialist) => {
+      const busyTimeRanges = allSpecialistBusyTimes[specialist.userId] || [];
+      for (const busyRange of busyTimeRanges) {
+        const busyStartMinutes = timeToMinutes(busyRange.startTime);
+        const busyEndMinutes = timeToMinutes(busyRange.endTime);
+
+        if (
+          (startMinutes > busyStartMinutes && startMinutes < busyEndMinutes) ||
+          (endMinutes > busyStartMinutes && endMinutes <= busyEndMinutes) ||
+          (startMinutes <= busyStartMinutes && endMinutes > busyStartMinutes)
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }) ? { available: true } : { available: false };
+  };
 
   const isTimeSlotAvailable = (time) => {
     if (!bookingDate) return true;
@@ -1021,41 +1144,6 @@ const MyBooking = () => {
     const selectedTime = new Date(bookingDate).setHours(hour, minute, 0, 0);
     return selectedTime >= now.getTime();
   };
-
-  // Inside the time picker:
-  {
-    timeSlots.map((time) => {
-      const isAvailable =
-        (!selectedSpecialist ||
-          specialistSchedule.some(
-            (slot) => slot.timeSlot === time && slot.availability
-          )) &&
-        isTimeSlotAvailable(time);
-      return (
-        <motion.button
-          key={time}
-          onClick={() => {
-            if (isAvailable) {
-              setStartTime(time);
-              setIsTimePickerOpen(false);
-            }
-          }}
-          disabled={!isAvailable}
-          className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            startTime === time
-              ? "bg-rose-600 text-white"
-              : !isAvailable
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
-          }`}
-          whileHover={{ scale: !isAvailable ? 1 : 1.02 }}
-          whileTap={{ scale: !isAvailable ? 1 : 0.98 }}
-        >
-          {time} {!isAvailable && "(Unavailable)"}
-        </motion.button>
-      );
-    });
-  }
 
   const closeErrorPopup = () => setErrorPopup("");
   const handleOpenFeedback = (booking) => {
@@ -1167,10 +1255,10 @@ const MyBooking = () => {
   const formatDate = (dateString) =>
     dateString
       ? new Date(dateString).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
@@ -1422,11 +1510,11 @@ const MyBooking = () => {
 
                 <div className="space-y-4 mb-4">
                   {/* Row 1: Booking Date and Start Time */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    {/* Chọn ngày */}
                     <div className="relative">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Calendar className="w-4 h-4 inline mr-1" /> Booking
-                        Date
+                        <Calendar className="w-4 h-4 inline mr-1" /> Booking Date
                       </label>
                       <motion.button
                         type="button"
@@ -1440,12 +1528,7 @@ const MyBooking = () => {
                       </motion.button>
                       <AnimatePresence>
                         {isCalendarOpen && (
-                          <motion.div
-                            className="absolute z-10 mt-2"
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                          >
+                          <motion.div className="absolute z-10 mt-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                             <CalendarMyBooking
                               selectedDate={bookingDate}
                               onDateChange={(date) => {
@@ -1457,6 +1540,27 @@ const MyBooking = () => {
                         )}
                       </AnimatePresence>
                     </div>
+
+                    {/* Chọn chuyên gia */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <User className="w-4 h-4 inline mr-1" /> Specialist
+                      </label>
+                      <select
+                        value={selectedSpecialist}
+                        onChange={(e) => setSelectedSpecialist(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                      >
+                        <option value="">Auto-assign</option>
+                        {specialists.map((specialist) => (
+                          <option key={specialist.userId} value={specialist.userId}>
+                            {specialist.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Chọn giờ */}
                     <div className="relative">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         <Clock className="w-4 h-4 inline mr-1" /> Start Time
@@ -1471,6 +1575,7 @@ const MyBooking = () => {
                         <span>{startTime || "Select a start time"}</span>
                         <Clock className="w-5 h-5 text-gray-500" />
                       </motion.button>
+
                       <AnimatePresence>
                         {isTimePickerOpen && (
                           <motion.div
@@ -1481,46 +1586,33 @@ const MyBooking = () => {
                           >
                             <div className="p-2">
                               {timeSlots.map((time) => {
-                                const isAvailable = specialistSchedule.some(
-                                  (slot) =>
-                                    slot.timeSlot === time && slot.availability
+                                const totalDuration = selectedServices.reduce(
+                                  (sum, service) => sum + service.duration,
+                                  0
                                 );
+                                const status = isAnySpecialistAvailable(time, totalDuration);
+                                const isAvailable = status.available && isTimeSlotAvailable(time);
+
                                 return (
                                   <motion.button
                                     key={time}
                                     onClick={() => {
-                                      if (isAvailable || !selectedSpecialist) {
+                                      if (isAvailable) {
                                         setStartTime(time);
                                         setIsTimePickerOpen(false);
                                       }
                                     }}
-                                    disabled={
-                                      selectedSpecialist && !isAvailable
-                                    }
-                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                                      startTime === time
+                                    disabled={!isAvailable}
+                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${startTime === time
                                         ? "bg-rose-600 text-white"
-                                        : selectedSpecialist && !isAvailable
-                                        ? "text-gray-400 cursor-not-allowed"
-                                        : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
-                                    }`}
-                                    whileHover={{
-                                      scale:
-                                        selectedSpecialist && !isAvailable
-                                          ? 1
-                                          : 1.02,
-                                    }}
-                                    whileTap={{
-                                      scale:
-                                        selectedSpecialist && !isAvailable
-                                          ? 1
-                                          : 0.98,
-                                    }}
+                                        : !isAvailable
+                                          ? "text-gray-400 cursor-not-allowed"
+                                          : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+                                      }`}
+                                    whileHover={{ scale: !isAvailable ? 1 : 1.02 }}
+                                    whileTap={{ scale: !isAvailable ? 1 : 0.98 }}
                                   >
-                                    {time}{" "}
-                                    {selectedSpecialist &&
-                                      !isAvailable &&
-                                      "(Unavailable)"}
+                                    {time} {!isAvailable && status.conflict ? `(${status.conflict.split(" ").pop()})` : !isAvailable && "(Unavailable)"}
                                   </motion.button>
                                 );
                               })}
@@ -1530,87 +1622,15 @@ const MyBooking = () => {
                       </AnimatePresence>
                     </div>
                   </div>
-                  {/* Row 2: Specialist and Schedule */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <User className="w-4 h-4 inline mr-1" /> Specialist
-                        (Optional)
-                      </label>
-                      <select
-                        value={selectedSpecialist}
-                        onChange={(e) => setSelectedSpecialist(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
-                      >
-                        <option value="">Auto-assign</option>
-                        {specialists.map((specialist) => (
-                          <option
-                            key={specialist.userId}
-                            value={specialist.userId}
-                          >
-                            {specialist.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Calendar className="w-4 h-4 inline mr-1" /> Specialist
-                        Schedule
-                      </label>
-                      {isScheduleLoading ? (
-                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
-                          <RefreshCw className="w-5 h-5 text-rose-600 animate-spin" />
-                          <span className="ml-2 text-gray-600">
-                            Loading schedule...
-                          </span>
-                        </div>
-                      ) : selectedSpecialist &&
-                        specialistSchedule.length > 0 ? (
-                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto">
-                          {specialistSchedule.map((slot, index) => (
-                            <div
-                              key={index}
-                              className={`flex justify-between items-center py-1 px-2 rounded-md text-sm ${
-                                slot.availability
-                                  ? "text-gray-700"
-                                  : "text-gray-400"
-                              }`}
-                            >
-                              <span>{slot.timeSlot}</span>
-                              <span
-                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                  slot.availability
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {slot.availability
-                                  ? "Available"
-                                  : "Unavailable"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 text-sm">
-                          {selectedSpecialist
-                            ? "No schedule available for this date."
-                            : "Select a specialist to view their schedule."}
-                        </div>
-                      )}
-                    </div>
-                  </div>
                 </div>
 
                 <motion.button
                   onClick={handleConfirmBooking}
                   disabled={isBooking}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
-                    isBooking
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-rose-600 text-white hover:bg-rose-700"
-                  }`}
+                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-rose-600 text-white hover:bg-rose-700"
+                    }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -1673,8 +1693,8 @@ const MyBooking = () => {
         </motion.div>
 
         {filteredBookings.length === 0 &&
-        selectedServices.length === 0 &&
-        !confirmedBooking ? (
+          selectedServices.length === 0 &&
+          !confirmedBooking ? (
           <motion.div
             className="bg-white rounded-xl shadow-md p-8 text-center"
             variants={fadeIn}
@@ -1820,11 +1840,10 @@ const MyBooking = () => {
                               handleCancelBooking(booking.bookingId)
                             }
                             disabled={isCancelling[booking.bookingId]} // Vô hiệu hóa nút khi đang hủy
-                            className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                              isCancelling[booking.bookingId]
-                                ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-                                : "bg-rose-100 text-rose-700 hover:bg-rose-200"
-                            }`}
+                            className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isCancelling[booking.bookingId]
+                              ? "bg-gray-300 text-gray-700 cursor-not-allowed"
+                              : "bg-rose-100 text-rose-700 hover:bg-rose-200"
+                              }`}
                           >
                             {isCancelling[booking.bookingId] ? (
                               <>
@@ -1973,14 +1992,14 @@ const MyBooking = () => {
                     {filteredBookings.findIndex(
                       (b) => b.bookingId === selectedBooking.bookingId
                     ) !== -1 && (
-                      <span className="text-lg font-semibold text-gray-800">
-                        Booking #
-                        {filteredBookings.length -
-                          filteredBookings.findIndex(
-                            (b) => b.bookingId === selectedBooking.bookingId
-                          )}
-                      </span>
-                    )}
+                        <span className="text-lg font-semibold text-gray-800">
+                          Booking #
+                          {filteredBookings.length -
+                            filteredBookings.findIndex(
+                              (b) => b.bookingId === selectedBooking.bookingId
+                            )}
+                        </span>
+                      )}
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(
                         selectedBooking.status
@@ -2109,11 +2128,10 @@ const MyBooking = () => {
                               {Array.from({ length: 5 }, (_, i) => (
                                 <span
                                   key={i}
-                                  className={`w-5 h-5 ${
-                                    i < bookingDetails.feedback.rating
-                                      ? "text-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
+                                  className={`w-5 h-5 ${i < bookingDetails.feedback.rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                                    }`}
                                 >
                                   ★
                                 </span>
@@ -2168,44 +2186,43 @@ const MyBooking = () => {
                       </motion.div>
                       {(bookingDetails.paymentStatus === "PENDING" ||
                         bookingDetails.paymentStatus === "FAILED") && (
-                        <>
-                          {bookingDetails.paymentStatus === "FAILED" && (
-                            <motion.div
-                              className="mb-4 p-3 bg-rose-50 rounded-lg flex items-center"
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.3 }}
-                            >
-                              <AlertCircle className="w-5 h-5 text-rose-600 mr-2" />
-                              <p className="text-sm text-rose-700">
-                                Payment failed. Please try again.
-                              </p>
-                            </motion.div>
-                          )}
-                          <motion.button
-                            onClick={handlePayment}
-                            disabled={isPaying}
-                            className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
-                              isPaying
+                          <>
+                            {bookingDetails.paymentStatus === "FAILED" && (
+                              <motion.div
+                                className="mb-4 p-3 bg-rose-50 rounded-lg flex items-center"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                              >
+                                <AlertCircle className="w-5 h-5 text-rose-600 mr-2" />
+                                <p className="text-sm text-rose-700">
+                                  Payment failed. Please try again.
+                                </p>
+                              </motion.div>
+                            )}
+                            <motion.button
+                              onClick={handlePayment}
+                              disabled={isPaying}
+                              className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
                                 ? "bg-gray-400 text-white cursor-not-allowed"
                                 : "bg-rose-600 text-white hover:bg-rose-700"
-                            } mb-4`}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                          >
-                            {isPaying ? (
-                              <>
-                                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                <DollarSign className="w-5 h-5 mr-2" /> Pay Now
-                              </>
-                            )}
-                          </motion.button>
-                        </>
-                      )}
+                                } mb-4`}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                            >
+                              {isPaying ? (
+                                <>
+                                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
+                                  Processing...
+                                </>
+                              ) : (
+                                <>
+                                  <DollarSign className="w-5 h-5 mr-2" /> Pay Now
+                                </>
+                              )}
+                            </motion.button>
+                          </>
+                        )}
                     </>
                   )}
                   {selectedBooking.status === "CANCELLED" && (
@@ -2309,11 +2326,10 @@ const MyBooking = () => {
                             onMouseLeave={() =>
                               setFeedbackRating(feedbackRating)
                             }
-                            className={`text-3xl cursor-pointer transition-colors duration-200 ${
-                              starValue <= feedbackRating
-                                ? "text-yellow-400"
-                                : "text-gray-300"
-                            }`}
+                            className={`text-3xl cursor-pointer transition-colors duration-200 ${starValue <= feedbackRating
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                              }`}
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.9 }}
                           >
@@ -2326,14 +2342,14 @@ const MyBooking = () => {
                       {feedbackRating === 0
                         ? "Select a rating"
                         : feedbackRating === 1
-                        ? "1 - Poor"
-                        : feedbackRating === 2
-                        ? "2 - Fair"
-                        : feedbackRating === 3
-                        ? "3 - Good"
-                        : feedbackRating === 4
-                        ? "4 - Very Good"
-                        : "5 - Excellent"}
+                          ? "1 - Poor"
+                          : feedbackRating === 2
+                            ? "2 - Fair"
+                            : feedbackRating === 3
+                              ? "3 - Good"
+                              : feedbackRating === 4
+                                ? "4 - Very Good"
+                                : "5 - Excellent"}
                     </p>
                   </div>
                   <div>
@@ -2351,11 +2367,10 @@ const MyBooking = () => {
                   <motion.button
                     onClick={handleSubmitFeedback}
                     disabled={isSubmittingFeedback}
-                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                      isSubmittingFeedback
-                        ? "bg-gray-400 text-white cursor-not-allowed"
-                        : "bg-rose-600 text-white hover:bg-rose-700"
-                    }`}
+                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isSubmittingFeedback
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-rose-600 text-white hover:bg-rose-700"
+                      }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
