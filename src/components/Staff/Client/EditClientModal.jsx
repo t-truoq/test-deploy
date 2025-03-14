@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
 const API_URL =
-  "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users";
+  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users";
 
 export function EditClientModal({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);

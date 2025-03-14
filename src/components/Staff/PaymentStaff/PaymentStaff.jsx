@@ -1,14 +1,13 @@
 "use client";
 
 import axios from "axios";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
-  BarChart4,
   Calendar,
   CheckCircle2,
   ChevronDown,
-  Download,
+  DollarSign,
   Filter,
   RefreshCw,
   Search,
@@ -16,18 +15,20 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Hàm parse payment_time từ định dạng API
-const parsePaymentTime = (timeString) => {
-  if (!timeString || timeString === "N/A") return "N/A";
-  const date = new Date(timeString.replace(" ", "T") + "Z");
-  return date.toLocaleString();
+// Hàm parse booking date
+const parseBookingDate = (dateString) => {
+  if (!dateString || dateString === "N/A") return "N/A";
+  return new Date(dateString).toLocaleDateString();
 };
 
-const BASE_URL =
-  "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/v1/vnpay";
+// Updated API URL to fetch all bookings (not just confirmed)
+const BOOKING_API_URL =
+  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/confirmed";
+const CASH_PAYMENT_API_URL =
+  "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/v1/vnpay/cash-payment";
 
-export default function PaymentStaff() {
-  const [payments, setPayments] = useState([]);
+export default function BookingStaff() {
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
@@ -40,14 +41,14 @@ export default function PaymentStaff() {
   useEffect(() => {
     if (hasFetched) return;
 
-    const fetchPayments = async () => {
+    const fetchBookings = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("No token found. Please login again.");
         }
 
-        const response = await axios.get(BASE_URL, {
+        const response = await axios.get(BOOKING_API_URL, {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -55,21 +56,24 @@ export default function PaymentStaff() {
           maxRedirects: 5,
         });
 
+        console.log("API Response:", response.data);
+
         if (!response.data || !Array.isArray(response.data)) {
-          throw new Error("Invalid or empty response from payments API");
+          throw new Error("Invalid or empty response from bookings API");
         }
 
-        const paymentData = response.data.map((payment) => ({
-          paymentId: payment.paymentId || "N/A",
-          amount: payment.amount ? Number(payment.amount) : 0,
-          paymentMethod: payment.paymentMethod || "VNPAY",
-          paymentTime: payment.paymentTime || "N/A",
-          status: payment.status || "N/A",
-          transactionId: payment.transactionId || "N/A",
-          bookingId: payment.bookingId || "N/A",
+        const bookingData = response.data.map((booking) => ({
+          bookingId: booking.bookingId || "N/A",
+          customerName: booking.customerName || "N/A",
+          specialistName: booking.specialistName || "N/A",
+          totalPrice: booking.totalPrice ? Number(booking.totalPrice) : 0,
+          bookingDate: booking.bookingDate || "N/A",
+          timeSlot: booking.timeSlot || "N/A",
+          status: booking.status || "N/A",
+          paymentStatus: booking.paymentStatus || "N/A",
         }));
 
-        setPayments(paymentData);
+        setBookings(bookingData);
       } catch (error) {
         console.error("Detailed Error:", error);
         if (error.response) {
@@ -84,11 +88,11 @@ export default function PaymentStaff() {
               break;
             case 403:
               setError(
-                "Forbidden: You do not have permission to view payments."
+                "Forbidden: You do not have permission to view bookings."
               );
               break;
             case 404:
-              setError("No payment data found.");
+              setError("No confirmed or in-progress bookings found.");
               break;
             default:
               setError(
@@ -109,40 +113,72 @@ export default function PaymentStaff() {
       }
     };
 
-    fetchPayments();
+    fetchBookings();
   }, [hasFetched]);
 
-  // Filter payments based on selected filters and search term
-  const filteredPayments = payments
+  // Hàm xử lý thanh toán bằng tiền mặt
+  const handleCashPayment = async (bookingId, amount) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found. Please login again.");
+      }
+
+      const response = await axios.post(
+        CASH_PAYMENT_API_URL,
+        { bookingId, amount },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+
+      if (response.data.message === "Cash payment processed successfully") {
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
+            booking.bookingId === bookingId
+              ? { ...booking, paymentStatus: "SUCCESS" }
+              : booking
+          )
+        );
+        alert(`Payment successful for Booking ID: ${bookingId}`);
+      }
+    } catch (error) {
+      console.error("Cash Payment Error:", error);
+      alert(
+        `Failed to process payment: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    }
+  };
+
+  // Filter bookings based on selected filters and search term
+  const filteredBookings = bookings
     .filter(
-      (payment) =>
-        (statusFilter === "all" || payment.status === statusFilter) &&
+      (booking) =>
+        (statusFilter === "all" || booking.status === statusFilter) &&
         (searchTerm === "" ||
-          payment.paymentId.toString().includes(searchTerm) ||
-          payment.bookingId.toString().includes(searchTerm) ||
-          payment.transactionId.toString().includes(searchTerm))
+          booking.bookingId.toString().includes(searchTerm) ||
+          booking.customerName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          booking.specialistName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()))
     )
     .sort((a, b) => {
       if (dateFilter === "newest") {
-        return new Date(b.paymentTime || 0) - new Date(a.paymentTime || 0);
+        return new Date(b.bookingDate || 0) - new Date(a.bookingDate || 0);
       }
       if (dateFilter === "oldest") {
-        return new Date(a.paymentTime || 0) - new Date(b.paymentTime || 0);
+        return new Date(a.bookingDate || 0) - new Date(b.bookingDate || 0);
       }
       return 0;
     });
-
-  const totalAmount = filteredPayments.reduce(
-    (sum, payment) => sum + (payment.amount || 0),
-    0
-  );
-
-  const successCount = filteredPayments.filter(
-    (payment) => payment.status === "SUCCESS"
-  ).length;
-  const failedCount = filteredPayments.filter(
-    (payment) => payment.status === "FAILED"
-  ).length;
 
   const resetFilters = () => {
     setDateFilter("all");
@@ -152,10 +188,21 @@ export default function PaymentStaff() {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case "CONFIRMED":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "IN_PROGRESS":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getPaymentStatusColor = (paymentStatus) => {
+    switch (paymentStatus) {
       case "SUCCESS":
         return "bg-emerald-100 text-emerald-800 border-emerald-200";
-      case "FAILED":
-        return "bg-red-100 text-red-800 border-red-200";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -181,7 +228,7 @@ export default function PaymentStaff() {
             />
           </div>
           <h3 className="text-xl text-[#3D021E] font-medium">
-            Loading payments...
+            Loading bookings...
           </h3>
           <p className="text-gray-500 mt-2">
             Please wait while we fetch your data
@@ -233,93 +280,8 @@ export default function PaymentStaff() {
             animate={{ opacity: 1, x: 0 }}
             className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]"
           >
-            Payment Dashboard
+            Booking Dashboard
           </motion.h1>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Total Payments Card */}
-          <motion.div
-            whileHover={{ y: -5 }}
-            className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm text-gray-500">Total Payments</p>
-                <h3 className="text-2xl font-bold mt-1 text-gray-900">
-                  {filteredPayments.length}
-                </h3>
-              </div>
-              <div className="p-3 rounded-full bg-[#F8F2F5] text-[#3D021E]">
-                <BarChart4 className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                  <span className="text-xs text-gray-500">Success</span>
-                </div>
-                <span className="text-xs font-medium text-gray-900">
-                  {successCount}
-                </span>
-              </div>
-              <div className="flex justify-between items-center mt-2">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span className="text-xs text-gray-500">Failed</span>
-                </div>
-                <span className="text-xs font-medium text-gray-900">
-                  {failedCount}
-                </span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Total Amount Card */}
-          <motion.div
-            whileHover={{ y: -5 }}
-            className="bg-white border-gray-200 rounded-xl shadow-lg p-6 border backdrop-blur-sm"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm text-gray-500">Total Amount</p>
-                <h3 className="text-2xl font-bold mt-1 text-gray-900">
-                  $
-                  {totalAmount.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </h3>
-              </div>
-              <div className="p-3 rounded-full bg-[#F8F2F5] text-[#3D021E]">
-                <Download className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${(successCount / filteredPayments.length) * 100}%`,
-                  }}
-                  transition={{ duration: 1, delay: 0.2 }}
-                  className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
-                />
-              </div>
-              <div className="flex justify-between mt-2">
-                <span className="text-xs text-gray-500">Success Rate</span>
-                <span className="text-xs font-medium text-gray-900">
-                  {filteredPayments.length > 0
-                    ? `${Math.round(
-                        (successCount / filteredPayments.length) * 100
-                      )}%`
-                    : "0%"}
-                </span>
-              </div>
-            </div>
-          </motion.div>
         </div>
 
         {/* Main Content */}
@@ -340,7 +302,7 @@ export default function PaymentStaff() {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by ID..."
+                  placeholder="Search by ID, Customer, Specialist..."
                   className="pl-10 pr-4 py-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-900 focus:ring-[#3D021E] focus:border-[#3D021E] border outline-none focus:ring-2"
                 />
               </div>
@@ -378,55 +340,57 @@ export default function PaymentStaff() {
                     <ChevronDown className="w-4 h-4" />
                   </motion.button>
 
-                  {showDateDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
-                    >
-                      <button
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          dateFilter === "all"
-                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                            : "text-gray-700"
-                        } hover:bg-[#F8F2F5]`}
-                        onClick={() => {
-                          setDateFilter("all");
-                          setShowDateDropdown(false);
-                        }}
+                  <AnimatePresence>
+                    {showDateDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
                       >
-                        All Dates
-                      </button>
-                      <button
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          dateFilter === "newest"
-                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                            : "text-gray-700"
-                        } hover:bg-[#F8F2F5]`}
-                        onClick={() => {
-                          setDateFilter("newest");
-                          setShowDateDropdown(false);
-                        }}
-                      >
-                        Newest First
-                      </button>
-                      <button
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          dateFilter === "oldest"
-                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                            : "text-gray-700"
-                        } hover:bg-[#F8F2F5]`}
-                        onClick={() => {
-                          setDateFilter("oldest");
-                          setShowDateDropdown(false);
-                        }}
-                      >
-                        Oldest First
-                      </button>
-                    </motion.div>
-                  )}
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            dateFilter === "all"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setDateFilter("all");
+                            setShowDateDropdown(false);
+                          }}
+                        >
+                          All Dates
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            dateFilter === "newest"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setDateFilter("newest");
+                            setShowDateDropdown(false);
+                          }}
+                        >
+                          Newest First
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            dateFilter === "oldest"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setDateFilter("oldest");
+                            setShowDateDropdown(false);
+                          }}
+                        >
+                          Oldest First
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Status Filter */}
@@ -444,9 +408,9 @@ export default function PaymentStaff() {
                       setShowDateDropdown(false);
                     }}
                   >
-                    {statusFilter === "SUCCESS" ? (
+                    {statusFilter === "CONFIRMED" ? (
                       <CheckCircle2 className="w-4 h-4" />
-                    ) : statusFilter === "FAILED" ? (
+                    ) : statusFilter === "IN_PROGRESS" ? (
                       <XCircle className="w-4 h-4" />
                     ) : (
                       <Filter className="w-4 h-4" />
@@ -454,68 +418,70 @@ export default function PaymentStaff() {
                     <span>
                       {statusFilter === "all"
                         ? "All Status"
-                        : statusFilter === "SUCCESS"
-                        ? "Success"
-                        : "Failed"}
+                        : statusFilter === "CONFIRMED"
+                        ? "Confirmed"
+                        : "In Progress"}
                     </span>
                     <ChevronDown className="w-4 h-4" />
                   </motion.button>
 
-                  {showStatusDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
-                    >
-                      <button
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          statusFilter === "all"
-                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                            : "text-gray-700"
-                        } hover:bg-[#F8F2F5]`}
-                        onClick={() => {
-                          setStatusFilter("all");
-                          setShowStatusDropdown(false);
-                        }}
+                  <AnimatePresence>
+                    {showStatusDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
                       >
-                        All Status
-                      </button>
-                      <button
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          statusFilter === "SUCCESS"
-                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                            : "text-gray-700"
-                        } hover:bg-[#F8F2F5]`}
-                        onClick={() => {
-                          setStatusFilter("SUCCESS");
-                          setShowStatusDropdown(false);
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                          Success
-                        </div>
-                      </button>
-                      <button
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          statusFilter === "FAILED"
-                            ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
-                            : "text-gray-700"
-                        } hover:bg-[#F8F2F5]`}
-                        onClick={() => {
-                          setStatusFilter("FAILED");
-                          setShowStatusDropdown(false);
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <XCircle className="w-4 h-4 text-red-500" />
-                          Failed
-                        </div>
-                      </button>
-                    </motion.div>
-                  )}
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "all"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("all");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          All Status
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "CONFIRMED"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("CONFIRMED");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                            Confirmed
+                          </div>
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "IN_PROGRESS"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("IN_PROGRESS");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-green-500" />
+                            In Progress
+                          </div>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <motion.button
@@ -536,77 +502,114 @@ export default function PaymentStaff() {
               <thead>
                 <tr className="bg-[#F8F2F5]">
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
-                    Payment ID
+                    Booking ID
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Customer
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Specialist
                   </th>
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
                     Amount
                   </th>
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
-                    Payment Method
+                    Date
                   </th>
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
-                    Payment Time
+                    Time Slot
                   </th>
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
                     Status
                   </th>
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
-                    Transaction ID
+                    Payment Status
                   </th>
                   <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
-                    Booking ID
+                    Action
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredPayments.length > 0 ? (
-                  filteredPayments.map((payment, index) => (
+                {filteredBookings.length > 0 ? (
+                  filteredBookings.map((booking, index) => (
                     <motion.tr
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      key={payment.paymentId}
+                      key={booking.bookingId}
                       className={`border-gray-100 hover:bg-[#F8F2F5] ${
                         index % 2 === 0 ? "bg-white" : "bg-gray-50/80"
                       } border-b transition-colors`}
                     >
                       <td className="py-4 px-4 text-sm text-gray-800 font-medium">
-                        #{payment.paymentId}
+                        #{booking.bookingId}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800">
+                        {booking.customerName}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800">
+                        {booking.specialistName}
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-800 font-medium">
                         $
-                        {payment.amount.toLocaleString(undefined, {
+                        {booking.totalPrice.toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-800">
-                        {payment.paymentMethod}
+                        {parseBookingDate(booking.bookingDate)}
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-800">
-                        {parsePaymentTime(payment.paymentTime)}
+                        {booking.timeSlot}
                       </td>
                       <td className="py-4 px-4 text-sm">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                            payment.status
+                            booking.status
                           )}`}
                         >
-                          {payment.status}
+                          {booking.status}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-sm text-gray-800">
-                        {payment.transactionId}
+                      <td className="py-4 px-4 text-sm">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium border ${getPaymentStatusColor(
+                            booking.paymentStatus
+                          )}`}
+                        >
+                          {booking.paymentStatus}
+                        </span>
                       </td>
-                      <td className="py-4 px-4 text-sm text-gray-800">
-                        #{payment.bookingId}
+                      <td className="py-4 px-4 text-sm">
+                        {booking.paymentStatus !== "SUCCESS" ? (
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-3 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-md flex items-center gap-1"
+                            onClick={() =>
+                              handleCashPayment(
+                                booking.bookingId,
+                                booking.totalPrice
+                              )
+                            }
+                          >
+                            <DollarSign className="w-4 h-4" />
+                            Pay Cash
+                          </motion.button>
+                        ) : (
+                          <span className="text-emerald-600 font-medium">
+                            Paid
+                          </span>
+                        )}
                       </td>
                     </motion.tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-gray-500">
-                      No payment records found matching your filters
+                    <td colSpan={9} className="py-8 text-center text-gray-500">
+                      No booking records found matching your filters
                     </td>
                   </tr>
                 )}
@@ -617,17 +620,19 @@ export default function PaymentStaff() {
           {/* Footer */}
           <div className="p-6 border-gray-200 bg-white border-t flex flex-wrap justify-between items-center gap-4">
             <div className="text-sm text-gray-500">
-              Showing {filteredPayments.length} of {payments.length} payments
+              Showing {filteredBookings.length} of {bookings.length} bookings
             </div>
 
             <div className="text-sm bg-[#F8F2F5] text-gray-600 px-4 py-2 rounded-lg">
               <span className="font-medium">Total: </span>
               <span className="font-bold text-[#3D021E]">
                 $
-                {totalAmount.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                {bookings
+                  .reduce((sum, booking) => sum + (booking.totalPrice || 0), 0)
+                  .toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
               </span>
             </div>
           </div>

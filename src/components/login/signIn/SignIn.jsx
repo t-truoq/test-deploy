@@ -29,7 +29,7 @@
 //     try {
 //       const response = await axios.get(
 
-//         `https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/login/oauth2/code/google?code=${code}`,
+//         `https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/login/oauth2/code/google?code=${code}`,
 
 //         { headers: { "Content-Type": "application/json" } }
 //       );
@@ -96,7 +96,7 @@
 
 //       console.log("Request data:", { email, password });
 //       const response = await axios.post(
-//         "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/auth/token",
+//         "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/auth/token",
 
 //         { email, password },
 
@@ -165,7 +165,7 @@
 //   const handleGoogleLogin = () => {
 
 //     window.location.href =
-//       "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/oauth2/authorization/google";
+//       "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/oauth2/authorization/google";
 //   };
 
 //   return (
@@ -320,7 +320,6 @@
 //   );
 // }
 
-
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -337,7 +336,8 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const BACKEND_URL = "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app";
+  const BACKEND_URL =
+    "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app";
 
   useEffect(() => {
     console.log("Location search:", location.search); // Debug URL

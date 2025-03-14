@@ -1,24 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Thêm useNavigate
+import axios from "axios";
 import {
+  AlertCircle,
   Bell,
+  Calendar,
   ChevronDown,
-  User,
-  KeyRound,
   History,
+  KeyRound,
   LogOut,
   Settings,
-  Calendar,
+  User,
   UserCircle,
-  AlertCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const navigate = useNavigate(); // Hook để điều hướng
+  const [userInfo, setUserInfo] = useState({
+    name: "Loading...",
+    role: "Loading...",
+  }); // Default to loading states
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // Xử lý click ngoài để đóng dropdown
   useEffect(() => {
@@ -32,22 +38,82 @@ export function Header() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Gọi API để lấy thông tin người dùng từ token
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No token found. Please log in.");
+        navigate("/");
+        return;
+      }
+
+      try {
+        console.log("Fetching user profile with token:", token);
+        const response = await axios.get(
+          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
+
+        console.log("User profile response:", response.data);
+
+        if (response.data) {
+          const { name, role } = response.data; // Directly access name and role from response.data
+          setUserInfo({
+            name: name || "User",
+            role: role || "Guest",
+          });
+        } else {
+          setError("Failed to fetch user profile: Invalid response data.");
+          console.log("Invalid response data:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        if (error.response) {
+          console.log("Error response:", error.response.data);
+          console.log("Status:", error.response.status);
+          setError(
+            error.response.data.message ||
+              `Failed to fetch user profile (Status: ${error.response.status})`
+          );
+          if (error.response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            navigate("/");
+          }
+        } else if (error.request) {
+          console.log("No response received:", error.request);
+          setError(
+            "Cannot connect to the server. Please check if the server is running."
+          );
+        } else {
+          console.log("Error setting up request:", error.message);
+          setError("An unexpected error occurred. Please try again.");
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
   // Hàm xử lý logout
   const handleLogout = () => {
-    // Xóa token và thông tin người dùng khỏi localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // Điều hướng về trang home chưa đăng nhập
     navigate("/");
   };
 
   // Hàm điều hướng
   const handleNavigation = (path) => {
     if (path === "/logout") {
-      handleLogout(); // Gọi hàm logout nếu path là /logout
+      handleLogout();
     } else {
-      navigate(path); // Điều hướng bằng react-router-dom cho các path khác
+      navigate(path);
     }
   };
 
@@ -55,6 +121,9 @@ export function Header() {
     <header className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2">
       {/* Notifications and Profile */}
       <div className="flex items-center gap-6">
+        {/* Hiển thị lỗi nếu có */}
+        {error && <div className="text-red-500 text-sm mr-4">{error}</div>}
+
         <div className="relative">
           <button
             className="dropdown-toggle rounded-md p-2 hover:bg-gray-100"
@@ -145,9 +214,9 @@ export function Header() {
           >
             <div className="flex flex-col items-end">
               <span className="text-sm font-medium text-gray-900">
-                Thanh Tam Bede
+                {userInfo.name}
               </span>
-              <span className="text-xs text-gray-500">Staff</span>
+              <span className="text-xs text-gray-500">{userInfo.role}</span>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-500" />
           </button>
@@ -177,7 +246,7 @@ export function Header() {
               </button>
               <button
                 className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/logout")} // Gọi hàm điều hướng với /logout
+                onClick={() => handleNavigation("/logout")}
               >
                 <LogOut className="h-4 w-4 text-blue-500" />
                 Log out

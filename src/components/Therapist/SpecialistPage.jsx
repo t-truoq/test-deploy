@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -43,10 +42,18 @@ const fillMissingData = (specialist) => {
 
   // Thêm trường about với nội dung ngẫu nhiên
   const abouts = [
-    `${specialist.name || "This specialist"} has years of experience in transforming skin health with personalized care and advanced techniques.`,
-    `With a deep passion for beauty, ${specialist.name || "this specialist"} specializes in creating tailored skincare routines for every client.`,
-    `${specialist.name || "This expert"} is renowned for their innovative approach to beauty treatments and client satisfaction.`,
-    `Dedicated to excellence, ${specialist.name || "this professional"} combines science and art to enhance your natural glow.`,
+    `${
+      specialist.name || "This specialist"
+    } has years of experience in transforming skin health with personalized care and advanced techniques.`,
+    `With a deep passion for beauty, ${
+      specialist.name || "this specialist"
+    } specializes in creating tailored skincare routines for every client.`,
+    `${
+      specialist.name || "This expert"
+    } is renowned for their innovative approach to beauty treatments and client satisfaction.`,
+    `Dedicated to excellence, ${
+      specialist.name || "this professional"
+    } combines science and art to enhance your natural glow.`,
   ];
   const randomAbout = abouts[getRandomNumber(0, abouts.length - 1)];
 
@@ -107,7 +114,9 @@ const fillMissingData = (specialist) => {
     specialty: specialist.specialty || "Specialist",
     image:
       specialist.image ||
-      `/placeholder.svg?height=300&width=400&id=${specialist.userId || Date.now()}`,
+      `/placeholder.svg?height=300&width=400&id=${
+        specialist.userId || Date.now()
+      }`,
     rating: specialist.rating || (getRandomNumber(35, 50) / 10).toFixed(1),
     reviews: specialist.reviews || getRandomNumber(1, 50),
     experience: specialist.experience || getRandomExperience(),
@@ -219,7 +228,8 @@ export const SpecialistDetail = ({ specialist, onClose }) => {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   About
                 </h3>
-                <p className="text-gray-600">{filledSpecialist.about}</p> {/* Hiển thị about thay vì description */}
+                <p className="text-gray-600">{filledSpecialist.about}</p>{" "}
+                {/* Hiển thị about thay vì description */}
               </div>
 
               <div className="mt-6 grid md:grid-cols-2 gap-4">
@@ -307,7 +317,7 @@ const SpecialistPage = () => {
     const fetchSpecialists = async () => {
       try {
         const response = await axios.get(
-          "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/users/specialists/active",
+          "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -476,4 +486,3 @@ const SpecialistPage = () => {
 
 // Export cả SpecialistPage và SpecialistDetail
 export default SpecialistPage;
-

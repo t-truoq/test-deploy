@@ -51,7 +51,7 @@ export default function Newsletter() {
 
     try {
       const response = await axios.post(
-        "https://09fc-2405-4802-8132-b860-581a-3b2c-b3b4-7b4c.ngrok-free.app/api/contact",
+        "https://adf4-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/contact",
         formData,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );
@@ -68,7 +68,7 @@ export default function Newsletter() {
       console.error("Error submitting contact:", error);
       setError(
         error.response?.data?.message ||
-        "Không thể gửi yêu cầu. Vui lòng thử lại."
+          "Không thể gửi yêu cầu. Vui lòng thử lại."
       );
     } finally {
       setIsLoading(false);
@@ -80,11 +80,11 @@ export default function Newsletter() {
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-          Get Support
+            Get Support
           </h2>
           <p className="text-lg md:text-xl text-white/90 mb-8">
-          Fill in the information below to receive support from us regarding skincare issues and services
-
+            Fill in the information below to receive support from us regarding
+            skincare issues and services
           </p>
 
           <form
@@ -130,10 +130,12 @@ export default function Newsletter() {
               type="submit"
               disabled={isLoading} // Disable button when loading
               className={`bg-white text-[#A10550] px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${
-                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
+                isLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-100"
               }`}
             >
-              {isLoading ? 'Sending...' : 'Send Request'}
+              {isLoading ? "Sending..." : "Send Request"}
             </button>
           </form>
 
@@ -145,7 +147,8 @@ export default function Newsletter() {
           )}
 
           <p className="mt-6 text-white/70 text-sm">
-          By submitting this request, you agree to our Privacy Policy and allow us to contact you.
+            By submitting this request, you agree to our Privacy Policy and
+            allow us to contact you.
           </p>
         </div>
       </div>

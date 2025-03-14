@@ -1,4 +1,3 @@
-import SalesChart from "../../../components/Admin/ChartAdmin/SalesChart";
 import Dashboard from "../../../components/Admin/DashboardAdmin/Dashboard";
 import Header from "../../../components/Admin/HeaderAdmin/Header";
 import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
@@ -25,7 +24,6 @@ function HomeAdmin() {
             Dashboard
           </h1>
           <Dashboard />
-          <SalesChart />
         </main>
       </div>
     </div>
