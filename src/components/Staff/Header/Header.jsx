@@ -6,11 +6,8 @@ import {
   Bell,
   Calendar,
   ChevronDown,
-  History,
-  KeyRound,
   LogOut,
   Settings,
-  User,
   UserCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -51,7 +48,7 @@ export function Header() {
       try {
         console.log("Fetching user profile with token:", token);
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/users/profile",
+          "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -223,27 +220,6 @@ export function Header() {
 
           {isDropdownOpen && (
             <div className="absolute right-0 top-full z-10 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/manage-account")}
-              >
-                <User className="h-4 w-4 text-blue-500" />
-                Manage Account
-              </button>
-              <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/change-password")}
-              >
-                <KeyRound className="h-4 w-4 text-blue-500" />
-                Change Password
-              </button>
-              <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/activity-log")}
-              >
-                <History className="h-4 w-4 text-blue-500" />
-                Activity Log
-              </button>
               <button
                 className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 onClick={() => handleNavigation("/logout")}

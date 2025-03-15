@@ -1,17 +1,17 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import EditServiceModal from "./EditService";
-import axios from "axios"; // Dùng axios trực tiếp thay vì api.js
+import axios from "axios";
 
 const BASE_URL =
-  "https://beautya-gr2-production.up.railway.app/api/services";
+  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/services";
 
 const ServiceRow = ({ service, onEditService, onDeleteService }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [error, setError] = useState(null);
 
   const handleDelete = async () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) {
+    if (window.confirm("Are you sure you want to delete this service?")) {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -27,7 +27,7 @@ const ServiceRow = ({ service, onEditService, onDeleteService }) => {
 
         onDeleteService(service.serviceId);
       } catch (err) {
-        setError("Không thể xóa dịch vụ. Vui lòng kiểm tra lại.");
+        setError("Failed to delete service. Please try again.");
         console.error(err);
         if (err.response) {
           console.error("Response error:", err.response.data);
@@ -37,38 +37,38 @@ const ServiceRow = ({ service, onEditService, onDeleteService }) => {
   };
 
   return (
-    <tr>
+    <tr className="hover:bg-gray-50 transition-colors duration-200">
       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
         {service.serviceId}
       </td>
-      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
         {service.name}
       </td>
-      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
         <img
           src={
             service.images?.[0]?.url || service.imageUrl || "/placeholder.svg"
-          } // Sửa để dùng imageUrl nếu không có images
+          }
           alt={service.name}
           className="h-10 w-10 rounded-full object-cover"
         />
       </td>
-      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
         ${service.price}
       </td>
-      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
         {service.duration} min
       </td>
       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
         <button
           onClick={() => setIsEditModalOpen(true)}
-          className="text-[#4A0404] hover:text-[#3A0303] mr-2"
+          className="text-[#3D021E] hover:text-[#4A0404] mr-4 transition-colors"
         >
           Edit
         </button>
         <button
           onClick={handleDelete}
-          className="text-red-600 hover:text-red-800"
+          className="text-red-600 hover:text-red-800 transition-colors"
         >
           Delete
         </button>
@@ -94,8 +94,8 @@ ServiceRow.propTypes = {
     duration: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       .isRequired,
     images: PropTypes.arrayOf(PropTypes.shape({ url: PropTypes.string })),
-    imageUrl: PropTypes.string, // Thêm propTypes cho imageUrl
-    recommendedSkinTypes: PropTypes.arrayOf(PropTypes.string), // Thêm cho đồng bộ
+    imageUrl: PropTypes.string,
+    recommendedSkinTypes: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   onEditService: PropTypes.func.isRequired,
   onDeleteService: PropTypes.func.isRequired,

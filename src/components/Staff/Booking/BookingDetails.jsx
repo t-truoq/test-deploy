@@ -6,8 +6,17 @@ import axios from "axios";
 export function BookingDetails({ bookingId, onStatusUpdate }) {
   const [booking, setBooking] = useState(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editForm, setEditForm] = useState({
+    specialistId: "",
+    serviceIds: [], // Mảng các service ID đã chọn
+    bookingDate: "",
+    startTime: "",
+  });
+  const [servicesList, setServicesList] = useState([]);
+  const [specialistsList, setSpecialistsList] = useState([]);
 
   const serviceDurationMap = {
     "Lấy Nhân Mụn Chuẩn Y Khoa": 45,
@@ -17,19 +26,18 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
   };
 
   useEffect(() => {
-    const fetchBookingDetails = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("token");
-        console.log("Token:", token);
         if (!token) {
           throw new Error(
             "No authentication token found. Please log in again."
           );
         }
 
-        const response = await axios.get(
-          `https://beautya-gr2-production.up.railway.app/api/bookings/${bookingId}`,
+        const servicesResponse = await axios.get(
+          `https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/services`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -37,8 +45,18 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
             },
           }
         );
-        const data = response.data;
-        console.log("Booking data:", data);
+        setServicesList(servicesResponse.data);
+
+        const bookingResponse = await axios.get(
+          `https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/bookings/${bookingId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
+        const data = bookingResponse.data;
 
         const enhancedBooking = {
           ...data,
@@ -51,35 +69,57 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
               }))
             : [],
         };
-
         const totalDuration = enhancedBooking.services.reduce(
           (sum, service) => sum + (service.duration || 0),
           0
         );
-
-        // Chuẩn hóa trạng thái từ BE
         const status = data.status.toUpperCase();
-
         setBooking({ ...enhancedBooking, totalDuration, status });
+
+        const specialistsResponse = await axios.get(
+          `https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users/specialists/active`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
+        setSpecialistsList(specialistsResponse.data);
+
+        const initialServiceIds = Array.isArray(data.serviceNames)
+          ? data.serviceNames
+              .map(
+                (name) =>
+                  servicesResponse.data.find((s) => s.name === name)?.serviceId
+              )
+              .filter(Boolean)
+          : [];
+
+        setEditForm({
+          specialistId: data.specialistId ? String(data.specialistId) : "",
+          serviceIds: initialServiceIds.map(String),
+          bookingDate: data.bookingDate || "",
+          startTime: data.timeSlot ? data.timeSlot.split("-")[0] : "",
+        });
       } catch (error) {
-        console.error("Error fetching booking details:", error);
+        console.error("Error fetching data:", error);
         setError(
           error.response?.data?.message ||
             error.message ||
-            "Failed to fetch booking details. Please try again later."
+            "Failed to fetch data. Please try again later."
         );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBookingDetails();
+    fetchData();
   }, [bookingId]);
 
   const handleStatusUpdate = async (newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Token for status update:", token, "New Status:", newStatus);
       if (!token) {
         throw new Error("No authentication token found. Please log in again.");
       }
@@ -96,7 +136,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           endpoint = `/api/bookings/${bookingId}/confirm`;
           break;
         case "IN_PROGRESS":
-          endpoint = `/api/bookings/${bookingId}/checkin`; // Dùng endpoint /checkin
+          endpoint = `/api/bookings/${bookingId}/checkin`;
           break;
         default:
           endpoint = `/api/bookings/${bookingId}/confirm`;
@@ -105,7 +145,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://beautya-gr2-production.up.railway.app${endpoint}`,
+        url: `https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -123,7 +163,6 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         setIsStatusDialogOpen(false);
         if (onStatusUpdate) {
           onStatusUpdate(bookingId, updatedStatus);
-          console.log("Status updated to:", updatedStatus);
         }
       }
     } catch (error) {
@@ -134,6 +173,107 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           "Failed to update booking status. Please try again later."
       );
     }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found. Please log in again.");
+      }
+
+      const requestBody = {
+        specialistId: editForm.specialistId
+          ? Number(editForm.specialistId)
+          : null,
+        bookingDate: editForm.bookingDate,
+        startTime: editForm.startTime,
+        serviceIds: editForm.serviceIds.map(Number),
+      };
+
+      const response = await axios.put(
+        `https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/bookings/${bookingId}`,
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const updatedData = response.data;
+
+        const enhancedBooking = {
+          ...updatedData,
+          services: Array.isArray(updatedData.serviceNames)
+            ? updatedData.serviceNames.map((name, index) => ({
+                id: index + 1,
+                name,
+                duration: serviceDurationMap[name] || 0,
+                price:
+                  updatedData.totalPrice /
+                    (updatedData.serviceNames.length || 1) || 0,
+              }))
+            : [],
+        };
+        const totalDuration = enhancedBooking.services.reduce(
+          (sum, service) => sum + (service.duration || 0),
+          0
+        );
+        setBooking({
+          ...enhancedBooking,
+          totalDuration,
+          status: updatedData.status
+            ? updatedData.status.toUpperCase()
+            : booking.status,
+        });
+
+        const updatedServiceIds = Array.isArray(updatedData.serviceNames)
+          ? updatedData.serviceNames
+              .map(
+                (name) => servicesList.find((s) => s.name === name)?.serviceId
+              )
+              .filter(Boolean)
+          : [];
+
+        setEditForm({
+          specialistId: updatedData.specialistId
+            ? String(updatedData.specialistId)
+            : "",
+          serviceIds: updatedServiceIds.map(String),
+          bookingDate: updatedData.bookingDate || "",
+          startTime: updatedData.timeSlot
+            ? updatedData.timeSlot.split("-")[0]
+            : "",
+        });
+
+        setIsEditDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Error updating booking:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update booking. Please try again later."
+      );
+    }
+  };
+
+  const toggleService = (serviceId) => {
+    setEditForm((prev) => {
+      const serviceIds = prev.serviceIds.includes(serviceId)
+        ? prev.serviceIds.filter((id) => id !== serviceId)
+        : [...prev.serviceIds, serviceId];
+      return { ...prev, serviceIds };
+    });
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
   };
 
   if (loading) {
@@ -173,7 +313,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       case "COMPLETED":
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-500 text-white">
-            COMPLETED
+            Completed
           </span>
         );
       case "IN_PROGRESS":
@@ -282,7 +422,26 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       <div className="flex justify-between p-4 border-t">
         <div className="flex gap-2">
-          {/* Add additional buttons if needed */}
+          <button
+            className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm font-medium flex items-center"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Edit Booking
+          </button>
         </div>
         <div className="flex gap-2">
           <button
@@ -351,13 +510,6 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
                   Status
                 </label>
                 <div className="grid grid-cols-1 gap-2">
-                  {/* <button
-                    className="px-4 py-2 border border-yellow-500 text-yellow-600 rounded-md hover:bg-yellow-50 flex items-center justify-center"
-                    onClick={() => handleStatusUpdate("PENDING")}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-                    Pending
-                  </button> */}
                   <button
                     className="px-4 py-2 border border-green-500 text-green-600 rounded-md hover:bg-green-50 flex items-center justify-center"
                     onClick={() => handleStatusUpdate("CONFIRMED")}
@@ -397,6 +549,165 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isEditDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Edit Booking Details
+            </h3>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Specialist
+                </label>
+                <select
+                  value={editForm.specialistId}
+                  onChange={(e) =>
+                    handleEditChange("specialistId", e.target.value)
+                  }
+                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select a specialist</option>
+                  {specialistsList.map((specialist) => (
+                    <option
+                      key={specialist.userId}
+                      value={String(specialist.userId)}
+                    >
+                      {specialist.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Services
+                </label>
+                <div className="mt-1 max-h-32 overflow-y-auto border rounded-md p-2">
+                  {servicesList.map((service) => (
+                    <div
+                      key={service.serviceId}
+                      className="flex items-center space-x-2 py-1"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={editForm.serviceIds.includes(
+                          String(service.serviceId)
+                        )}
+                        onChange={() =>
+                          toggleService(String(service.serviceId))
+                        }
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {service.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Selected Services
+                </label>
+                <div className="mt-1 border rounded-md p-2 min-h-[50px] bg-gray-50">
+                  {editForm.serviceIds.length > 0 ? (
+                    editForm.serviceIds.map((serviceId) => {
+                      const service = servicesList.find(
+                        (s) => String(s.serviceId) === serviceId
+                      );
+                      return (
+                        <div
+                          key={serviceId}
+                          className="flex items-center justify-between bg-white p-1 mb-1 rounded-md shadow-sm"
+                        >
+                          <span className="text-sm text-gray-700">
+                            {service?.name || "Unknown"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => toggleService(serviceId)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <span className="text-sm text-gray-500">
+                      No services selected
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={
+                    editForm.bookingDate
+                      ? format(new Date(editForm.bookingDate), "yyyy-MM-dd")
+                      : ""
+                  }
+                  onChange={(e) =>
+                    handleEditChange("bookingDate", e.target.value)
+                  }
+                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Start Time
+                </label>
+                <input
+                  type="time"
+                  value={editForm.startTime}
+                  onChange={(e) =>
+                    handleEditChange("startTime", e.target.value)
+                  }
+                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

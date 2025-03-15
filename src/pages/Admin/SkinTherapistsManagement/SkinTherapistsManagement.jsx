@@ -17,11 +17,6 @@ const SkinTherapistsManagement = () => {
         </div>
 
         <main className="p-6">
-          <div className="mb-6">
-            <h1 className="mb text-2xl font-semibold text-gray-900">
-              Skin Therapists
-            </h1>
-          </div>
           <SkinTherapist />
         </main>
       </div>

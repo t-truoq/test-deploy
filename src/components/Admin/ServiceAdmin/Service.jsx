@@ -13,7 +13,7 @@ const ServiceCard = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-shadow hover:shadow-xl">
       <div className="aspect-square w-full overflow-hidden">
         <img
           src={imageUrl || "/placeholder.svg"}
@@ -22,14 +22,14 @@ const ServiceCard = ({
         />
       </div>
       <div className="p-4">
-        <h3 className="mb-2 text-lg font-medium text-gray-900 capitalize">
+        <h3 className="mb-2 text-lg font-semibold text-gray-900 capitalize">
           {name}
         </h3>
-        <p className="mb-2 text-lg font-semibold text-[#4A0404]">${price}</p>
+        <p className="mb-2 text-lg font-semibold text-[#3D021E]">${price}</p>
         <p className="mb-4 text-sm text-gray-600">{duration} minutes</p>
         <button
           onClick={() => setIsEditModalOpen(true)}
-          className="w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4A0404] focus:ring-offset-2"
+          className="w-full rounded-lg bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] px-4 py-2 text-sm font-medium text-white hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors focus:outline-none focus:ring-2 focus:ring-[#3D021E] focus:ring-offset-2"
         >
           Edit Service
         </button>

@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
 const API_URL =
-  "https://beautya-gr2-production.up.railway.app/api/users";
+  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users";
 
 export function Edit({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);
@@ -39,18 +39,17 @@ export function Edit({ isOpen, onClose, client, onSave }) {
 
     try {
       const token = localStorage.getItem("token");
-      console.log("Token from localStorage:", token);
+      console.log("Token from localStorage (Assign Role):", token);
       if (!token) {
         throw new Error("No admin token found. Please log in as an admin.");
       }
 
       const decodedToken = jwtDecode(token);
-      console.log("Decoded token:", decodedToken);
+      console.log("Decoded token (Assign Role):", decodedToken);
       if (decodedToken.role !== "ADMIN") {
         throw new Error("Unauthorized: Only admins can assign roles.");
       }
 
-      // Sử dụng query parameter thay vì body JSON
       const response = await fetch(
         `${API_URL}/${formData.id}/assign-role?newRole=${formData.role}`,
         {
@@ -63,19 +62,17 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       );
 
       if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401)
           throw new Error("Unauthorized: Invalid or expired token.");
-        } else if (response.status === 403) {
+        if (response.status === 403)
           throw new Error("Forbidden: Admin privileges required.");
-        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
       console.log("Role assignment response:", result);
 
-      // Giả sử API trả về UserResponse với code và dữ liệu user
-      if (result.code !== undefined && result.code !== 0) {
+      if (result.code !== 0) {
         throw new Error(result.msg || "Failed to assign role");
       }
 
@@ -97,13 +94,13 @@ export function Edit({ isOpen, onClose, client, onSave }) {
 
     try {
       const token = localStorage.getItem("token");
-      console.log("Token from localStorage:", token);
+      console.log("Token from localStorage (Submit):", token);
       if (!token) {
         throw new Error("No admin token found. Please log in as an admin.");
       }
 
       const decodedToken = jwtDecode(token);
-      console.log("Decoded token:", decodedToken);
+      console.log("Decoded token (Submit):", decodedToken);
       if (decodedToken.role !== "ADMIN") {
         throw new Error("Unauthorized: Only admins can update users.");
       }
@@ -126,11 +123,10 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401)
           throw new Error("Unauthorized: Invalid or expired token.");
-        } else if (response.status === 403) {
+        if (response.status === 403)
           throw new Error("Forbidden: Admin privileges required.");
-        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
