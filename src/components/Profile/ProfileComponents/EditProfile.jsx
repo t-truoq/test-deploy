@@ -57,7 +57,7 @@ const EditProfile = () => {
         }
 
         const response = await axios.get(
-          `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/profile`,
+          `https://beautya-gr2-production.up.railway.app/api/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -199,7 +199,7 @@ const EditProfile = () => {
       console.log("Sending update data:", updateData);
 
       const response = await axios.put(
-        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/profile`,
+        `https://beautya-gr2-production.up.railway.app/api/users/profile`,
         updateData,
         {
           headers: {
@@ -698,7 +698,7 @@ export default EditProfile;
 //       console.log("Sending change password data:", updateData);
 
 //       const response = await axios.put(
-//         `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users/profile`,
+//         `https://beautya-gr2-production.up.railway.app/api/users/profile`,
 //         updateData,
 //         {
 //           headers: {

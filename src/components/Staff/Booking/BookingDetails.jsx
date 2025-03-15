@@ -29,7 +29,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         }
 
         const response = await axios.get(
-          `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/bookings/${bookingId}`,
+          `https://beautya-gr2-production.up.railway.app/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app${endpoint}`,
+        url: `https://beautya-gr2-production.up.railway.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

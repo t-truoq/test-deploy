@@ -37,7 +37,7 @@ export default function ServiceDetail() {
 
       try {
         const response = await axios.get(
-          `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/services/${id}`,
+          `https://beautya-gr2-production.up.railway.app/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

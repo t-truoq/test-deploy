@@ -1,7 +1,96 @@
 // Dữ liệu tĩnh
 export const staticBlogs = [
+  // Blog 1: Terms & Conditions
   {
     id: 1,
+    title: "Understanding Our Terms & Conditions",
+    content: {
+      h1: "Understanding Our Terms & Conditions",
+      sections: [
+        {
+          h2: "What Are Terms & Conditions?",
+          h3: "A Guide to Your Agreement",
+          content:
+            "Our Terms & Conditions outline the rules and guidelines for using Beautya’s services, website, and facilities. They ensure a fair and transparent experience for all our clients.",
+        },
+        {
+          h2: "Key Points to Know",
+          h3: "Booking and Cancellation Policies",
+          content:
+            "Learn about our booking requirements, cancellation fees, and rescheduling options to ensure a smooth spa experience. We recommend booking at least 48 hours in advance and notifying us 24 hours prior for cancellations.",
+        },
+        {
+          h3: "Service Usage",
+          content:
+            "By using our services, you agree to respect our facilities, staff, and other clients. Any misuse may result in service termination without refund.",
+        },
+        {
+          h2: "Why It Matters",
+          h3: "Protecting Your Experience",
+          content:
+            "Our Terms & Conditions are designed to protect both you and Beautya, ensuring a safe, enjoyable, and professional environment for everyone.",
+        },
+      ],
+    },
+    excerpt:
+      "Learn about Beautya’s Terms & Conditions to ensure a smooth and enjoyable spa experience...",
+    author: "Beautya Team",
+    authorImage:
+      "https://ui-avatars.com/api/?name=Beautya+Team&background=A10550&color=fff",
+    date: "March 15, 2025",
+    image: "/blog/dieukhoan.webp",
+    category: "Policies",
+    readTime: "2 min read",
+    metaDescription:
+      "Understand Beautya’s Terms & Conditions for a seamless spa experience.",
+  },
+
+  // Blog 2: Privacy Policy
+  {
+    id: 2,
+    title: "Your Privacy Matters: Our Privacy Policy Explained",
+    content: {
+      h1: "Your Privacy Matters: Our Privacy Policy Explained",
+      sections: [
+        {
+          h2: "What is Our Privacy Policy?",
+          h3: "Protecting Your Information",
+          content:
+            "At Beautya, we are committed to safeguarding your personal information. Our Privacy Policy explains how we collect, use, and protect your data when you use our services or website.",
+        },
+        {
+          h2: "How We Use Your Data",
+          h3: "Personalized Services",
+          content:
+            "We collect information such as your name, email, and preferences to provide personalized spa experiences, send appointment reminders, and offer promotions tailored to your interests.",
+        },
+        {
+          h3: "Data Security",
+          content:
+            "Your data is stored securely with industry-standard encryption, and we never share it with third parties without your consent, except as required by law.",
+        },
+        {
+          h2: "Your Rights",
+          h3: "Control Over Your Information",
+          content:
+            "You have the right to access, update, or delete your personal information at any time. Contact us to manage your data or opt out of marketing communications.",
+        },
+      ],
+    },
+    excerpt:
+      "Discover how Beautya protects your personal information with our Privacy Policy...",
+    author: "Beautya Team",
+    authorImage:
+      "https://ui-avatars.com/api/?name=Beautya+Team&background=A10550&color=fff",
+    date: "March 14, 2025",
+    image: "/blog/baomat.png",
+    category: "Policies",
+    readTime: "2 min read",
+    metaDescription:
+      "Learn how Beautya safeguards your data with our Privacy Policy.",
+  },
+  {
+    id: 3,
     title: "Ultimate Relaxation with Full Body Massage",
     content: {
       h1: "Ultimate Relaxation with Full Body Massage",
@@ -37,7 +126,7 @@ export const staticBlogs = [
     metaDescription: "Discover the benefits of a full body massage at our spa, including stress relief and improved circulation.",
   },
   {
-    id: 2,
+    id: 4,
     title: "Deep Facial Care for Radiant Skin",
     content: {
       h1: "Deep Facial Care for Radiant Skin",
@@ -68,38 +157,7 @@ export const staticBlogs = [
     metaDescription: "Learn about our deep facial care treatments to achieve a radiant and healthy complexion.",
   },
   {
-    id: 3,
-    title: "Salt Stone Sauna Experience",
-    content: {
-      h1: "Salt Stone Sauna Experience",
-      sections: [
-        {
-          h2: "What Makes Salt Stone Sauna Special?",
-          h3: "Natural Healing Properties",
-          content: "The salt stone sauna uses Himalayan salt blocks to release negative ions, purify the air, and promote respiratory health.",
-        },
-        {
-          h2: "Health Benefits",
-          h3: "Detoxification and Relaxation",
-          content: "This therapy detoxifies your body, reduces muscle soreness, and creates a serene environment for deep relaxation.",
-        },
-        {
-          h3: "Skin and Wellness Boost",
-          content: "Regular sessions can improve skin clarity and boost your immune system, making it a holistic wellness treatment.",
-        },
-      ],
-    },
-    excerpt: "Enjoy the healing benefits of our salt stone sauna, perfect for detoxification and relaxation...",
-    author: "Liam Brown",
-    authorImage: "https://ui-avatars.com/api/?name=Liam+Brown&background=A10550&color=fff",
-    date: "March 5, 2025",
-    image: "/blog/3.jpg",
-    category: "Wellness",
-    readTime: "2 min read",
-    metaDescription: "Explore the unique salt stone sauna experience for detoxification and improved wellness.",
-  },
-  {
-    id: 4,
+    id: 6,
     title: "Luxury Spa Package for Total Rejuvenation",
     content: {
       h1: "Luxury Spa Package for Total Rejuvenation",
@@ -166,7 +224,7 @@ export const staticBlogs = [
     "metaDescription": "Explore the benefits of aromatherapy at our spa, from stress relief to improved sleep."
   },
   {
-    "id": 6,
+    "id": 7,
     "title": "Hydrotherapy: Rejuvenation Through Water",
     "content": {
       "h1": "Hydrotherapy: Rejuvenation Through Water",
@@ -202,7 +260,7 @@ export const staticBlogs = [
     "metaDescription": "Learn how hydrotherapy can rejuvenate your body and mind with our specialized water treatments."
   },
   {
-    "id": 7,
+    "id": 8,
     "title": "Detox with Herbal Body Wraps",
     "content": {
       "h1": "Detox with Herbal Body Wraps",
@@ -238,7 +296,7 @@ export const staticBlogs = [
     "metaDescription": "Discover the detoxifying benefits of herbal body wraps at our spa."
   },
   {
-    "id": 8,
+    "id": 9,
     "title": "Hot Stone Massage for Deep Relaxation",
     "content": {
       "h1": "Hot Stone Massage for Deep Relaxation",
@@ -274,7 +332,7 @@ export const staticBlogs = [
     "metaDescription": "Experience deep relaxation with our hot stone massage therapy at the spa."
   },
   {
-    "id": 9,
+    "id": 10,
     "title": "Reflexology: Healing Through Your Feet",
     "content": {
       "h1": "Reflexology: Healing Through Your Feet",
@@ -310,7 +368,7 @@ export const staticBlogs = [
     "metaDescription": "Discover the healing benefits of reflexology with our certified therapists."
   },
   {
-    "id": 10,
+    "id": 11,
     "title": "Anti-Aging Facial Treatments",
     "content": {
       "h1": "Anti-Aging Facial Treatments",
@@ -346,7 +404,7 @@ export const staticBlogs = [
     "metaDescription": "Rejuvenate your skin with our anti-aging facial treatments at the spa."
   },
   {
-    "id": 11,
+    "id": 12,
     "title": "Swedish Massage for Total Relaxation",
     "content": {
       "h1": "Swedish Massage for Total Relaxation",
@@ -382,7 +440,7 @@ export const staticBlogs = [
     "metaDescription": "Enjoy total relaxation with our Swedish massage, tailored to your needs."
   },
   {
-    "id": 12,
+    "id": 13,
     "title": "Hydrating Facial for Dry Skin",
     "content": {
       "h1": "Hydrating Facial for Dry Skin",
@@ -418,7 +476,7 @@ export const staticBlogs = [
     "metaDescription": "Restore moisture to dry skin with our hydrating facial treatments."
   },
   {
-    "id": 13,
+    "id": 14,
     "title": "Meditation and Mindfulness Sessions",
     "content": {
       "h1": "Meditation and Mindfulness Sessions",
@@ -454,7 +512,7 @@ export const staticBlogs = [
     "metaDescription": "Boost your mental health with our guided meditation and mindfulness sessions."
   },
   {
-    "id": 14,
+    "id": 15,
     "title": "Luxury Couple’s Spa Day",
     "content": {
       "h1": "Luxury Couple’s Spa Day",
@@ -490,7 +548,7 @@ export const staticBlogs = [
     "metaDescription": "Enjoy a luxurious couple’s spa day with tailored treatments and private amenities."
   },
   {
-    "id": 15,
+    "id": 16,
     "title": "Cryotherapy for Skin Rejuvenation",
     "content": {
       "h1": "Cryotherapy for Skin Rejuvenation",
@@ -526,7 +584,7 @@ export const staticBlogs = [
     "metaDescription": "Discover skin rejuvenation with our cryotherapy treatments at the spa."
   },
   {
-    "id": 16,
+    "id": 17,
     "title": "Thai Massage for Flexibility",
     "content": {
       "h1": "Thai Massage for Flexibility",

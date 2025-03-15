@@ -31,7 +31,7 @@ export default function BlogHome() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {blogs.slice(0, 4).map((post) => (
+          {blogs.slice(2, 6).map((post) => (
             <Link
               to={`/blog/${post.id}`}
               onClick={() => handleClick(post.id)}
