@@ -76,7 +76,7 @@ const MyBooking = () => {
   });
   const [specialistBusyTimes, setSpecialistBusyTimes] = useState([]);
   const [allSpecialistBusyTimes, setAllSpecialistBusyTimes] = useState({});
-  
+
 
   // Generate time slots (08:00 to 20:00, 30-minute intervals)
   const timeSlots = [];
@@ -2396,3 +2396,4 @@ const MyBooking = () => {
 };
 
 export default MyBooking;
+
