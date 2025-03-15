@@ -5,7 +5,7 @@ import { Search, MoreHorizontal } from "lucide-react";
 import { Edit } from "./Edit";
 
 const API_URL =
-  "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/users";
+  "https://beautya-gr2-production.up.railway.app/api/users";
 
 export function Staffs() {
   const [clients, setClients] = useState([]);

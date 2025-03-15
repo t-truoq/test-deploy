@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Newsletter() {
   const [formData, setFormData] = useState({
@@ -29,29 +29,29 @@ export default function Newsletter() {
     setIsLoading(true);
 
     if (!formData.fullName.trim()) {
-      setError("Vui lòng nhập họ và tên");
+      setError("Please enter your name !");
       setIsLoading(false);
       return;
     }
     if (!formData.phoneNumber || !/^[0-9]{10,11}$/.test(formData.phoneNumber)) {
-      setError("Vui lòng nhập số điện thoại hợp lệ (10-11 số)");
+      setError("Only 10 or 11 numbers for phone number");
       setIsLoading(false);
       return;
     }
     if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) {
-      setError("Vui lòng nhập địa chỉ email hợp lệ");
+      setError("Please enter correct email !");
       setIsLoading(false);
       return;
     }
     if (!formData.message.trim()) {
-      setError("Vui lòng nhập nội dung tin nhắn");
+      setError("Please enter your requirement !");
       setIsLoading(false);
       return;
     }
 
     try {
       const response = await axios.post(
-        "https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/api/contact",
+        "https://beautya-gr2-production.up.railway.app/api/contact",
         formData,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );
@@ -68,17 +68,28 @@ export default function Newsletter() {
       console.error("Error submitting contact:", error);
       setError(
         error.response?.data?.message ||
-          "Không thể gửi yêu cầu. Vui lòng thử lại."
+        "Cannot sent requirement. Try again"
       );
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    const hash = window.location.hash; // Lấy hash từ URL (ví dụ: #newsletter)
+    if (hash === "#newsletter") {
+      const newsletterSection = document.getElementById("newsletter");
+      if (newsletterSection) {
+          newsletterSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, []);
+
   return (
     <section className="py-16 md:py-24 w-full bg-gradient-to-r from-[#3D021E] to-[#A10550]">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <div className="max-w-3xl mx-auto text-center">
+        <div id="newsletter" 
+            className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
             Get Support
           </h2>
@@ -129,11 +140,10 @@ export default function Newsletter() {
             <button
               type="submit"
               disabled={isLoading} // Disable button when loading
-              className={`bg-white text-[#A10550] px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${
-                isLoading
+              className={`bg-white text-[#A10550] px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${isLoading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-gray-100"
-              }`}
+                }`}
             >
               {isLoading ? "Sending..." : "Send Request"}
             </button>

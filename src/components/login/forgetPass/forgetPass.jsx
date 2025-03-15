@@ -188,7 +188,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/forgotPassword/verifyMail/${email}`,
+        `https://beautya-gr2-production.up.railway.app/forgotPassword/verifyMail/${email}`,
 
         {}, // Backend có thể không yêu cầu body, gửi body rỗng
         {
@@ -250,7 +250,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
+        `https://beautya-gr2-production.up.railway.app/forgotPassword/verifyOtp/${otp}/${email}`,
 
         {},
         {
@@ -327,7 +327,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `https://a66f-2405-4802-811e-11a0-5c40-f238-ce80-2dce.ngrok-free.app/forgotPassword/changePassword/${email}`,
+        `https://beautya-gr2-production.up.railway.app/forgotPassword/changePassword/${email}`,
 
         {
           password: newPassword,
