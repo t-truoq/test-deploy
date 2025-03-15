@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CalendarMyBooking from "../../Profile/ProfileComponents/MybookingComponents/CalendarMyBooking"; // Adjust the import path as needed
+import { format, addHours } from 'date-fns'; // Chỉ cần format và addHours
 
 const MyBooking = () => {
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ const MyBooking = () => {
   });
   const [specialistBusyTimes, setSpecialistBusyTimes] = useState([]);
   const [allSpecialistBusyTimes, setAllSpecialistBusyTimes] = useState({});
+  
 
   // Generate time slots (08:00 to 20:00, 30-minute intervals)
   const timeSlots = [];
