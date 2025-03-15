@@ -17,9 +17,6 @@ const StaffsManagement = () => {
         </div>
 
         <main className="p-6">
-          <div className="mb-6">
-            <h1 className="mb text-2xl font-semibold text-gray-900">Staffs</h1>
-          </div>
           <Staffs />
         </main>
       </div>

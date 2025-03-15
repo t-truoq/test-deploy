@@ -18,9 +18,9 @@ function HomeAdmin() {
         </div>
 
         <main className="p-7">
-          <h1 className="mb-3 text-2xl font-semibold text-gray-900">
-            Dashboard
-          </h1>
+          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
+            Dash Board
+          </h2>
           <Dashboard />
         </main>
       </div>

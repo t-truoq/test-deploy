@@ -1,13 +1,12 @@
 "use client";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   ListChecks,
   ClipboardList,
   Contact,
   FileText,
-  LogOut,
   MessageCircleWarning,
   FileQuestion,
 } from "lucide-react";
@@ -15,16 +14,6 @@ import { Link } from "react-router-dom";
 
 export default function Sidebar() {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // Xóa token và thông tin user từ localStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    // Chuyển hướng về trang home
-    navigate("/");
-  };
 
   const mainNav = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/admin/home" },
@@ -55,7 +44,6 @@ export default function Sidebar() {
       icon: FileText,
       path: "/admin/paymentmanagement",
     },
-    { name: "Logout", icon: LogOut, onClick: handleLogout },
   ];
 
   return (
@@ -102,16 +90,7 @@ export default function Sidebar() {
         <nav className="flex flex-col gap-1">
           {pages.map((item) => {
             const Icon = item.icon;
-            return item.name === "Logout" ? (
-              <button
-                key={item.name}
-                onClick={item.onClick}
-                className={`flex items-center w-full p-2 text-sm rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-pink-100 hover:text-pink-700 hover:scale-105 group`}
-              >
-                <Icon className="w-5 h-5 mr-3 transition-transform duration-200 ease-in-out group-hover:rotate-10" />
-                {item.name}
-              </button>
-            ) : (
+            return (
               <Link
                 to={item.path}
                 key={item.name}

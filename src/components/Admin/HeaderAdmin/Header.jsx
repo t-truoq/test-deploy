@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom"; // Thêm useNavigate
 import {
   Bell,
   ChevronDown,
-  User,
-  KeyRound,
-  History,
   LogOut,
   Settings,
   Calendar,
@@ -152,18 +149,6 @@ export default function Header() {
 
           {isDropdownOpen && (
             <div className="absolute right-0 top-full z-10 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <User className="h-4 w-4 text-blue-500" />
-                Manage Account
-              </button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <KeyRound className="h-4 w-4 text-blue-500" />
-                Change Password
-              </button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <History className="h-4 w-4 text-blue-500" />
-                Activity Log
-              </button>
               <button
                 className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 onClick={handleLogout} // Gọi hàm handleLogout khi nhấn nút Log out

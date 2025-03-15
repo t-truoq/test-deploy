@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
 const API_URL =
-  "https://beautya-gr2-production.up.railway.app/api/users";
+  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users";
 
 export function Edit({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);

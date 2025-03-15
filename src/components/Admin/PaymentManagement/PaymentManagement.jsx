@@ -1,11 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Printer, Send, Filter, ChevronDown } from "lucide-react";
+import {
+  Printer,
+  Send,
+  Filter,
+  ChevronDown,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL =
-  "https://beautya-gr2-production.up.railway.app/api/v1/vnpay";
+  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);
@@ -23,7 +31,6 @@ export default function PaymentStaff() {
     const fetchPayments = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log("Token:", token); // Debug token
         if (!token) {
           throw new Error("No token found. Please login again.");
         }
@@ -35,8 +42,6 @@ export default function PaymentStaff() {
           },
           maxRedirects: 5,
         });
-
-        console.log("API Response:", response.data); // Debug full response
 
         if (!response.data || !Array.isArray(response.data)) {
           throw new Error("Invalid or empty response from payments API");
@@ -53,14 +58,12 @@ export default function PaymentStaff() {
         }));
         setPayments(paymentData);
       } catch (error) {
-        console.error("Detailed Error:", error); // Log full error
-        console.log("Server Response:", error.response?.data); // Log server response details
+        console.error("Detailed Error:", error);
         if (error.response) {
           switch (error.response.status) {
             case 400:
               setError(
-                "Bad request. Please check the token or API endpoint. Details: " +
-                  (error.response.data?.message || "No additional details")
+                "Bad Request: Please check the request format or token."
               );
               break;
             case 401:
@@ -71,33 +74,20 @@ export default function PaymentStaff() {
               break;
             default:
               setError(
-                `API error (Status: ${error.response.status}) - ${error.message}`
+                error.response.data?.message ||
+                  `API error (Status: ${error.response.status})`
               );
           }
         } else if (error.request) {
-          setError("Unable to connect to server. Please try again.");
+          setError("Unable to connect to server.");
         } else {
           setError(error.message || "An unexpected error occurred.");
         }
-        // Fallback to mock data if API fails
-        if (!payments.length) {
-          console.log("Using mock data due to API failure");
-          const mockData = [
-            {
-              paymentId: "9007199254740991",
-              amount: 0,
-              paymentMethod: "string", // Placeholder, replace with actual method if available
-              paymentTime: "2025-03-12T15:14:42.819Z",
-              status: "PENDING",
-              transactionId: "9007199254740991",
-              bookingId: "9007199254740991",
-            },
-          ];
-          setPayments(mockData);
-        }
       } finally {
-        setLoading(false);
-        setHasFetched(true);
+        setTimeout(() => {
+          setLoading(false);
+          setHasFetched(true);
+        }, 1500);
       }
     };
 
@@ -129,253 +119,420 @@ export default function PaymentStaff() {
     setStatusFilter("all");
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "SUCCESS":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "FAILED":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const parsePaymentTime = (timeString) => {
+    if (!timeString || timeString === "N/A") return "N/A";
+    return new Date(timeString).toLocaleString();
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-600">Loading payments...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center bg-white border-gray-100 p-8 rounded-xl shadow-lg border backdrop-blur-sm"
+        >
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 1.5,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "linear",
+              }}
+              className="w-20 h-20 rounded-full border-4 border-[#3D021E] border-t-transparent"
+            />
+          </div>
+          <h3 className="text-xl text-[#3D021E] font-medium">
+            Loading payments...
+          </h3>
+          <p className="text-gray-500 mt-2">
+            Please wait while we fetch your data
+          </p>
+        </motion.div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-200">
-          <div className="w-20 h-20 mx-auto mb-6 text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-3-3v6m-9 3h18a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white border-gray-200 p-10 rounded-xl shadow-xl max-w-md w-full text-center border"
+        >
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: [0.8, 1.2, 1] }}
+            transition={{ duration: 0.5 }}
+            className="w-20 h-20 mx-auto mb-6 text-[#3D021E]"
+          >
+            <AlertCircle className="w-full h-full" />
+          </motion.div>
+          <h2 className="text-2xl font-bold text-[#3D021E] mb-2">Error</h2>
           <p className="text-gray-600 mb-8 text-lg">{error}</p>
-          <button
-            className="px-4 py-2 bg-[#3D021E] text-white rounded-md hover:bg-[#3D021E]/90"
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] hover:from-[#4A0404] hover:to-[#7D1F4D] text-white rounded-lg transition-colors duration-300 shadow-md flex items-center justify-center gap-2 mx-auto"
             onClick={() => window.location.reload()}
           >
+            <RefreshCw className="w-5 h-5" />
             Retry
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      {/* Filters - Centered */}
-      <div className="flex justify-center items-center gap-4 mb-6">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Filter className="w-4 h-4" />
-          Filter By
-        </div>
-
-        {/* Date Filter */}
-        <div className="relative">
-          <button
-            className="flex items-center justify-between gap-2 px-4 py-2 text-sm border rounded-md min-w-[100px] bg-white"
-            onClick={() => {
-              setShowDateDropdown(!showDateDropdown);
-              setShowStatusDropdown(false);
-            }}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900">
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
+        {/* Header */}
+        <div className="mb-6">
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]"
           >
-            Date
-            <ChevronDown className="w-4 h-4" />
-          </button>
-
-          {showDateDropdown && (
-            <div className="absolute top-full mt-1 w-[150px] bg-white border rounded-md shadow-lg z-10">
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  dateFilter === "all" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setDateFilter("all");
-                  setShowDateDropdown(false);
-                }}
-              >
-                All Dates
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  dateFilter === "newest" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setDateFilter("newest");
-                  setShowDateDropdown(false);
-                }}
-              >
-                Newest First
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  dateFilter === "oldest" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setDateFilter("oldest");
-                  setShowDateDropdown(false);
-                }}
-              >
-                Oldest First
-              </button>
-            </div>
-          )}
+            Payment Dashboard
+          </motion.h1>
         </div>
 
-        {/* Status Filter */}
-        <div className="relative">
-          <button
-            className="flex items-center justify-between gap-2 px-4 py-2 text-sm border rounded-md min-w-[120px] bg-white"
-            onClick={() => {
-              setShowStatusDropdown(!showStatusDropdown);
-              setShowDateDropdown(false);
-            }}
-          >
-            Status
-            <ChevronDown className="w-4 h-4" />
-          </button>
-
-          {showStatusDropdown && (
-            <div className="absolute top-full mt-1 w-[150px] bg-white border rounded-md shadow-lg z-10">
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  statusFilter === "all" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setStatusFilter("all");
-                  setShowStatusDropdown(false);
-                }}
-              >
-                All Status
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  statusFilter === "PENDING" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setStatusFilter("PENDING");
-                  setShowStatusDropdown(false);
-                }}
-              >
-                Pending
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  statusFilter === "SUCCESS" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setStatusFilter("SUCCESS");
-                  setShowStatusDropdown(false);
-                }}
-              >
-                Success
-              </button>
-              <button
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                  statusFilter === "FAILED" ? "bg-gray-50" : ""
-                }`}
-                onClick={() => {
-                  setStatusFilter("FAILED");
-                  setShowStatusDropdown(false);
-                }}
-              >
-                Failed
-              </button>
-            </div>
-          )}
-        </div>
-
-        <button
-          className="text-red-500 text-sm hover:text-red-600"
-          onClick={resetFilters}
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white border-gray-200 rounded-xl shadow-xl border overflow-hidden backdrop-blur-sm"
         >
-          Reset Filter
-        </button>
-      </div>
+          {/* Filters */}
+          <div className="p-6 border-gray-200 border-b">
+            <div className="flex flex-col md:flex-row justify-between gap-4">
+              <div className="flex-1 max-w-md"></div>{" "}
+              {/* Placeholder for search if needed */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="text-sm text-[#3D021E] font-medium flex items-center gap-1">
+                  <Filter className="w-4 h-4" />
+                  Filters
+                </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Payment ID
-              </th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Amount
-              </th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Payment method
-              </th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Time
-              </th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Status
-              </th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Transaction ID
-              </th>
-              <th className="py-3 px-4 text-left text-sm font-medium text-gray-900">
-                Booking ID
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPayments.map((payment) => (
-              <tr key={payment.paymentId} className="border-b">
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {payment.paymentId}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  ${payment.amount.toLocaleString()}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {payment.paymentMethod}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {payment.paymentTime
-                    ? new Date(payment.paymentTime).toLocaleString()
-                    : "N/A"}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {payment.status}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {payment.transactionId}
-                </td>
-                <td className="py-4 px-4 text-sm text-gray-900">
-                  {payment.bookingId}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                {/* Date Filter */}
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`flex items-center justify-between gap-2 px-4 py-2 text-sm rounded-lg min-w-[140px] ${
+                      dateFilter !== "all"
+                        ? "text-[#3D021E] border-[#3D021E]"
+                        : "text-gray-700 border-gray-300"
+                    } bg-white border`}
+                    onClick={() => {
+                      setShowDateDropdown(!showDateDropdown);
+                      setShowStatusDropdown(false);
+                    }}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                    <span>
+                      {dateFilter === "all"
+                        ? "All Dates"
+                        : dateFilter === "newest"
+                        ? "Newest First"
+                        : "Oldest First"}
+                    </span>
+                  </motion.button>
 
-      {/* Footer */}
-      <div className="mt-6 flex justify-end items-center gap-4">
-        <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900">
-          <Printer className="w-4 h-4" />
-        </button>
-        <div className="text-sm">
-          <span className="font-medium">Total = </span>
-          <span className="font-semibold">${totalAmount.toFixed(2)}</span>
-        </div>
-        <button className="flex items-center gap-2 px-6 py-2 bg-[#3D021E] text-white rounded-md hover:bg-[#3D021E]/90">
-          Send
-          <Send className="w-4 h-4" />
-        </button>
+                  <AnimatePresence>
+                    {showDateDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                      >
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            dateFilter === "all"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setDateFilter("all");
+                            setShowDateDropdown(false);
+                          }}
+                        >
+                          All Dates
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            dateFilter === "newest"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setDateFilter("newest");
+                            setShowDateDropdown(false);
+                          }}
+                        >
+                          Newest First
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            dateFilter === "oldest"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setDateFilter("oldest");
+                            setShowDateDropdown(false);
+                          }}
+                        >
+                          Oldest First
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Status Filter */}
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`flex items-center justify-between gap-2 px-4 py-2 text-sm rounded-lg min-w-[140px] ${
+                      statusFilter !== "all"
+                        ? "text-[#3D021E] border-[#3D021E]"
+                        : "text-gray-700 border-gray-300"
+                    } bg-white border`}
+                    onClick={() => {
+                      setShowStatusDropdown(!showStatusDropdown);
+                      setShowDateDropdown(false);
+                    }}
+                  >
+                    <Filter className="w-4 h-4" />
+                    <span>
+                      {statusFilter === "all"
+                        ? "All Status"
+                        : statusFilter === "SUCCESS"
+                        ? "Success"
+                        : statusFilter === "PENDING"
+                        ? "Pending"
+                        : "Failed"}
+                    </span>
+                    <ChevronDown className="w-4 h-4" />
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {showStatusDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-1 w-[150px] bg-white border-gray-200 border rounded-lg shadow-lg z-10 overflow-hidden"
+                      >
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "all"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("all");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          All Status
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "SUCCESS"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("SUCCESS");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          Success
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "PENDING"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("PENDING");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          Pending
+                        </button>
+                        <button
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            statusFilter === "FAILED"
+                              ? "bg-[#F8F2F5] text-[#3D021E] font-medium"
+                              : "text-gray-700"
+                          } hover:bg-[#F8F2F5]`}
+                          onClick={() => {
+                            setStatusFilter("FAILED");
+                            setShowStatusDropdown(false);
+                          }}
+                        >
+                          Failed
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-sm text-[#3D021E] hover:text-[#4A0404] transition-colors font-medium"
+                  onClick={resetFilters}
+                >
+                  Reset
+                </motion.button>
+              </div>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-[#F8F2F5]">
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Payment ID
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Amount
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Payment Method
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Time
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Status
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Transaction ID
+                  </th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold text-[#3D021E] border-gray-200 border-b">
+                    Booking ID
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPayments.length > 0 ? (
+                  filteredPayments.map((payment, index) => (
+                    <motion.tr
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      key={payment.paymentId}
+                      className={`border-gray-100 hover:bg-[#F8F2F5] ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50/80"
+                      } border-b transition-colors`}
+                    >
+                      <td className="py-4 px-4 text-sm text-gray-800 font-medium">
+                        #{payment.paymentId}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800 font-medium">
+                        $
+                        {payment.amount.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800">
+                        {payment.paymentMethod}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800">
+                        {parsePaymentTime(payment.paymentTime)}
+                      </td>
+                      <td className="py-4 px-4 text-sm">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                            payment.status
+                          )}`}
+                        >
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800">
+                        {payment.transactionId}
+                      </td>
+                      <td className="py-4 px-4 text-sm text-gray-800">
+                        #{payment.bookingId}
+                      </td>
+                    </motion.tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-gray-500">
+                      No payment records found matching your filters
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 border-gray-200 bg-white border-t flex flex-wrap justify-between items-center gap-4">
+            <div className="text-sm text-gray-500">
+              Showing {filteredPayments.length} of {payments.length} payments
+            </div>
+            <div className="flex items-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-[#3D021E] hover:text-[#4A0404] transition-colors"
+              >
+                <Printer className="w-4 h-4" />
+                Print
+              </motion.button>
+              <div className="text-sm bg-[#F8F2F5] text-gray-600 px-4 py-2 rounded-lg">
+                <span className="font-medium">Total: </span>
+                <span className="font-bold text-[#3D021E]">
+                  $
+                  {totalAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] hover:from-[#4A0404] hover:to-[#7D1F4D] text-white rounded-lg shadow-md"
+              >
+                Send
+                <Send className="w-4 h-4" />
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

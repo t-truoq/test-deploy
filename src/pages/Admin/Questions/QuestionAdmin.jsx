@@ -18,11 +18,6 @@ const QuestionAdmin = () => {
         </div>
 
         <main className="p-2">
-          <div className="px-5">
-            <h1 className="mb text-2xl font-semibold text-gray-900">
-              Questions Management
-            </h1>
-          </div>
           <QuestionDashboard />
         </main>
       </div>

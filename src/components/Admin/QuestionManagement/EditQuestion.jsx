@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+import { XIcon } from "lucide-react";
 
 export default function EditQuestionForm({ question, onSave, onCancel }) {
   const [editedQuestion, setEditedQuestion] = useState({ ...question });
@@ -35,20 +37,20 @@ export default function EditQuestionForm({ question, onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <label
           htmlFor="question"
           className="block text-sm font-medium text-gray-700"
         >
-          Câu hỏi
+          Question
         </label>
         <textarea
           id="question"
           value={editedQuestion.question}
           onChange={handleQuestionChange}
-          placeholder="Nhập câu hỏi"
-          className="w-full min-h-[100px] rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          placeholder="Enter question"
+          className="w-full min-h-[100px] rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
           required
         />
       </div>
@@ -58,25 +60,25 @@ export default function EditQuestionForm({ question, onSave, onCancel }) {
           htmlFor="skinType"
           className="block text-sm font-medium text-gray-700"
         >
-          Loại da
+          Skin Type
         </label>
         <select
           id="skinType"
           value={editedQuestion.skinType}
           onChange={handleSkinTypeChange}
-          className="w-full rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
         >
-          <option value="OILY">OILY</option>
-          <option value="DRY">DRY</option>
-          <option value="SENSITIVE">SENSITIVE</option>
-          <option value="COMBINATION">COMBINATION</option>
-          <option value="NORMAL">NORMAL</option>
+          <option value="OILY">Oily</option>
+          <option value="DRY">Dry</option>
+          <option value="SENSITIVE">Sensitive</option>
+          <option value="COMBINATION">Combination</option>
+          <option value="NORMAL">Normal</option>
         </select>
       </div>
 
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Các lựa chọn
+          Options
         </label>
         <div className="space-y-2">
           {editedQuestion.options.map((option, index) => (
@@ -85,27 +87,14 @@ export default function EditQuestionForm({ question, onSave, onCancel }) {
                 type="text"
                 value={option}
                 readOnly
-                className="flex-1 rounded-md border border-gray-300 p-2 bg-gray-50"
+                className="flex-1 rounded-md border border-gray-300 p-2 bg-gray-50 text-gray-600"
               />
               <button
                 type="button"
-                className="text-gray-400 hover:text-gray-500"
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
                 onClick={() => removeOption(index)}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <XIcon className="h-4 w-4" />
               </button>
             </div>
           ))}
@@ -115,32 +104,32 @@ export default function EditQuestionForm({ question, onSave, onCancel }) {
             type="text"
             value={newOption}
             onChange={(e) => setNewOption(e.target.value)}
-            placeholder="Thêm lựa chọn mới"
-            className="flex-1 rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            placeholder="Add new option"
+            className="flex-1 rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
           />
           <button
             type="button"
-            className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            className="rounded-md bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] px-4 py-2 text-white hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
             onClick={addOption}
           >
-            Thêm
+            Add
           </button>
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 pt-4">
+      <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
           onClick={onCancel}
         >
-          Hủy
+          Cancel
         </button>
         <button
           type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
         >
-          Lưu thay đổi
+          Save Changes
         </button>
       </div>
     </form>
