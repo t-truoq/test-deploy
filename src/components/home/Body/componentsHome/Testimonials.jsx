@@ -71,7 +71,9 @@ export default function Testimonials() {
   };
 
   const prevTestimonial = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length
+    );
   };
 
   const containerVariants = {
@@ -141,12 +143,14 @@ export default function Testimonials() {
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.div variants={itemVariants} className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">What Our Clients Say</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              What Our Clients Say
+            </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-              Hear from our satisfied clients about their experiences and transformations with our skincare services
+              Hear from our satisfied clients about their experiences and
+              transformations with our skincare services
             </p>
           </motion.div>
-
           <motion.div variants={itemVariants} className="relative max-w-5xl mx-auto">
             <div className="overflow-hidden">
               <div
@@ -154,7 +158,10 @@ export default function Testimonials() {
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
                 {testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
+                  <div
+                    key={testimonial.id}
+                    className="w-full flex-shrink-0 px-4"
+                  >
                     <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
                       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
                         <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
@@ -165,18 +172,26 @@ export default function Testimonials() {
                           />
                         </div>
                         <div className="text-center md:text-left">
-                          <h3 className="text-xl md:text-2xl font-bold mb-2">{testimonial.name}</h3>
+                          <h3 className="text-xl md:text-2xl font-bold mb-2">
+                            {testimonial.name}
+                          </h3>
                           <div className="flex justify-center md:justify-start">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-5 h-5 ${i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                                className={`w-5 h-5 ${
+                                  i < testimonial.rating
+                                    ? "text-yellow-500 fill-yellow-500"
+                                    : "text-gray-300"
+                                }`}
                               />
                             ))}
                           </div>
                         </div>
                       </div>
-                      <blockquote className="text-lg md:text-xl text-gray-700 italic">"{testimonial.message}"</blockquote>
+                      <blockquote className="text-lg md:text-xl text-gray-700 italic">
+                        "{testimonial.message}"
+                      </blockquote>
                     </div>
                   </div>
                 ))}

@@ -61,7 +61,7 @@ export default function HomeStaff() {
         setLoading(true);
         const token = getToken();
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/bookings",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
           {
             headers: {
               Authorization: `Bearer ${token}`,

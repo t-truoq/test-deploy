@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { Edit } from "./Edit";
 
 const API_URL =
-  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users";
+  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users";
 
 export function SkinTherapist() {
   const [clients, setClients] = useState([]);
@@ -222,15 +222,11 @@ export function SkinTherapist() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
-              Skin Therapists
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage your skin therapist database
-            </p>
-          </div>
+        {/* Tab Section - Only "All Appointments" */}
+        <div className="flex space-x-4 mb-6">
+          <button className="text-sm font-medium text-gray-600 border-b-2 border-[#6D0F3D] pb-2">
+            All Appointments
+          </button>
         </div>
 
         <div className="p-6 bg-white rounded-xl shadow-lg overflow-hidden">

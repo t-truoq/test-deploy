@@ -24,7 +24,7 @@ const Quiz = () => {
 
         // Gọi API để lấy câu hỏi và đáp án
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/quiz/questions-with-answers",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/quiz/questions-with-answers",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ const Quiz = () => {
       });
 
       const response = await axios.post(
-        "https://beautya-gr2-production.up.railway.app/api/quiz/submit",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/quiz/submit",
         submissionData,
         {
           headers: {

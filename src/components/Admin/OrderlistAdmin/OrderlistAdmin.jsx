@@ -6,7 +6,7 @@ import { motion } from "framer-motion"; // Added for loading animation consisten
 import { XIcon } from "lucide-react"; // Added for consistent icon usage
 
 const BASE_URL =
-  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/bookings"; // Replace with valid ngrok URL
+  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings"; // Replace with valid ngrok URL
 
 export default function OrderlistAdmin() {
   const [orders, setOrders] = useState([]);
