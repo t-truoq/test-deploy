@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { Edit } from "./Edit";
 
 const API_URL =
-  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users";
+  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users";
 
 export function Customers() {
   const [clients, setClients] = useState([]);

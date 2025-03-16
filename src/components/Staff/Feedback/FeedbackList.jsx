@@ -4,22 +4,23 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { MoreHorizontal, Search } from "lucide-react";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
 
-export default function FeedbackList({ filter }) {
-  const navigate = useNavigate();
+export default function FeedbackList({ filter, onLoadingChange }) {
   const [feedbackItems, setFeedbackItems] = useState([]);
   const [clients, setClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  // Loại bỏ dropdownDirection vì chúng ta sẽ luôn hiển thị lên trên
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+
+  const dropdownRefs = useRef({});
 
   const fetchClients = async () => {
     try {
       const response = await fetch(
-        "https://beautya-gr2-production.up.railway.app/api/users",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users",
         {
           headers: {
             "Content-Type": "application/json",
@@ -49,7 +50,6 @@ export default function FeedbackList({ filter }) {
           address: user.address || "N/A",
         }));
 
-      console.log("Fetched Clients:", mappedClients);
       return mappedClients;
     } catch (err) {
       console.error("Error fetching clients:", err);
@@ -63,10 +63,11 @@ export default function FeedbackList({ filter }) {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      onLoadingChange(true);
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Vui lòng đăng nhập để xem phản hồi");
-        navigate("/signin");
+        onLoadingChange(false);
         return;
       }
 
@@ -81,19 +82,9 @@ export default function FeedbackList({ filter }) {
         };
 
         const feedbackResponse = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/feedbacks",
-          {
-            headers,
-          }
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
+          { headers }
         );
-
-        console.log("Raw Feedback Response:", feedbackResponse.data);
-
-        if (!Array.isArray(feedbackResponse.data)) {
-          throw new Error(
-            "Dữ liệu phản hồi không phải là mảng. Vui lòng kiểm tra API."
-          );
-        }
 
         const mappedData = feedbackResponse.data
           .map((item) => {
@@ -111,10 +102,6 @@ export default function FeedbackList({ filter }) {
             const client = fetchedClients.find(
               (c) => c.id === item.customerId.toString()
             );
-            console.log(
-              `Mapping customerId ${item.customerId} to client:`,
-              client
-            );
 
             return {
               id: item.feedbackId,
@@ -123,14 +110,11 @@ export default function FeedbackList({ filter }) {
                 (client ? client.name : `Khách hàng ID: ${item.customerId}`),
               email: client ? client.email : "Email không khả dụng",
               avatar: "/placeholder.svg?height=40&width=40",
-              service: item.specialistName
-                ? `${item.specialistName} (ID: ${item.specialistId})`
-                : `Dịch vụ ID: ${item.specialistId}`,
+              service: item.specialistName || "Dịch vụ không xác định",
               message: item.comment || "",
               rating: item.rating || 0,
               date: item.createdAt ? item.createdAt.split("T")[0] : "N/A",
               bookingId: item.bookingId || "N/A",
-              feedbackStatus: item.feedbackStatus || "N/A",
               specialistId: item.specialistId,
               customerId: item.customerId,
               createdAt: item.createdAt,
@@ -141,22 +125,37 @@ export default function FeedbackList({ filter }) {
         setFeedbackItems(mappedData);
       } catch (err) {
         console.error("Error fetching data:", err);
-        if (err.response?.status === 401) {
-          setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-          localStorage.removeItem("token");
-          navigate("/signin");
-        } else {
-          setError(
-            "Không thể tải dữ liệu phản hồi. Vui lòng kiểm tra API hoặc thử lại."
-          );
-        }
+        setError(
+          "Không thể tải dữ liệu phản hồi. Vui lòng kiểm tra API hoặc thử lại."
+        );
       } finally {
         setIsLoading(false);
+        onLoadingChange(false);
       }
     };
 
     fetchData();
-  }, [navigate]);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        !Object.values(dropdownRefs.current).some(
+          (ref) => ref && ref.contains(event.target)
+        )
+      ) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Loại bỏ checkDropdownDirection vì chúng ta sẽ cố định hướng lên trên
+  // const checkDropdownDirection = (itemId, buttonRef) => { ... };
 
   const renderStars = (rating) => {
     return Array(5)
@@ -199,39 +198,9 @@ export default function FeedbackList({ filter }) {
       item.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center bg-white border-gray-100 p-8 rounded-xl shadow-lg border backdrop-blur-sm"
-        >
-          <div className="relative w-20 h-20 mx-auto mb-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="w-20 h-20 rounded-full border-4 border-[#3D021E] border-t-transparent"
-            />
-          </div>
-          <h3 className="text-xl text-[#3D021E] font-medium">
-            Loading feedback...
-          </h3>
-          <p className="text-gray-500 mt-2">
-            Please wait while we fetch your data
-          </p>
-        </motion.div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -277,7 +246,7 @@ export default function FeedbackList({ filter }) {
 
   if (!searchedItems.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white border-gray-200 p-6 rounded-xl shadow-xl max-w-md w-full text-center border">
           <h2 className="text-2xl font-bold text-[#3D021E] mb-2">
             No feedback found
@@ -294,7 +263,7 @@ export default function FeedbackList({ filter }) {
   }
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg">
+    <div className="p-6 bg-white rounded-xl shadow-lg relative">
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
         <input
@@ -365,32 +334,40 @@ export default function FeedbackList({ filter }) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                   {item.date}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="relative">
+                <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <div
+                    className="relative"
+                    ref={(el) => (dropdownRefs.current[item.id] = el)}
+                  >
                     <button
-                      onClick={() =>
+                      onClick={() => {
+                        console.log(
+                          `Toggling dropdown for feedback: ${item.id}`
+                        );
                         setDropdownOpen(
                           dropdownOpen === item.id ? null : item.id
-                        )
-                      }
-                      className="text-gray-500 hover:text-[#3D021E] focus:outline-none transition-colors"
+                        );
+                      }}
+                      className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
                     >
                       <MoreHorizontal className="h-5 w-5" />
                     </button>
                     <AnimatePresence>
                       {dropdownOpen === item.id && (
                         <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.1 }}
+                          className="absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 overflow-hidden bottom-full mb-2" // Luôn hiển thị lên trên
+                          style={{ maxHeight: "none", overflowY: "hidden" }} // Tắt thanh cuộn
                         >
                           <div className="py-1" role="menu">
                             <button
                               onClick={() =>
-                                navigate(`/staff/feedback/${item.id}`, {
-                                  state: { feedback: item },
-                                })
+                                setSelectedFeedback(
+                                  selectedFeedback?.id === item.id ? null : item
+                                )
                               }
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                               role="menuitem"
@@ -408,10 +385,71 @@ export default function FeedbackList({ filter }) {
           </tbody>
         </table>
       </div>
+
+      <AnimatePresence>
+        {selectedFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+          >
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-lg w-full mx-4">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">
+                Feedback Details
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <strong>Feedback ID:</strong> {selectedFeedback.id || "N/A"}
+                </div>
+                <div>
+                  <strong>Booking ID:</strong>{" "}
+                  {selectedFeedback.bookingId || "N/A"}
+                </div>
+                <div>
+                  <strong>Customer:</strong>{" "}
+                  {selectedFeedback.customer || "Unknown Customer"}
+                </div>
+                <div>
+                  <strong>Email:</strong>{" "}
+                  {selectedFeedback.email || "Email not available"}
+                </div>
+                <div>
+                  <strong>Specialist:</strong>{" "}
+                  {selectedFeedback.service || "Dịch vụ không xác định"}
+                </div>
+                <div>
+                  <strong>Rating:</strong>
+                  <div className="flex items-center gap-1">
+                    {renderStars(selectedFeedback.rating)}
+                  </div>
+                </div>
+                <div>
+                  <strong>Created At:</strong>{" "}
+                  {selectedFeedback.createdAt || "N/A"}
+                </div>
+                <div>
+                  <strong>Comment:</strong>
+                  <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    {selectedFeedback.message || "No comment available"}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedFeedback(null)}
+                className="mt-4 px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 FeedbackList.propTypes = {
   filter: PropTypes.number.isRequired,
+  onLoadingChange: PropTypes.func.isRequired,
 };

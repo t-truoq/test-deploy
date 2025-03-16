@@ -7,7 +7,7 @@ import BookingCard from "./BookingCard";
 import BookingDialog from "./BookingDialog";
 
 const BASE_URL =
-  "https://beautya-gr2-production.up.railway.app/api/bookings/specialist";
+  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/specialist";
 
 function Booking() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);

@@ -14,7 +14,7 @@ export default function ServiceHome() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/services",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",

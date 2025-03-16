@@ -15,7 +15,7 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
 
   const BACKEND_URL =
-    "https://beautya-gr2-production.up.railway.app";
+    "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app";
 
   useEffect(() => {
     console.log("Location search:", location.search); // Debug URL
@@ -98,10 +98,7 @@ export default function SignIn() {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError(
-        error.response?.data?.message ||
-          "Your account isn't exits !"
-      );
+      setError(error.response?.data?.message || "Your account isn't exits !");
     } finally {
       setIsLoading(false);
     }
@@ -147,9 +144,7 @@ export default function SignIn() {
           </div>
         )}
 
-        {isLoading && (
-          <div className="text-center">Processing login...</div>
-        )}
+        {isLoading && <div className="text-center">Processing login...</div>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -221,9 +216,7 @@ export default function SignIn() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">
-              Or sign in with
-            </span>
+            <span className="px-2 bg-white text-gray-500">Or sign in with</span>
           </div>
         </div>
 

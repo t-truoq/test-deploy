@@ -1,18 +1,15 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function FeedbackStats() {
+export default function FeedbackStar() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
-    resolved: 0,
-    pending: 0,
-    resolutionRate: 0,
-    pendingPercent: 0,
+    resolved: 0, // Giữ lại để tính toán nếu cần
+    resolutionRate: 0, // Giữ lại để tính toán nếu cần
   });
   const [error, setError] = useState("");
-  const [lastMonthTotal, setLastMonthTotal] = useState(0); // Để tính % tăng/giảm so với tháng trước
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -31,11 +28,13 @@ export default function FeedbackStats() {
         };
 
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/feedbacks",
-          { headers }
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
+          {
+            headers,
+          }
         );
 
-        console.log("Feedback Response in FeedbackStats:", response.data);
+        console.log("Feedback Response in FeedbackStar:", response.data);
 
         if (
           typeof response.data === "string" &&
@@ -47,47 +46,27 @@ export default function FeedbackStats() {
           return;
         }
 
-        // Tính toán thống kê
         const feedbackData = response.data;
         const total = feedbackData.length;
 
-        // Giả định: Feedback có response là "Resolved", không có là "Pending"
-        // Vì API hiện tại không có trường response, giả định tất cả là Pending
         const resolved = feedbackData.filter(
           (item) => item.response && item.response.trim() !== ""
         ).length;
-        const pending = total - resolved;
 
         const resolutionRate =
           total > 0 ? Math.round((resolved / total) * 100) : 0;
-        const pendingPercent =
-          total > 0 ? Math.round((pending / total) * 100) : 0;
-
-        // Giả lập % tăng/giảm so với tháng trước (cần API bổ sung nếu muốn chính xác)
-        const lastMonthTotal = 116; // Giả định giá trị tháng trước (cần API thực tế)
-        setLastMonthTotal(lastMonthTotal);
 
         setStats({
           total,
           resolved,
-          pending,
           resolutionRate,
-          pendingPercent,
         });
       } catch (err) {
-        console.error("Error fetching stats in FeedbackStats:", err);
+        console.error("Error fetching stats in FeedbackStar:", err);
         if (err.response?.status === 401) {
           setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
           localStorage.removeItem("token");
           navigate("/signin");
-        } else if (
-          err.response?.data &&
-          typeof err.response.data === "string" &&
-          err.response.data.startsWith("<!DOCTYPE")
-        ) {
-          setError(
-            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
-          );
         } else {
           setError("Không thể tải dữ liệu thống kê. Vui lòng thử lại.");
         }
@@ -97,20 +76,14 @@ export default function FeedbackStats() {
     fetchStats();
   }, [navigate]);
 
-  // Tính % tăng/giảm so với tháng trước
-  const growthPercent =
-    lastMonthTotal > 0
-      ? Math.round(((stats.total - lastMonthTotal) / lastMonthTotal) * 100)
-      : 0;
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+    <div className="flex justify-start p-2 bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-300 w-full md:w-1/3 lg:w-1/4">
         <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 className="text-sm font-medium">Total Feedback</h3>
+          <h3 className="text-sm font-medium text-gray-700">Total Feedback</h3>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-gray-500"
+            className="h-5 w-5 text-gray-500"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -121,66 +94,11 @@ export default function FeedbackStats() {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
         </div>
-        <div>
-          <div className="text-2xl font-bold">{stats.total}</div>
-          <p className="text-xs text-gray-500">
-            {growthPercent >= 0 ? `+${growthPercent}%` : `${growthPercent}%`}{" "}
-            from last month
-          </p>
-        </div>
+        <div className="text-3xl font-bold text-[#3D021E]">{stats.total}</div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 className="text-sm font-medium">Resolved</h3>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-gray-500"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-        </div>
-        <div>
-          <div className="text-2xl font-bold">{stats.resolved}</div>
-          <p className="text-xs text-gray-500">
-            {stats.resolutionRate}% resolution rate
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-        <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <h3 className="text-sm font-medium">Pending</h3>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-gray-500"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        </div>
-        <div>
-          <div className="text-2xl font-bold">{stats.pending}</div>
-          <p className="text-xs text-gray-500">
-            {stats.pendingPercent}% of total feedback
-          </p>
-        </div>
-      </div>
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4 w-full md:w-1/3 lg:w-1/4">
           {error}
         </div>
       )}

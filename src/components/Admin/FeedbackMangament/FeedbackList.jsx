@@ -1,26 +1,79 @@
-import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+"use client";
 
-export default function FeedbackList({ filter }) {
-  const navigate = useNavigate();
-  const [selectedFeedback, setSelectedFeedback] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [responseText, setResponseText] = useState("");
+import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
+import { MoreHorizontal, Search } from "lucide-react";
+import PropTypes from "prop-types";
+import { useEffect, useState, useRef } from "react";
+
+export default function FeedbackList({ filter, onLoadingChange }) {
   const [feedbackItems, setFeedbackItems] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [error, setError] = useState("");
+
+  const dropdownRefs = useRef({});
+
+  const fetchClients = async () => {
+    try {
+      const response = await fetch(
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const text = await response.text();
+      const data = JSON.parse(text);
+
+      if (data.code !== 0) {
+        throw new Error(data.msg || "API returned an error");
+      }
+
+      const mappedClients = data.result
+        .filter((user) => user.role === "CUSTOMER")
+        .map((user) => ({
+          id: user.userId.toString(),
+          name: user.name || `Khách hàng ID: ${user.userId}`,
+          email: user.email || "Email không khả dụng",
+          phone: user.phone || "N/A",
+          address: user.address || "N/A",
+        }));
+
+      return mappedClients;
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+      setError(
+        (prev) => prev || "Không thể tải dữ liệu khách hàng. Vui lòng thử lại."
+      );
+      return [];
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+      onLoadingChange(true);
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Vui lòng đăng nhập để xem phản hồi");
-        navigate("/signin");
+        onLoadingChange(false);
         return;
       }
 
       try {
+        const fetchedClients = await fetchClients();
+        setClients(fetchedClients);
+
         const headers = {
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true",
@@ -28,57 +81,80 @@ export default function FeedbackList({ filter }) {
         };
 
         const feedbackResponse = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/feedbacks",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
           { headers }
         );
 
-        console.log("Feedback Response:", feedbackResponse.data);
+        const mappedData = feedbackResponse.data
+          .map((item) => {
+            if (
+              !item.feedbackId ||
+              !item.customerId ||
+              !item.specialistId ||
+              !item.rating ||
+              !item.createdAt
+            ) {
+              console.warn("Dữ liệu feedback thiếu trường quan trọng:", item);
+              return null;
+            }
 
-        if (
-          typeof feedbackResponse.data === "string" &&
-          feedbackResponse.data.startsWith("<!DOCTYPE")
-        ) {
-          setError(
-            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
-          );
-          return;
-        }
+            const client = fetchedClients.find(
+              (c) => c.id === item.customerId.toString()
+            );
 
-        const mappedData = feedbackResponse.data.map((item) => ({
-          id: item.feedbackId,
-          customer: `Khách hàng ID: ${item.customerId}`,
-          email: "Email không khả dụng",
-          avatar: "/placeholder.svg?height=40&width=40",
-          service: `Dịch vụ ID: ${item.specialistId}`,
-          message: item.comment,
-          rating: item.rating,
-          date: item.createdAt.split("T")[0], // Định dạng YYYY-MM-DD
-          response: item.response || "",
-        }));
+            return {
+              id: item.feedbackId,
+              customer:
+                item.customerName ||
+                (client ? client.name : `Khách hàng ID: ${item.customerId}`),
+              email: client ? client.email : "Email không khả dụng",
+              avatar: "/placeholder.svg?height=40&width=40",
+              service: item.specialistName || "Dịch vụ không xác định",
+              message: item.comment || "",
+              rating: item.rating || 0,
+              date: item.createdAt ? item.createdAt.split("T")[0] : "N/A",
+              bookingId: item.bookingId || "N/A",
+              specialistId: item.specialistId,
+              customerId: item.customerId,
+              createdAt: item.createdAt,
+            };
+          })
+          .filter((item) => item !== null);
 
         setFeedbackItems(mappedData);
       } catch (err) {
         console.error("Error fetching data:", err);
-        if (err.response?.status === 401) {
-          setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-          localStorage.removeItem("token");
-          navigate("/signin");
-        } else if (
-          err.response?.data &&
-          typeof err.response.data === "string" &&
-          err.response.data.startsWith("<!DOCTYPE")
-        ) {
-          setError(
-            "API trả về HTML thay vì JSON. Vui lòng kiểm tra server hoặc ngrok."
-          );
-        } else {
-          setError("Không thể tải dữ liệu phản hồi. Vui lòng thử lại.");
-        }
+        setError(
+          "Không thể tải dữ liệu phản hồi. Vui lòng kiểm tra API hoặc thử lại."
+        );
+      } finally {
+        setIsLoading(false);
+        onLoadingChange(false);
       }
     };
 
     fetchData();
-  }, [navigate]);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        !Object.values(dropdownRefs.current).some(
+          (ref) => ref && ref.contains(event.target)
+        )
+      ) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Loại bỏ checkDropdownDirection vì chúng ta sẽ cố định hướng lên trên
+  // const checkDropdownDirection = (itemId, buttonRef) => { ... };
 
   const renderStars = (rating) => {
     return Array(5)
@@ -102,198 +178,277 @@ export default function FeedbackList({ filter }) {
       ));
   };
 
-  const handleFeedbackClick = (item) => {
-    setSelectedFeedback(item);
-    setShowModal(true);
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedFeedback(null);
-  };
-
-  useEffect(() => {
-    if (selectedFeedback) {
-      setResponseText(selectedFeedback.response || "");
-    }
-  }, [selectedFeedback]);
-
-  const handleSaveResponse = () => {
-    const updatedItems = feedbackItems.map((item) => {
-      if (item.id === selectedFeedback.id) {
-        return { ...item, response: responseText };
-      }
-      return item;
-    });
-    setFeedbackItems(updatedItems);
-    closeModal();
-  };
-
-  // Lọc và sắp xếp theo thời gian mới nhất
   const filteredItems =
     filter === 0
       ? feedbackItems
       : feedbackItems.filter((item) => item.rating === filter);
 
-  // Sắp xếp theo ngày giảm dần (mới nhất trước)
-  const sortedItems = [...filteredItems].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
+  const searchedItems = filteredItems.filter(
+    (item) =>
+      item.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
-    <>
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-          {error}
-        </div>
-      )}
-      <div className="space-y-4">
-        {sortedItems.length === 0 ? (
-          <div className="bg-white rounded-lg shadow border border-gray-200">
-            <div className="p-6 text-center text-gray-500">
-              Không tìm thấy phản hồi nào phù hợp với bộ lọc đã chọn.
-            </div>
-          </div>
-        ) : (
-          sortedItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-lg shadow border border-gray-200 cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => handleFeedbackClick(item)}
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white border-gray-200 p-6 rounded-xl shadow-xl max-w-md w-full text-center border"
+        >
+          <div className="w-20 h-20 mx-auto mb-6 text-[#3D021E]">
+            <svg
+              className="h-20 w-20"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <div className="p-6">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                      <img
-                        src={item.avatar || "/placeholder.svg"}
-                        alt={item.customer}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{item.customer}</h3>
-                      <p className="text-sm text-gray-500">{item.email}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500">{item.date}</span>
-                </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-[#3D021E] mb-2">{error}</h2>
+          <div className="mt-2">
+            {error.includes("đăng nhập") ? (
+              <button
+                onClick={() => navigate("/signin")}
+                className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+              >
+                Login
+              </button>
+            ) : (
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
-                <div className="mt-4">
-                  <div className="flex items-center gap-1 mb-2">
-                    {renderStars(item.rating)}
-                  </div>
-                  <p className="text-sm font-medium"> {item.service}</p>
-                  <p className="mt-2 text-sm">{item.message}</p>
+  if (!searchedItems.length) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white border-gray-200 p-6 rounded-xl shadow-xl max-w-md w-full text-center border">
+          <h2 className="text-2xl font-bold text-[#3D021E] mb-2">
+            No feedback found
+          </h2>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-                  {item.response && (
-                    <div className="mt-4 pl-4 border-l-2 border-primary/20">
-                      <p className="text-sm font-medium">
-                        Phản hồi của chúng tôi:
-                      </p>
-                      <p className="text-sm text-gray-500">{item.response}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <button className="text-xs px-3 py-1 text-gray-600 hover:bg-gray-100 rounded">
-                    {item.response ? "Chỉnh sửa phản hồi" : "Phản hồi"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+  return (
+    <div className="p-6 bg-white rounded-xl shadow-lg relative">
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by customer or email..."
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300 bg-gray-50"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
 
-      {showModal && selectedFeedback && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-[600px] max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  Phản hồi từ {selectedFeedback.customer}
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Customer
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Specialist
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Rating
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {searchedItems.map((item) => (
+              <motion.tr
+                key={item.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="hover:bg-gray-50 transition-colors duration-200"
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#3D021E] to-[#6D0F3D] flex items-center justify-center text-white text-sm font-medium">
+                      {getInitials(item.customer)}
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900">
+                        {item.customer}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {item.email}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {item.service}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    {renderStars(item.rating)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {item.date}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <div
+                    className="relative"
+                    ref={(el) => (dropdownRefs.current[item.id] = el)}
                   >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-            </div>
+                    <button
+                      onClick={() => {
+                        console.log(
+                          `Toggling dropdown for feedback: ${item.id}`
+                        );
+                        setDropdownOpen(
+                          dropdownOpen === item.id ? null : item.id
+                        );
+                      }}
+                      className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
+                    >
+                      <MoreHorizontal className="h-5 w-5" />
+                    </button>
+                    <AnimatePresence>
+                      {dropdownOpen === item.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.1 }}
+                          className="absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 overflow-hidden bottom-full mb-2" // Luôn hiển thị lên trên
+                          style={{ maxHeight: "none", overflowY: "hidden" }} // Tắt thanh cuộn
+                        >
+                          <div className="py-1" role="menu">
+                            <button
+                              onClick={() =>
+                                setSelectedFeedback(
+                                  selectedFeedback?.id === item.id ? null : item
+                                )
+                              }
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              role="menuitem"
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-            <div className="p-4 space-y-4">
-              <div className="flex justify-between">
+      <AnimatePresence>
+        {selectedFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+          >
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-lg w-full mx-4">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">
+                Feedback Details
+              </h2>
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium">Dịch vụ</p>
-                  <p className="text-sm">{selectedFeedback.service}</p>
+                  <strong>Feedback ID:</strong> {selectedFeedback.id || "N/A"}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Ngày</p>
-                  <p className="text-sm">{selectedFeedback.date}</p>
+                  <strong>Booking ID:</strong>{" "}
+                  {selectedFeedback.bookingId || "N/A"}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Đánh giá</p>
+                  <strong>Customer:</strong>{" "}
+                  {selectedFeedback.customer || "Unknown Customer"}
+                </div>
+                <div>
+                  <strong>Email:</strong>{" "}
+                  {selectedFeedback.email || "Email not available"}
+                </div>
+                <div>
+                  <strong>Specialist:</strong>{" "}
+                  {selectedFeedback.service || "Dịch vụ không xác định"}
+                </div>
+                <div>
+                  <strong>Rating:</strong>
                   <div className="flex items-center gap-1">
                     {renderStars(selectedFeedback.rating)}
                   </div>
                 </div>
+                <div>
+                  <strong>Created At:</strong>{" "}
+                  {selectedFeedback.createdAt || "N/A"}
+                </div>
+                <div>
+                  <strong>Comment:</strong>
+                  <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    {selectedFeedback.message || "No comment available"}
+                  </div>
+                </div>
               </div>
-
-              <div>
-                <p className="text-sm font-medium">Phản hồi</p>
-                <p className="text-sm mt-1 p-3 bg-gray-100 rounded-md">
-                  {selectedFeedback.message}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium">Phản hồi của chúng tôi</p>
-                <textarea
-                  placeholder="Nhập phản hồi của bạn tại đây..."
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  rows={4}
-                  value={responseText}
-                  onChange={(e) => setResponseText(e.target.value)}
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
               <button
-                onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                onClick={() => setSelectedFeedback(null)}
+                className="mt-4 px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
               >
-                Hủy
-              </button>
-              <button
-                onClick={handleSaveResponse}
-                className="px-4 py-2 bg-[#4A0404] hover:bg-[#3A0303] text-white rounded-md transition-colors"
-              >
-                Lưu phản hồi
+                Close
               </button>
             </div>
-          </div>
-        </div>
-      )}
-    </>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
 FeedbackList.propTypes = {
   filter: PropTypes.number.isRequired,
+  onLoadingChange: PropTypes.func.isRequired,
 };

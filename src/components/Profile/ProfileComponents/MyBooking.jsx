@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CalendarMyBooking from "../../Profile/ProfileComponents/MybookingComponents/CalendarMyBooking"; // Adjust the import path as needed
-import { format, addHours } from 'date-fns'; // Chỉ cần format và addHours
+import { format, addHours } from "date-fns"; // Chỉ cần format và addHours
 
 const MyBooking = () => {
   const navigate = useNavigate();
@@ -76,7 +76,6 @@ const MyBooking = () => {
   });
   const [specialistBusyTimes, setSpecialistBusyTimes] = useState([]);
   const [allSpecialistBusyTimes, setAllSpecialistBusyTimes] = useState({});
-  
 
   // Generate time slots (08:00 to 20:00, 30-minute intervals)
   const timeSlots = [];
@@ -154,7 +153,7 @@ const MyBooking = () => {
         // Lấy danh sách bookings
         console.log("Fetching bookings from /api/bookings/user...");
         const bookingsResponse = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/bookings/user",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/user",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -183,7 +182,7 @@ const MyBooking = () => {
         // Lấy toàn bộ feedback trong một lần gọi
         console.log("Fetching feedbacks from /api/feedbacks...");
         const feedbackResponse = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/feedbacks",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -254,7 +253,7 @@ const MyBooking = () => {
           } else {
             setErrorPopup(
               error.response.data.message ||
-              "Failed to load bookings. Please try again."
+                "Failed to load bookings. Please try again."
             );
           }
         } else if (error.request) {
@@ -281,7 +280,7 @@ const MyBooking = () => {
         if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/users/specialists/active",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -343,11 +342,11 @@ const MyBooking = () => {
 
   const filteredBookings = searchDate
     ? bookings.filter((booking) => {
-      const bookingDateFormatted = new Date(booking.bookingDate)
-        .toISOString()
-        .split("T")[0];
-      return bookingDateFormatted === searchDate;
-    })
+        const bookingDateFormatted = new Date(booking.bookingDate)
+          .toISOString()
+          .split("T")[0];
+        return bookingDateFormatted === searchDate;
+      })
     : bookings;
 
   const checkBookingConflict = (bookingDate, startTime, services) => {
@@ -384,7 +383,7 @@ const MyBooking = () => {
 
       if (specialistId) {
         const response = await axios.get(
-          `https://beautya-gr2-production.up.railway.app/api/schedules/${specialistId}/busy`,
+          `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/schedules/${specialistId}/busy`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -395,7 +394,12 @@ const MyBooking = () => {
           }
         );
 
-        console.log("Full response data from API for specialist", specialistId, ":", response.data);
+        console.log(
+          "Full response data from API for specialist",
+          specialistId,
+          ":",
+          response.data
+        );
 
         if (Array.isArray(response.data)) {
           const busyTimeRanges = response.data
@@ -408,7 +412,12 @@ const MyBooking = () => {
               return { startTime, endTime };
             });
 
-          console.log("Filtered busy time ranges for specialist", specialistId, ":", busyTimeRanges);
+          console.log(
+            "Filtered busy time ranges for specialist",
+            specialistId,
+            ":",
+            busyTimeRanges
+          );
           setSpecialistBusyTimes(busyTimeRanges);
           setAllSpecialistBusyTimes((prev) => ({
             ...prev,
@@ -422,7 +431,7 @@ const MyBooking = () => {
         for (const specialist of specialists) {
           try {
             const response = await axios.get(
-              `https://beautya-gr2-production.up.railway.app/api/schedules/${specialist.userId}/busy`,
+              `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/schedules/${specialist.userId}/busy`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -433,12 +442,17 @@ const MyBooking = () => {
               }
             );
 
-            console.log(`Full response data for specialist ${specialist.userId}:`, response.data);
+            console.log(
+              `Full response data for specialist ${specialist.userId}:`,
+              response.data
+            );
 
             if (Array.isArray(response.data)) {
               const busyTimeRanges = response.data
                 .filter((item) => {
-                  const itemDate = new Date(item.date).toISOString().split("T")[0];
+                  const itemDate = new Date(item.date)
+                    .toISOString()
+                    .split("T")[0];
                   return itemDate === date;
                 })
                 .map((item) => {
@@ -451,21 +465,33 @@ const MyBooking = () => {
               busyTimesMap[specialist.userId] = [];
             }
           } catch (error) {
-            console.error(`Error fetching busy times for specialist ${specialist.userId}:`, error);
+            console.error(
+              `Error fetching busy times for specialist ${specialist.userId}:`,
+              error
+            );
             busyTimesMap[specialist.userId] = [];
           }
         }
 
-        console.log("All specialist busy times for date", date, ":", busyTimesMap);
+        console.log(
+          "All specialist busy times for date",
+          date,
+          ":",
+          busyTimesMap
+        );
         setAllSpecialistBusyTimes(busyTimesMap);
         setSpecialistBusyTimes([]);
       }
     } catch (error) {
       console.error("Error fetching specialist busy times:", error);
       if (error.response && error.response.status === 404) {
-        setErrorPopup("Specialist schedule not found. Please try another specialist.");
+        setErrorPopup(
+          "Specialist schedule not found. Please try another specialist."
+        );
       } else {
-        setErrorPopup("Failed to load specialist busy times. Please try again.");
+        setErrorPopup(
+          "Failed to load specialist busy times. Please try again."
+        );
       }
       if (specialistId) {
         setSpecialistBusyTimes([]);
@@ -525,7 +551,7 @@ const MyBooking = () => {
       console.log("isCancelling updated to true for bookingId:", bookingId);
 
       const response = await axios.post(
-        `https://beautya-gr2-production.up.railway.app/api/bookings/${bookingId}/cancel`,
+        `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {},
         {
           headers: {
@@ -618,7 +644,7 @@ const MyBooking = () => {
 
     try {
       const response = await axios.post(
-        "https://beautya-gr2-production.up.railway.app/api/bookings",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {
@@ -733,7 +759,7 @@ const MyBooking = () => {
       }
 
       const response = await axios.get(
-        `https://beautya-gr2-production.up.railway.app/api/bookings/${bookingId}`,
+        `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -810,7 +836,7 @@ const MyBooking = () => {
       if (!feedbackResponseData) {
         try {
           const feedbackResponse = await axios.get(
-            `https://beautya-gr2-production.up.railway.app/api/feedbacks/booking/${bookingId}`,
+            `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks/booking/${bookingId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -916,7 +942,7 @@ const MyBooking = () => {
       console.log("Payment data to be sent:", paymentData);
 
       const response = await axios.post(
-        "https://beautya-gr2-production.up.railway.app/api/v1/vnpay/create-payment",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/v1/vnpay/create-payment",
         paymentData,
         {
           headers: {
@@ -985,7 +1011,7 @@ const MyBooking = () => {
       };
 
       const response = await axios.post(
-        "https://beautya-gr2-production.up.railway.app/api/feedbacks",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {
@@ -1085,14 +1111,17 @@ const MyBooking = () => {
 
   // Hàm chuyển phút thành thời gian dạng "HH:mm"
   const minutesToTime = (minutes) => {
-    const hour = Math.floor(minutes / 60).toString().padStart(2, "0");
+    const hour = Math.floor(minutes / 60)
+      .toString()
+      .padStart(2, "0");
     const minute = (minutes % 60).toString().padStart(2, "0");
     return `${hour}:${minute}`;
   };
 
   // Hàm kiểm tra xem có specialist nào rảnh không
   const isAnySpecialistAvailable = (time, totalDuration) => {
-    if (!bookingDate || totalDuration === 0 || specialists.length === 0) return { available: true };
+    if (!bookingDate || totalDuration === 0 || specialists.length === 0)
+      return { available: true };
 
     const startMinutes = timeToMinutes(time);
     const endMinutes = startMinutes + totalDuration;
@@ -1109,7 +1138,11 @@ const MyBooking = () => {
         ) {
           return {
             available: false,
-            conflict: `Time slot ${time} to ${minutesToTime(endMinutes)} conflicts with busy range ${busyRange.startTime}-${busyRange.endTime}`,
+            conflict: `Time slot ${time} to ${minutesToTime(
+              endMinutes
+            )} conflicts with busy range ${busyRange.startTime}-${
+              busyRange.endTime
+            }`,
           };
         }
       }
@@ -1132,7 +1165,9 @@ const MyBooking = () => {
         }
       }
       return true;
-    }) ? { available: true } : { available: false };
+    })
+      ? { available: true }
+      : { available: false };
   };
 
   const isTimeSlotAvailable = (time) => {
@@ -1257,10 +1292,10 @@ const MyBooking = () => {
   const formatDate = (dateString) =>
     dateString
       ? new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
       : "N/A";
   const formatTime = (timeString) => (timeString ? timeString : "N/A");
 
@@ -1516,7 +1551,8 @@ const MyBooking = () => {
                     {/* Chọn ngày */}
                     <div className="relative">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        <Calendar className="w-4 h-4 inline mr-1" /> Booking Date
+                        <Calendar className="w-4 h-4 inline mr-1" /> Booking
+                        Date
                       </label>
                       <motion.button
                         type="button"
@@ -1530,7 +1566,12 @@ const MyBooking = () => {
                       </motion.button>
                       <AnimatePresence>
                         {isCalendarOpen && (
-                          <motion.div className="absolute z-10 mt-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                          <motion.div
+                            className="absolute z-10 mt-2"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                          >
                             <CalendarMyBooking
                               selectedDate={bookingDate}
                               onDateChange={(date) => {
@@ -1555,7 +1596,10 @@ const MyBooking = () => {
                       >
                         <option value="">Auto-assign</option>
                         {specialists.map((specialist) => (
-                          <option key={specialist.userId} value={specialist.userId}>
+                          <option
+                            key={specialist.userId}
+                            value={specialist.userId}
+                          >
                             {specialist.name}
                           </option>
                         ))}
@@ -1592,8 +1636,12 @@ const MyBooking = () => {
                                   (sum, service) => sum + service.duration,
                                   0
                                 );
-                                const status = isAnySpecialistAvailable(time, totalDuration);
-                                const isAvailable = status.available && isTimeSlotAvailable(time);
+                                const status = isAnySpecialistAvailable(
+                                  time,
+                                  totalDuration
+                                );
+                                const isAvailable =
+                                  status.available && isTimeSlotAvailable(time);
 
                                 return (
                                   <motion.button
@@ -1605,16 +1653,24 @@ const MyBooking = () => {
                                       }
                                     }}
                                     disabled={!isAvailable}
-                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${startTime === time
+                                    className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                                      startTime === time
                                         ? "bg-rose-600 text-white"
                                         : !isAvailable
-                                          ? "text-gray-400 cursor-not-allowed"
-                                          : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
-                                      }`}
-                                    whileHover={{ scale: !isAvailable ? 1 : 1.02 }}
-                                    whileTap={{ scale: !isAvailable ? 1 : 0.98 }}
+                                        ? "text-gray-400 cursor-not-allowed"
+                                        : "text-gray-700 hover:bg-rose-50 hover:text-rose-600"
+                                    }`}
+                                    whileHover={{
+                                      scale: !isAvailable ? 1 : 1.02,
+                                    }}
+                                    whileTap={{
+                                      scale: !isAvailable ? 1 : 0.98,
+                                    }}
                                   >
-                                    {time} {!isAvailable && status.conflict ? `(${status.conflict.split(" ").pop()})` : !isAvailable && "(Unavailable)"}
+                                    {time}{" "}
+                                    {!isAvailable && status.conflict
+                                      ? `(${status.conflict.split(" ").pop()})`
+                                      : !isAvailable && "(Unavailable)"}
                                   </motion.button>
                                 );
                               })}
@@ -1629,10 +1685,11 @@ const MyBooking = () => {
                 <motion.button
                   onClick={handleConfirmBooking}
                   disabled={isBooking}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${isBooking
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-rose-600 text-white hover:bg-rose-700"
-                    }`}
+                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
+                    isBooking
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-rose-600 text-white hover:bg-rose-700"
+                  }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -1695,8 +1752,8 @@ const MyBooking = () => {
         </motion.div>
 
         {filteredBookings.length === 0 &&
-          selectedServices.length === 0 &&
-          !confirmedBooking ? (
+        selectedServices.length === 0 &&
+        !confirmedBooking ? (
           <motion.div
             className="bg-white rounded-xl shadow-md p-8 text-center"
             variants={fadeIn}
@@ -1842,10 +1899,11 @@ const MyBooking = () => {
                               handleCancelBooking(booking.bookingId)
                             }
                             disabled={isCancelling[booking.bookingId]} // Vô hiệu hóa nút khi đang hủy
-                            className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isCancelling[booking.bookingId]
-                              ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-                              : "bg-rose-100 text-rose-700 hover:bg-rose-200"
-                              }`}
+                            className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
+                              isCancelling[booking.bookingId]
+                                ? "bg-gray-300 text-gray-700 cursor-not-allowed"
+                                : "bg-rose-100 text-rose-700 hover:bg-rose-200"
+                            }`}
                           >
                             {isCancelling[booking.bookingId] ? (
                               <>
@@ -1994,14 +2052,14 @@ const MyBooking = () => {
                     {filteredBookings.findIndex(
                       (b) => b.bookingId === selectedBooking.bookingId
                     ) !== -1 && (
-                        <span className="text-lg font-semibold text-gray-800">
-                          Booking #
-                          {filteredBookings.length -
-                            filteredBookings.findIndex(
-                              (b) => b.bookingId === selectedBooking.bookingId
-                            )}
-                        </span>
-                      )}
+                      <span className="text-lg font-semibold text-gray-800">
+                        Booking #
+                        {filteredBookings.length -
+                          filteredBookings.findIndex(
+                            (b) => b.bookingId === selectedBooking.bookingId
+                          )}
+                      </span>
+                    )}
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(
                         selectedBooking.status
@@ -2130,10 +2188,11 @@ const MyBooking = () => {
                               {Array.from({ length: 5 }, (_, i) => (
                                 <span
                                   key={i}
-                                  className={`w-5 h-5 ${i < bookingDetails.feedback.rating
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                                    }`}
+                                  className={`w-5 h-5 ${
+                                    i < bookingDetails.feedback.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
                                 >
                                   ★
                                 </span>
@@ -2188,43 +2247,44 @@ const MyBooking = () => {
                       </motion.div>
                       {(bookingDetails.paymentStatus === "PENDING" ||
                         bookingDetails.paymentStatus === "FAILED") && (
-                          <>
-                            {bookingDetails.paymentStatus === "FAILED" && (
-                              <motion.div
-                                className="mb-4 p-3 bg-rose-50 rounded-lg flex items-center"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                              >
-                                <AlertCircle className="w-5 h-5 text-rose-600 mr-2" />
-                                <p className="text-sm text-rose-700">
-                                  Payment failed. Please try again.
-                                </p>
-                              </motion.div>
-                            )}
-                            <motion.button
-                              onClick={handlePayment}
-                              disabled={isPaying}
-                              className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${isPaying
+                        <>
+                          {bookingDetails.paymentStatus === "FAILED" && (
+                            <motion.div
+                              className="mb-4 p-3 bg-rose-50 rounded-lg flex items-center"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.3 }}
+                            >
+                              <AlertCircle className="w-5 h-5 text-rose-600 mr-2" />
+                              <p className="text-sm text-rose-700">
+                                Payment failed. Please try again.
+                              </p>
+                            </motion.div>
+                          )}
+                          <motion.button
+                            onClick={handlePayment}
+                            disabled={isPaying}
+                            className={`w-full flex items-center justify-center py-3 rounded-lg font-medium transition-colors ${
+                              isPaying
                                 ? "bg-gray-400 text-white cursor-not-allowed"
                                 : "bg-rose-600 text-white hover:bg-rose-700"
-                                } mb-4`}
-                              whileHover={{ scale: 1.03 }}
-                              whileTap={{ scale: 0.97 }}
-                            >
-                              {isPaying ? (
-                                <>
-                                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
-                                  Processing...
-                                </>
-                              ) : (
-                                <>
-                                  <DollarSign className="w-5 h-5 mr-2" /> Pay Now
-                                </>
-                              )}
-                            </motion.button>
-                          </>
-                        )}
+                            } mb-4`}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                          >
+                            {isPaying ? (
+                              <>
+                                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />{" "}
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                <DollarSign className="w-5 h-5 mr-2" /> Pay Now
+                              </>
+                            )}
+                          </motion.button>
+                        </>
+                      )}
                     </>
                   )}
                   {selectedBooking.status === "CANCELLED" && (
@@ -2328,10 +2388,11 @@ const MyBooking = () => {
                             onMouseLeave={() =>
                               setFeedbackRating(feedbackRating)
                             }
-                            className={`text-3xl cursor-pointer transition-colors duration-200 ${starValue <= feedbackRating
-                              ? "text-yellow-400"
-                              : "text-gray-300"
-                              }`}
+                            className={`text-3xl cursor-pointer transition-colors duration-200 ${
+                              starValue <= feedbackRating
+                                ? "text-yellow-400"
+                                : "text-gray-300"
+                            }`}
                             whileHover={{ scale: 1.2 }}
                             whileTap={{ scale: 0.9 }}
                           >
@@ -2344,14 +2405,14 @@ const MyBooking = () => {
                       {feedbackRating === 0
                         ? "Select a rating"
                         : feedbackRating === 1
-                          ? "1 - Poor"
-                          : feedbackRating === 2
-                            ? "2 - Fair"
-                            : feedbackRating === 3
-                              ? "3 - Good"
-                              : feedbackRating === 4
-                                ? "4 - Very Good"
-                                : "5 - Excellent"}
+                        ? "1 - Poor"
+                        : feedbackRating === 2
+                        ? "2 - Fair"
+                        : feedbackRating === 3
+                        ? "3 - Good"
+                        : feedbackRating === 4
+                        ? "4 - Very Good"
+                        : "5 - Excellent"}
                     </p>
                   </div>
                   <div>
@@ -2369,10 +2430,11 @@ const MyBooking = () => {
                   <motion.button
                     onClick={handleSubmitFeedback}
                     disabled={isSubmittingFeedback}
-                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${isSubmittingFeedback
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-rose-600 text-white hover:bg-rose-700"
-                      }`}
+                    className={`w-full flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors ${
+                      isSubmittingFeedback
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-rose-600 text-white hover:bg-rose-700"
+                    }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >

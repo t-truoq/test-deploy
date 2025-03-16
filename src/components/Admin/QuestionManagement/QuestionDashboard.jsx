@@ -7,7 +7,7 @@ import { useEffect, useState, useRef } from "react";
 import EditQuestionForm from "./EditQuestion";
 
 const BACKEND_URL =
-  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app";
+  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app";
 
 export default function QuestionDashboard() {
   const [questions, setQuestions] = useState([]);

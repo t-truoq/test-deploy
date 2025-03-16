@@ -51,7 +51,7 @@ export default function Newsletter() {
 
     try {
       const response = await axios.post(
-        "https://beautya-gr2-production.up.railway.app/api/contact",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/contact",
         formData,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );
@@ -67,8 +67,7 @@ export default function Newsletter() {
     } catch (error) {
       console.error("Error submitting contact:", error);
       setError(
-        error.response?.data?.message ||
-        "Cannot sent requirement. Try again"
+        error.response?.data?.message || "Cannot sent requirement. Try again"
       );
     } finally {
       setIsLoading(false);
@@ -80,7 +79,7 @@ export default function Newsletter() {
     if (hash === "#newsletter") {
       const newsletterSection = document.getElementById("newsletter");
       if (newsletterSection) {
-          newsletterSection.scrollIntoView({ behavior: "smooth" });
+        newsletterSection.scrollIntoView({ behavior: "smooth" });
       }
     }
   }, []);
@@ -88,8 +87,7 @@ export default function Newsletter() {
   return (
     <section className="py-16 md:py-24 w-full bg-gradient-to-r from-[#3D021E] to-[#A10550]">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <div id="newsletter" 
-            className="max-w-3xl mx-auto text-center">
+        <div id="newsletter" className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
             Get Support
           </h2>
@@ -140,10 +138,11 @@ export default function Newsletter() {
             <button
               type="submit"
               disabled={isLoading} // Disable button when loading
-              className={`bg-white text-[#A10550] px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${isLoading
+              className={`bg-white text-[#A10550] px-8 py-4 rounded-lg text-lg font-semibold transition-colors ${
+                isLoading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-gray-100"
-                }`}
+              }`}
             >
               {isLoading ? "Sending..." : "Send Request"}
             </button>

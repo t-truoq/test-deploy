@@ -1,19 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Printer,
-  Send,
-  Filter,
-  ChevronDown,
-  AlertCircle,
-  RefreshCw,
-} from "lucide-react";
+import { Filter, ChevronDown, AlertCircle, RefreshCw } from "lucide-react";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL =
-  "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/v1/vnpay";
+  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);
@@ -458,11 +451,11 @@ export default function PaymentStaff() {
                         #{payment.paymentId}
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-800 font-medium">
-                        $
                         {payment.amount.toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        })}
+                        })}{" "}
+                        ₫
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-800">
                         {payment.paymentMethod}
@@ -503,33 +496,15 @@ export default function PaymentStaff() {
             <div className="text-sm text-gray-500">
               Showing {filteredPayments.length} of {payments.length} payments
             </div>
-            <div className="flex items-center gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-[#3D021E] hover:text-[#4A0404] transition-colors"
-              >
-                <Printer className="w-4 h-4" />
-                Print
-              </motion.button>
-              <div className="text-sm bg-[#F8F2F5] text-gray-600 px-4 py-2 rounded-lg">
-                <span className="font-medium">Total: </span>
-                <span className="font-bold text-[#3D021E]">
-                  $
-                  {totalAmount.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] hover:from-[#4A0404] hover:to-[#7D1F4D] text-white rounded-lg shadow-md"
-              >
-                Send
-                <Send className="w-4 h-4" />
-              </motion.button>
+            <div className="text-sm bg-[#F8F2F5] text-gray-600 px-4 py-2 rounded-lg">
+              <span className="font-medium">Total: </span>
+              <span className="font-bold text-[#3D021E]">
+                {totalAmount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                ₫
+              </span>
             </div>
           </div>
         </motion.div>

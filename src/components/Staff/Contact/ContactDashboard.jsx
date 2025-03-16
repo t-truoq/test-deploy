@@ -42,7 +42,7 @@ export function ContactDashboard() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        "https://beautya-gr2-production.up.railway.app/api/contact",
+        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/contact",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ export function ContactDashboard() {
     }
     try {
       const response = await axios.put(
-        `https://beautya-gr2-production.up.railway.app/api/contact/${id}/status?status=${status}`,
+        `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/contact/${id}/status?status=${status}`,
         null,
         {
           headers: {

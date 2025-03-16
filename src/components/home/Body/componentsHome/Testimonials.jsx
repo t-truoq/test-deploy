@@ -165,28 +165,27 @@
 //   )
 // }
 
+"use client";
 
-"use client"
-
-import { useState, useEffect, useRef } from "react"
-import { ChevronLeft, ChevronRight, Star } from "lucide-react"
-import { motion, useInView } from "framer-motion"
-import axios from "axios"
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import axios from "axios";
 
 export default function Testimonials() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [testimonials, setTestimonials] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   // Fetch testimonials from API using axios
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
         const response = await axios.get(
-          "https://beautya-gr2-production.up.railway.app/api/feedbacks",
+          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -199,17 +198,17 @@ export default function Testimonials() {
 
         // Kiểm tra nếu dữ liệu là mảng
         const data = Array.isArray(response.data) ? response.data : [];
-        
+
         // Chuẩn hóa và lọc 5 feedback 5 sao đầu tiên
         const transformedData = data
-          .map(feedback => ({
+          .map((feedback) => ({
             id: feedback.feedbackId,
             name: feedback.customerName || "Anonymous",
             rating: Math.min(5, Math.max(1, feedback.rating || 1)), // Giới hạn rating từ 1-5
             message: feedback.comment || "No comment provided",
-            image: "/placeholder.svg?height=96&width=96" // Hình mặc định
+            image: "/placeholder.svg?height=96&width=96", // Hình mặc định
           }))
-          .filter(testimonial => testimonial.rating === 5) // Chỉ lấy feedback 5 sao
+          .filter((testimonial) => testimonial.rating === 5) // Chỉ lấy feedback 5 sao
           .slice(0, 5); // Lấy 5 cái đầu tiên
 
         console.log("Transformed Data:", transformedData);
@@ -223,9 +222,13 @@ export default function Testimonials() {
       } catch (error) {
         console.error("Error fetching testimonials:", error.message || error);
         if (error.response) {
-          setError(`Server error: ${error.response.status} - ${error.response.statusText}. Please check the backend.`);
+          setError(
+            `Server error: ${error.response.status} - ${error.response.statusText}. Please check the backend.`
+          );
         } else {
-          setError("Failed to connect to the API. Please ensure ngrok is running and the URL is valid.");
+          setError(
+            "Failed to connect to the API. Please ensure ngrok is running and the URL is valid."
+          );
         }
         setTestimonials([]);
         setLoading(false);
@@ -240,7 +243,9 @@ export default function Testimonials() {
   };
 
   const prevTestimonial = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length
+    );
   };
 
   const containerVariants = {
@@ -281,7 +286,10 @@ export default function Testimonials() {
       <section className="py-16 md:py-24 w-full bg-pink-50">
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 text-center">
           <p className="text-red-500">{error}</p>
-          <p className="text-gray-600 mt-2">Current URL: https://beautya-gr2-production.up.railway.app/api/feedbacks</p>
+          <p className="text-gray-600 mt-2">
+            Current URL:
+            https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks
+          </p>
         </div>
       </section>
     );
@@ -300,15 +308,25 @@ export default function Testimonials() {
   return (
     <section className="py-16 md:py-24 w-full bg-pink-50" ref={ref}>
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
           <motion.div variants={itemVariants} className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">What Our Clients Say</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              What Our Clients Say
+            </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-              Hear from our satisfied clients about their experiences and transformations with our skincare services
+              Hear from our satisfied clients about their experiences and
+              transformations with our skincare services
             </p>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="relative max-w-5xl mx-auto">
+          <motion.div
+            variants={itemVariants}
+            className="relative max-w-5xl mx-auto"
+          >
             {/* Testimonial Slider */}
             <div className="overflow-hidden">
               <div
@@ -316,7 +334,10 @@ export default function Testimonials() {
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
                 {testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
+                  <div
+                    key={testimonial.id}
+                    className="w-full flex-shrink-0 px-4"
+                  >
                     <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
                       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
                         <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
@@ -327,18 +348,26 @@ export default function Testimonials() {
                           />
                         </div>
                         <div className="text-center md:text-left">
-                          <h3 className="text-xl md:text-2xl font-bold mb-2">{testimonial.name}</h3>
+                          <h3 className="text-xl md:text-2xl font-bold mb-2">
+                            {testimonial.name}
+                          </h3>
                           <div className="flex justify-center md:justify-start">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-5 h-5 ${i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                                className={`w-5 h-5 ${
+                                  i < testimonial.rating
+                                    ? "text-yellow-500 fill-yellow-500"
+                                    : "text-gray-300"
+                                }`}
                               />
                             ))}
                           </div>
                         </div>
                       </div>
-                      <blockquote className="text-lg md:text-xl text-gray-700 italic">"{testimonial.message}"</blockquote>
+                      <blockquote className="text-lg md:text-xl text-gray-700 italic">
+                        "{testimonial.message}"
+                      </blockquote>
                     </div>
                   </div>
                 ))}

@@ -71,7 +71,8 @@ const Navbar = () => {
   const [showNotificationMessage, setShowNotificationMessage] = useState(true);
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
-  const baseUrl = "https://beautya-gr2-production.up.railway.app";
+  const baseUrl =
+    "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app";
 
   const handleBlogPage = () => {
     navigate(`/blog`);
@@ -198,9 +199,7 @@ const Navbar = () => {
         setErrorNotifications(null);
         const token = localStorage.getItem("token");
         if (!token) {
-          setErrorNotifications(
-            "Please log in before check notifications."
-          );
+          setErrorNotifications("Please log in before check notifications.");
           setLoadingNotifications(false);
           return;
         }
@@ -264,10 +263,7 @@ const Navbar = () => {
           await new Promise((resolve) => setTimeout(resolve, 2000));
           return fetchNotifications(retryCount - 1);
         }
-        setErrorNotifications(
-          error.message ||
-            "Check your network again !"
-        );
+        setErrorNotifications(error.message || "Check your network again !");
       } finally {
         setLoadingNotifications(false);
       }
@@ -407,7 +403,11 @@ const Navbar = () => {
         style={{ zIndex: 1000 }}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2" onClick={handleHomePage}>
+          <Link
+            to="/"
+            className="flex items-center space-x-2"
+            onClick={handleHomePage}
+          >
             <img
               src="home/logo/logo.webp"
               alt="Beauty Logo"

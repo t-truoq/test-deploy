@@ -85,7 +85,7 @@ export default function SpecialistShowcase() {
   const [error, setError] = useState(null);
   const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const baseUrl =
-    "https://beautya-gr2-production.up.railway.app";
+    "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app";
 
   useEffect(() => {
     const fetchSpecialists = async () => {

@@ -63,7 +63,7 @@ const Dashboard = () => {
           [usersResponse, ordersResponse, salesResponse] = await Promise.all([
             axios
               .get(
-                "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/users",
+                "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users",
                 config
               )
               .catch((err) => {
@@ -75,7 +75,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/bookings",
+                "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
                 config
               )
               .catch((err) => {
@@ -87,7 +87,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/v1/vnpay",
+                "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/v1/vnpay",
                 config
               )
               .catch((err) => {
@@ -108,7 +108,7 @@ const Dashboard = () => {
           applyFilters(salesResponse.data || []); // Áp dụng bộ lọc mặc định
         } else if (userRole === "SPECIALIST") {
           ordersResponse = await axios.get(
-            "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/bookings",
+            "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
             config
           );
           const totalOrders =
@@ -116,7 +116,7 @@ const Dashboard = () => {
           setStats((prev) => ({ ...prev, totalOrders }));
         } else if (userRole === "CUSTOMER") {
           ordersResponse = await axios.get(
-            "https://b865-2405-4802-811e-11a0-875-581e-b53-2910.ngrok-free.app/api/bookings",
+            "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
             {
               ...config,
               params: { userId: decodedToken.sub },
@@ -168,8 +168,6 @@ const Dashboard = () => {
         return acc;
       }, {});
 
-    console.log("Filtered Sales By Day:", salesByDay);
-
     setStats((prev) => ({
       ...prev,
       totalSales,
@@ -185,7 +183,7 @@ const Dashboard = () => {
     labels: Array.from({ length: 31 }, (_, i) => i + 1),
     datasets: [
       {
-        label: "Sales ($)",
+        label: "Sales (VND)",
         data: Array.from(
           { length: 31 },
           (_, i) => stats.salesByDay[i + 1] || 0
@@ -207,7 +205,10 @@ const Dashboard = () => {
       },
     },
     scales: {
-      y: { beginAtZero: true, title: { display: true, text: "Amount ($)" } },
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: "Amount (VND)" },
+      },
       x: { title: { display: true, text: "Day" } },
     },
   };
@@ -256,7 +257,7 @@ const Dashboard = () => {
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between">
               <h3 className="text-3xl font-semibold text-gray-900">
-                ${stats.totalSales.toLocaleString()}
+                {stats.totalSales.toLocaleString()} ₫
               </h3>
               <div className="rounded-full bg-green-50 p-3">
                 <TrendingUp className="h-6 w-6 text-green-500" />

@@ -171,7 +171,6 @@ import StaffsManagement from "./pages/Admin/StaffsManagment/StaffsManagement";
 import SkinTherapistsManagement from "./pages/Admin/SkinTherapistsManagement/SkinTherapistsManagement";
 import ContactManagment from "./pages/Staff/ContactManagment";
 import Payment from "./pages/Staff/Payment";
-import FeedBackViewDetail from "./components/Staff/Feedback/FeedBackViewDetail";
 import QuestionAdmin from "./pages/Admin/Questions/QuestionAdmin";
 
 function App() {
@@ -198,7 +197,6 @@ function App() {
     "/staff/contact",
     "/staff/paymentmanagement",
     "/staff/feedback",
-    "/staff/feedback/:id",
     "/skintherapist/home",
     "/skintherapist/feedback",
     "/skintherapist/profile",
@@ -255,10 +253,6 @@ function App() {
             <Route path="/staff/skintherapist" element={<HomeStaff />} />
             <Route path="/staff/schedule" element={<HomeStaff />} />
             <Route path="/staff/feedback" element={<FeedbackStaff />} />
-            <Route
-              path="/staff/feedback/:id"
-              element={<FeedBackViewDetail />}
-            />
             <Route path="/staff/contact" element={<ContactManagment />} />
             <Route path="/staff/paymentmanagement" element={<Payment />} />
             {/* Skin therapist router */}
