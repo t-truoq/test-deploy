@@ -415,7 +415,7 @@ const ServiceList = () => {
     const fetchRecommendedServices = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found. Please login again.");
+        if (!token) throw new Error("Please login before doing quiz !.");
 
         const response = await axios.get(
           "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/quiz/recommended-services",

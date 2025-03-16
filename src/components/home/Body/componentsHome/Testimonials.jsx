@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react"
 import { motion } from "framer-motion"
 import axios from "axios"
@@ -13,10 +13,9 @@ export default function Testimonials() {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await axios.get("https://beautya-gr2-production.up.railway.app/api/feedbacks", {
+      const response = await axios.get("https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks", {
         headers: {
           "ngrok-skip-browser-warning": "true",
-          "Cache-Control": "no-cache",
         },
       });
 
@@ -24,20 +23,22 @@ export default function Testimonials() {
 
       const data = Array.isArray(response.data) ? response.data : [];
       
+      // Filter for 5-star ratings only
       const transformedData = data
+        .filter(feedback => feedback.rating === 5) // Only keep 5-star feedback
         .map(feedback => ({
           id: feedback.feedbackId,
           name: feedback.customerName || "Anonymous",
-          rating: feedback.rating ? Math.min(5, Math.max(1, feedback.rating)) : 5,
+          rating: 5, // Since we're filtering for 5 stars, this is always 5
           message: feedback.comment || "No comment provided",
           image: "/placeholder.svg?height=96&width=96"
         }))
-        .slice(0, 5);
+        .slice(0, 5); // Still limit to 5 testimonials
 
-      console.log("Transformed Data:", transformedData);
+      console.log("Transformed Data (5-star only):", transformedData);
 
       if (transformedData.length === 0) {
-        setError("No testimonials found in the database.");
+        setError("No 5-star testimonials found in the database.");
         setTestimonials([]);
       } else {
         setTestimonials(transformedData);
@@ -119,7 +120,7 @@ export default function Testimonials() {
       <section className="py-16 md:py-24 w-full bg-pink-50">
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 text-center">
           <p className="text-red-500">{error}</p>
-          <p className="text-gray-600 mt-2">Current URL: https://beautya-gr2-production.up.railway.app/api/feedbacks</p>
+          <p className="text-gray-600 mt-2">Current URL: https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks</p>
           <button onClick={fetchTestimonials} className="mt-4 text-blue-500 hover:underline">
             Try Again
           </button>
@@ -132,7 +133,7 @@ export default function Testimonials() {
     return (
       <section className="py-16 md:py-24 w-full bg-pink-50">
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 text-center">
-          <p>No testimonials available at this time.</p>
+          <p>No 5-star testimonials available at this time.</p>
         </div>
       </section>
     );
@@ -179,11 +180,7 @@ export default function Testimonials() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-5 h-5 ${
-                                  i < testimonial.rating
-                                    ? "text-yellow-500 fill-yellow-500"
-                                    : "text-gray-300"
-                                }`}
+                                className="w-5 h-5 text-yellow-500 fill-yellow-500" // All stars are 5, so always yellow
                               />
                             ))}
                           </div>
