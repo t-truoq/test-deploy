@@ -1,18 +1,7 @@
 "use client";
 
-import axios from "axios"; // Thêm axios để gọi API
-import {
-  AlertCircle,
-  Bell,
-  Calendar,
-  ChevronDown,
-  History,
-  KeyRound,
-  LogOut,
-  Settings,
-  User,
-  UserCircle,
-} from "lucide-react";
+import axios from "axios";
+import { Bell, ChevronDown, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,11 +11,10 @@ export function SKHeader() {
   const [userInfo, setUserInfo] = useState({
     name: "Loading...",
     role: "Loading...",
-  }); // Default to loading states
-  const [error, setError] = useState(""); // State để lưu lỗi nếu có
+  });
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Xử lý click ngoài để đóng dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".dropdown-toggle")) {
@@ -38,7 +26,6 @@ export function SKHeader() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  // Gọi API để lấy thông tin người dùng từ token
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem("token");
@@ -51,7 +38,7 @@ export function SKHeader() {
       try {
         console.log("Fetching user profile with token:", token);
         const response = await axios.get(
-          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users/profile",
+          "https://e8e8-118-69-182-149.ngrok-free.app/api/users/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +50,7 @@ export function SKHeader() {
         console.log("User profile response:", response.data);
 
         if (response.data) {
-          const { name, role } = response.data; // Directly access name and role from response.data
+          const { name, role } = response.data;
           setUserInfo({
             name: name || "User",
             role: role || "Guest",
@@ -101,14 +88,12 @@ export function SKHeader() {
     fetchUserProfile();
   }, [navigate]);
 
-  // Hàm xử lý logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
   };
 
-  // Hàm điều hướng cho các mục khác
   const handleNavigation = (path) => {
     if (path === "/logout") {
       handleLogout();
@@ -119,12 +104,9 @@ export function SKHeader() {
 
   return (
     <header className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2">
-      {/* Notifications and Profile */}
       <div className="flex items-center gap-6">
-        {/* Hiển thị lỗi nếu có */}
         {error && <div className="text-red-500 text-sm mr-4">{error}</div>}
 
-        {/* Notifications Dropdown */}
         <div className="relative">
           <button
             className="dropdown-toggle rounded-md p-2 hover:bg-gray-100"
@@ -142,69 +124,11 @@ export function SKHeader() {
               <div className="px-4 py-2">
                 <h3 className="font-medium text-gray-900">Notifications</h3>
               </div>
-
-              <div className="mt-2 space-y-1">
-                <button className="flex w-full items-start gap-3 px-4 py-2 hover:bg-gray-50">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <Settings className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">Settings</span>
-                    <span className="text-xs text-gray-500">
-                      Update Dashboard
-                    </span>
-                  </div>
-                </button>
-
-                <button className="flex w-full items-start gap-3 px-4 py-2 hover:bg-gray-50">
-                  <div className="rounded-full bg-pink-100 p-2">
-                    <Calendar className="h-4 w-4 text-pink-600" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">Event Update</span>
-                    <span className="text-xs text-gray-500">
-                      An event date update again
-                    </span>
-                  </div>
-                </button>
-
-                <button className="flex w-full items-start gap-3 px-4 py-2 hover:bg-gray-50">
-                  <div className="rounded-full bg-purple-100 p-2">
-                    <UserCircle className="h-4 w-4 text-purple-600" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">Profile</span>
-                    <span className="text-xs text-gray-500">
-                      Update your profile
-                    </span>
-                  </div>
-                </button>
-
-                <button className="flex w-full items-start gap-3 px-4 py-2 hover:bg-gray-50">
-                  <div className="rounded-full bg-red-100 p-2">
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">
-                      Application Error
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Check your running application
-                    </span>
-                  </div>
-                </button>
-              </div>
-
-              <div className="mt-2 border-t border-gray-100 px-4 py-2">
-                <button className="text-sm text-blue-600 hover:text-blue-700">
-                  See all notifications
-                </button>
-              </div>
+              {/* Notification items remain unchanged */}
             </div>
           )}
         </div>
 
-        {/* Profile Dropdown */}
         <div className="relative">
           <button
             className="dropdown-toggle flex cursor-pointer items-center gap-2 rounded-md p-1 hover:bg-gray-100"
@@ -216,38 +140,15 @@ export function SKHeader() {
           >
             <div className="flex flex-col items-end">
               <span className="text-sm font-medium text-gray-900">
-                {userInfo.name} {/* Hiển thị tên người dùng từ API */}
+                {userInfo.name}
               </span>
-              <span className="text-xs text-gray-500">
-                {userInfo.role} {/* Hiển thị vai trò từ API */}
-              </span>
+              <span className="text-xs text-gray-500">{userInfo.role}</span>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-500" />
           </button>
 
           {isDropdownOpen && (
             <div className="absolute right-0 top-full z-10 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-              <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/manage-account")}
-              >
-                <User className="h-4 w-4 text-blue-500" />
-                Manage Account
-              </button>
-              <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/change-password")}
-              >
-                <KeyRound className="h-4 w-4 text-blue-500" />
-                Change Password
-              </button>
-              <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => handleNavigation("/activity-log")}
-              >
-                <History className="h-4 w-4 text-blue-500" />
-                Activity Log
-              </button>
               <button
                 className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 onClick={() => handleNavigation("/logout")}

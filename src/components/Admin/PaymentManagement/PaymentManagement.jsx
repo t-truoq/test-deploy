@@ -6,7 +6,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL =
-  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/v1/vnpay";
+  "https://e8e8-118-69-182-149.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);
@@ -103,7 +103,8 @@ export default function PaymentStaff() {
     });
 
   const totalAmount = filteredPayments.reduce(
-    (sum, payment) => sum + (payment.amount || 0),
+    (sum, payment) =>
+      payment.status !== "FAILED" ? sum + (payment.amount || 0) : sum,
     0
   );
 

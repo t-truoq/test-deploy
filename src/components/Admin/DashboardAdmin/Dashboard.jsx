@@ -63,7 +63,7 @@ const Dashboard = () => {
           [usersResponse, ordersResponse, salesResponse] = await Promise.all([
             axios
               .get(
-                "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users",
+                "https://e8e8-118-69-182-149.ngrok-free.app/api/users",
                 config
               )
               .catch((err) => {
@@ -75,7 +75,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
+                "https://e8e8-118-69-182-149.ngrok-free.app/api/bookings",
                 config
               )
               .catch((err) => {
@@ -87,7 +87,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/v1/vnpay",
+                "https://e8e8-118-69-182-149.ngrok-free.app/api/v1/vnpay",
                 config
               )
               .catch((err) => {
@@ -108,7 +108,7 @@ const Dashboard = () => {
           applyFilters(salesResponse.data || []); // Áp dụng bộ lọc mặc định
         } else if (userRole === "SPECIALIST") {
           ordersResponse = await axios.get(
-            "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
+            "https://e8e8-118-69-182-149.ngrok-free.app/api/bookings",
             config
           );
           const totalOrders =
@@ -116,7 +116,7 @@ const Dashboard = () => {
           setStats((prev) => ({ ...prev, totalOrders }));
         } else if (userRole === "CUSTOMER") {
           ordersResponse = await axios.get(
-            "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings",
+            "https://e8e8-118-69-182-149.ngrok-free.app/api/bookings",
             {
               ...config,
               params: { userId: decodedToken.sub },

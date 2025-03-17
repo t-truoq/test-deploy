@@ -4,31 +4,20 @@ import { useState } from "react";
 import { XIcon } from "lucide-react";
 
 export default function EditQuestionForm({ question, onSave, onCancel }) {
-  const [editedQuestion, setEditedQuestion] = useState({ ...question });
-  const [newOption, setNewOption] = useState("");
+  const [editedQuestion, setEditedQuestion] = useState({
+    id: question.id,
+    questionText: question.questionText,
+    answers: [...question.answers],
+  });
 
   const handleQuestionChange = (e) => {
-    setEditedQuestion({ ...editedQuestion, question: e.target.value });
+    setEditedQuestion({ ...editedQuestion, questionText: e.target.value });
   };
 
-  const handleSkinTypeChange = (e) => {
-    setEditedQuestion({ ...editedQuestion, skinType: e.target.value });
-  };
-
-  const addOption = () => {
-    if (newOption.trim() !== "") {
-      setEditedQuestion({
-        ...editedQuestion,
-        options: [...editedQuestion.options, newOption.trim()],
-      });
-      setNewOption("");
-    }
-  };
-
-  const removeOption = (index) => {
-    const updatedOptions = [...editedQuestion.options];
-    updatedOptions.splice(index, 1);
-    setEditedQuestion({ ...editedQuestion, options: updatedOptions });
+  const handleAnswerChange = (index, field, value) => {
+    const updatedAnswers = [...editedQuestion.answers];
+    updatedAnswers[index] = { ...updatedAnswers[index], [field]: value };
+    setEditedQuestion({ ...editedQuestion, answers: updatedAnswers });
   };
 
   const handleSubmit = (e) => {
@@ -43,91 +32,69 @@ export default function EditQuestionForm({ question, onSave, onCancel }) {
           htmlFor="question"
           className="block text-sm font-medium text-gray-700"
         >
-          Question
+          Question Text
         </label>
         <textarea
           id="question"
-          value={editedQuestion.question}
+          value={editedQuestion.questionText}
           onChange={handleQuestionChange}
-          placeholder="Enter question"
-          className="w-full min-h-[100px] rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
+          placeholder="Enter question text"
+          className="w-full min-h-[100px] rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="skinType"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Skin Type
-        </label>
-        <select
-          id="skinType"
-          value={editedQuestion.skinType}
-          onChange={handleSkinTypeChange}
-          className="w-full rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
-        >
-          <option value="OILY">Oily</option>
-          <option value="DRY">Dry</option>
-          <option value="SENSITIVE">Sensitive</option>
-          <option value="COMBINATION">Combination</option>
-          <option value="NORMAL">Normal</option>
-        </select>
-      </div>
-
-      <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
-          Options
+          Answers
         </label>
-        <div className="space-y-2">
-          {editedQuestion.options.map((option, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <input
-                type="text"
-                value={option}
-                readOnly
-                className="flex-1 rounded-md border border-gray-300 p-2 bg-gray-50 text-gray-600"
-              />
-              <button
-                type="button"
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
-                onClick={() => removeOption(index)}
-              >
-                <XIcon className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={newOption}
-            onChange={(e) => setNewOption(e.target.value)}
-            placeholder="Add new option"
-            className="flex-1 rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
-          />
-          <button
-            type="button"
-            className="rounded-md bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] px-4 py-2 text-white hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
-            onClick={addOption}
-          >
-            Add
-          </button>
-        </div>
+        {editedQuestion.answers.map((answer, index) => (
+          <div key={index} className="flex gap-2 mt-1">
+            <input
+              type="text"
+              value={answer.answerText}
+              onChange={(e) =>
+                handleAnswerChange(index, "answerText", e.target.value)
+              }
+              className="w-2/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+              placeholder={`Answer ${index + 1}`}
+            />
+            <input
+              type="number"
+              value={answer.score}
+              onChange={(e) =>
+                handleAnswerChange(index, "score", parseInt(e.target.value))
+              }
+              className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+              placeholder="Score"
+            />
+            <select
+              value={answer.skinType}
+              onChange={(e) =>
+                handleAnswerChange(index, "skinType", e.target.value)
+              }
+              className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+            >
+              <option value="SENSITIVE">Sensitive</option>
+              <option value="NORMAL">Normal</option>
+              <option value="OILY">Oily</option>
+              <option value="COMBINATION">Combination</option>
+            </select>
+          </div>
+        ))}
       </div>
 
       <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"
-          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
           onClick={onCancel}
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors"
+          className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D]"
         >
           Save Changes
         </button>

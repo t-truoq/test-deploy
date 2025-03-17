@@ -4,7 +4,7 @@ import EditServiceModal from "./EditService";
 import axios from "axios";
 
 const BASE_URL =
-  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/services";
+  "https://e8e8-118-69-182-149.ngrok-free.app/api/services";
 
 const ServiceRow = ({ service, onEditService, onDeleteService }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

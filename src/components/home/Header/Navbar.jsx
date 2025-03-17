@@ -72,7 +72,7 @@ const Navbar = () => {
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
   const baseUrl =
-    "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app";
+    "https://e8e8-118-69-182-149.ngrok-free.app";
 
   const handleBlogPage = () => {
     navigate(`/blog`);

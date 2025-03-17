@@ -3,20 +3,25 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import BookingCard from "./BookingCard";
-import BookingDialog from "./BookingDialog";
 
-const BASE_URL =
-  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/specialist";
+const BASE_URL = "https://e8e8-118-69-182-149.ngrok-free.app/api/bookings/specialist";
 
 function Booking() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("upcoming");
+  const [activeTab, setActiveTab] = useState("pending");
   const [localAppointments, setLocalAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasFetched, setHasFetched] = useState(false);
+
+  const statusStyles = {
+    PENDING: "bg-yellow-100 text-yellow-800",
+    CONFIRMED: "bg-blue-100 text-blue-800",
+    IN_PROGRESS: "bg-purple-100 text-purple-800",
+    COMPLETED: "bg-green-100 text-green-800",
+    CANCELLED: "bg-red-100 text-red-800"
+  };
 
   useEffect(() => {
     if (hasFetched) return;
@@ -24,13 +29,9 @@ function Booking() {
     const fetchBookings = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("No token found. Please login again.");
-        }
+        if (!token) throw new Error("No token found. Please login again.");
 
         const decodedToken = jwtDecode(token);
-        console.log("Decoded Token:", decodedToken);
-
         const response = await axios.get(BASE_URL, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -39,19 +40,21 @@ function Booking() {
           maxRedirects: 5,
         });
 
-        console.log("Bookings API Response:", response.data);
-
         if (Array.isArray(response.data)) {
           const specialistBookings = response.data.map((booking) => ({
             id: booking.bookingId.toString(),
-            clientName: booking.customerName || "Unknown Customer", // Sử dụng customerName từ API, fallback nếu null
-            service: booking.serviceNames
-              ? booking.serviceNames.join(", ")
-              : "N/A",
+            clientName: booking.customerName || "Unknown Customer",
+            service: booking.serviceNames?.join(", ") || "N/A",
             date: booking.bookingDate,
-            time: booking.timeSlot.split("-")[0],
-            duration: calculateDuration(booking.timeSlot),
-            status: booking.status.toLowerCase().replace("_", " "),
+            timeSlot: booking.timeSlot,
+            duration: booking.totalDuration, // Lấy trực tiếp totalDuration từ API
+            status: booking.status,
+            specialistName: booking.specialistName,
+            totalPrice: booking.totalPrice, // Lấy trực tiếp totalPrice từ API
+            paymentStatus: booking.paymentStatus,
+            createdAt: booking.createdAt,
+            checkInTime: booking.checkInTime,
+            checkOutTime: booking.checkOutTime
           }));
           setLocalAppointments(specialistBookings);
         } else {
@@ -59,19 +62,7 @@ function Booking() {
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
-        if (error.response) {
-          if (error.response.status === 401) {
-            setError("Unauthorized: Please login again.");
-          } else if (error.response.status === 404) {
-            setError("No bookings found for this specialist.");
-          } else {
-            setError(error.response.data.message || "Failed to load bookings.");
-          }
-        } else if (error.request) {
-          setError("Unable to connect to server. Please try again.");
-        } else {
-          setError(error.message || "Failed to load bookings.");
-        }
+        setError(error.response?.data?.message || error.message || "Failed to load bookings");
       } finally {
         setLoading(false);
         setHasFetched(true);
@@ -80,16 +71,6 @@ function Booking() {
 
     fetchBookings();
   }, [hasFetched]);
-
-  const calculateDuration = (timeSlot) => {
-    if (!timeSlot || !timeSlot.includes("-")) return "N/A";
-    const [start, end] = timeSlot.split("-");
-    const startDate = new Date(`1970-01-01T${start}:00`);
-    const endDate = new Date(`1970-01-01T${end}:00`);
-    const diffMs = endDate - startDate;
-    const minutes = Math.round(diffMs / 60000);
-    return `${minutes} min`;
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -101,26 +82,38 @@ function Booking() {
     }).format(date);
   };
 
+  const formatTime = (timeString) => {
+    if (!timeString) return "N/A";
+    return new Date(timeString).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  const formatPrice = (price) => {
+    if (!price && price !== 0) return "N/A";
+    return (price / 1000).toLocaleString() + "K VND";
+  };
+
   const filteredAppointmentsByDate = Object.keys(
     localAppointments.reduce((acc, appointment) => {
-      if (!acc[appointment.date]) {
-        acc[appointment.date] = [];
-      }
+      if (!acc[appointment.date]) acc[appointment.date] = [];
       acc[appointment.date].push(appointment);
       return acc;
     }, {})
   ).reduce((acc, date) => {
-    if (activeTab === "upcoming") {
-      acc[date] = localAppointments.filter(
-        (a) => a.date === date && a.status === "pending"
-      );
-    } else if (activeTab === "confirmed") {
-      acc[date] = localAppointments.filter(
-        (a) => a.date === date && a.status === "confirmed"
-      );
-    } else {
-      acc[date] = localAppointments.filter((a) => a.date === date);
-    }
+    acc[date] = localAppointments.filter((a) => a.date === date)
+      .filter((a) => {
+        switch (activeTab) {
+          case "pending": return a.status === "PENDING";
+          case "confirmed": return a.status === "CONFIRMED";
+          case "in_progress": return a.status === "IN_PROGRESS";
+          case "completed": return a.status === "COMPLETED";
+          case "cancelled": return a.status === "CANCELLED";
+          case "all": return true;
+          default: return true;
+        }
+      });
     return acc;
   }, {});
 
@@ -129,41 +122,8 @@ function Booking() {
     setIsDialogOpen(true);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-600">Loading bookings...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white p-10 rounded-xl shadow-xl max-w-md w-full text-center border border-gray-200">
-          <div className="w-20 h-20 mx-auto mb-6 text-gray-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-3-3v6m-9 3h18a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <p className="text-gray-600 mb-8 text-lg">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading bookings...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div className="p-6">
@@ -172,44 +132,33 @@ function Booking() {
       </div>
 
       <div className="border-b border-gray-200 mb-6">
-        <nav className="flex -mb-px">
-          <button
-            onClick={() => setActiveTab("upcoming")}
-            className={`mr-8 py-2 text-sm font-medium border-b-2 ${
-              activeTab === "upcoming"
-                ? "border-pink-500 text-pink-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            onClick={() => setActiveTab("confirmed")}
-            className={`mr-8 py-2 text-sm font-medium border-b-2 ${
-              activeTab === "confirmed"
-                ? "border-pink-500 text-pink-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            Confirmed
-          </button>
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`py-2 text-sm font-medium border-b-2 ${
-              activeTab === "all"
-                ? "border-pink-500 text-pink-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            All Appointments
-          </button>
+        <nav className="flex -mb-px space-x-4">
+          {[
+            { key: "pending", label: "Pending" },
+            { key: "confirmed", label: "Confirmed" },
+            { key: "in_progress", label: "In Progress" },
+            { key: "completed", label: "Completed" },
+            { key: "cancelled", label: "Cancelled" },
+            { key: "all", label: "All" }
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`py-2 text-sm font-medium border-b-2 ${
+                activeTab === tab.key
+                  ? "border-pink-500 text-pink-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </nav>
       </div>
 
       <div className="space-y-8">
         {Object.keys(filteredAppointmentsByDate).map((date) => {
           const dateAppointments = filteredAppointmentsByDate[date];
-
           if (dateAppointments.length === 0) return null;
 
           return (
@@ -217,11 +166,42 @@ function Booking() {
               <h2 className="text-lg font-semibold">{formatDate(date)}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dateAppointments.map((appointment) => (
-                  <BookingCard
+                  <div
                     key={appointment.id}
-                    appointment={appointment}
-                    onViewDetails={handleViewDetails}
-                  />
+                    className="bg-white p-4 rounded-lg shadow-md border"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{appointment.clientName}</h3>
+                        <p className="text-sm text-gray-600">{appointment.service}</p>
+                      </div>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${
+                          statusStyles[appointment.status] || "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {appointment.status}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-sm">
+                      <p>Time: {appointment.timeSlot}</p>
+                      <p>Duration: {appointment.duration ? `${appointment.duration} min` : "N/A"}</p>
+                      <p>Price: {formatPrice(appointment.totalPrice)}</p>
+                      <p>Specialist: {appointment.specialistName}</p>
+                      {appointment.checkInTime && (
+                        <p>Check-in: {formatTime(appointment.checkInTime)}</p>
+                      )}
+                      {appointment.checkOutTime && (
+                        <p>Check-out: {formatTime(appointment.checkOutTime)}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleViewDetails(appointment)}
+                      className="mt-3 text-pink-600 hover:text-pink-800 text-sm"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -230,12 +210,37 @@ function Booking() {
       </div>
 
       {selectedAppointment && (
-        <BookingDialog
-          appointment={selectedAppointment}
-          onClose={() => setIsDialogOpen(false)}
-          formatDate={formatDate}
-          isOpen={isDialogOpen}
-        />
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center"
+          onClick={() => setIsDialogOpen(false)}
+        >
+          <div
+            className="bg-white p-6 rounded-lg max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4">Booking Details</h2>
+            <p><strong>Client:</strong> {selectedAppointment.clientName}</p>
+            <p><strong>Service:</strong> {selectedAppointment.service}</p>
+            <p><strong>Status:</strong> {selectedAppointment.status}</p>
+            <p><strong>Date:</strong> {formatDate(selectedAppointment.date)}</p>
+            <p><strong>Time:</strong> {selectedAppointment.timeSlot}</p>
+            <p><strong>Duration:</strong> {selectedAppointment.duration} min</p>
+            <p><strong>Price:</strong> {formatPrice(selectedAppointment.totalPrice)}</p>
+            <p><strong>Specialist:</strong> {selectedAppointment.specialistName}</p>
+            {selectedAppointment.checkInTime && (
+              <p><strong>Check-in:</strong> {formatTime(selectedAppointment.checkInTime)}</p>
+            )}
+            {selectedAppointment.checkOutTime && (
+              <p><strong>Check-out:</strong> {formatTime(selectedAppointment.checkOutTime)}</p>
+            )}
+            <button
+              onClick={() => setIsDialogOpen(false)}
+              className="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

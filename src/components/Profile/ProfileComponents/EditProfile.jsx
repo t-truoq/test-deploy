@@ -57,7 +57,7 @@ const EditProfile = () => {
         }
 
         const response = await axios.get(
-          `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users/profile`,
+          `https://e8e8-118-69-182-149.ngrok-free.app/api/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -199,7 +199,7 @@ const EditProfile = () => {
       console.log("Sending update data:", updateData);
 
       const response = await axios.put(
-        `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users/profile`,
+        `https://e8e8-118-69-182-149.ngrok-free.app/api/users/profile`,
         updateData,
         {
           headers: {
@@ -698,7 +698,7 @@ export default EditProfile;
 //       console.log("Sending change password data:", updateData);
 
 //       const response = await axios.put(
-//         `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users/profile`,
+//         `https://e8e8-118-69-182-149.ngrok-free.app/api/users/profile`,
 //         updateData,
 //         {
 //           headers: {

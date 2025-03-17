@@ -51,13 +51,13 @@ export function BookingCalendar({
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {
       case "CONFIRMED":
-        return "bg-green-500";
+        return "bg-purple-500";  // Changed from green to purple
       case "PENDING":
         return "bg-yellow-500";
       case "CANCELLED":
         return "bg-red-500";
       case "COMPLETED":
-        return "bg-purple-500";
+        return "bg-green-500";   // Changed from purple to green
       case "IN_PROGRESS":
         return "bg-blue-500";
       default:
