@@ -27,7 +27,7 @@ const AboutDoctor = () => {
     const fetchSpecialists = async () => {
       try {
         const response = await axios.get(
-          "https://e8e8-118-69-182-149.ngrok-free.app/api/users/specialists/active",
+          "https://f084-118-69-182-149.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",

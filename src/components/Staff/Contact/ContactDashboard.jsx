@@ -42,7 +42,7 @@ export function ContactDashboard() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        "https://e8e8-118-69-182-149.ngrok-free.app/api/contact",
+        "https://f084-118-69-182-149.ngrok-free.app/api/contact",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ export function ContactDashboard() {
     }
     try {
       const response = await axios.put(
-        `https://e8e8-118-69-182-149.ngrok-free.app/api/contact/${id}/status?status=${status}`,
+        `https://f084-118-69-182-149.ngrok-free.app/api/contact/${id}/status?status=${status}`,
         null,
         {
           headers: {

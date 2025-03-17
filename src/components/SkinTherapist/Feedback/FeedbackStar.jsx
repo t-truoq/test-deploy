@@ -27,7 +27,7 @@ export default function FeedbackStats() {
         };
 
         const response = await axios.get(
-          "https://e8e8-118-69-182-149.ngrok-free.app/api/feedbacks/specialist/feedbacks",
+          "https://f084-118-69-182-149.ngrok-free.app/api/feedbacks/specialist/feedbacks",
           { headers }
         );
 

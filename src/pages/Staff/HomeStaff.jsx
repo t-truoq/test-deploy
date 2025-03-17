@@ -61,7 +61,7 @@ export default function HomeStaff() {
         setLoading(true);
         const token = getToken();
         const response = await axios.get(
-          "https://e8e8-118-69-182-149.ngrok-free.app/api/bookings",
+          "https://f084-118-69-182-149.ngrok-free.app/api/bookings",
           {
             headers: {
               Authorization: `Bearer ${token}`,

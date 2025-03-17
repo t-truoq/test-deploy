@@ -32,7 +32,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         // Fetch the list of services
         const servicesResponse = await axios.get(
-          `https://e8e8-118-69-182-149.ngrok-free.app/api/services`,
+          `https://f084-118-69-182-149.ngrok-free.app/api/services`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         // Fetch the booking details
         const bookingResponse = await axios.get(
-          `https://e8e8-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+          `https://f084-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         // Fetch the list of specialists
         const specialistsResponse = await axios.get(
-          `https://e8e8-118-69-182-149.ngrok-free.app/api/users/specialists/active`,
+          `https://f084-118-69-182-149.ngrok-free.app/api/users/specialists/active`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://e8e8-118-69-182-149.ngrok-free.app${endpoint}`,
+        url: `https://f084-118-69-182-149.ngrok-free.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -192,7 +192,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       };
 
       const response = await axios.put(
-        `https://e8e8-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://f084-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
         requestBody,
         {
           headers: {
