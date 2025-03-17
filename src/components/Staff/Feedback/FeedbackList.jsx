@@ -4,23 +4,21 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { MoreHorizontal, Search } from "lucide-react";
 import PropTypes from "prop-types";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export default function FeedbackList({ filter, onLoadingChange }) {
   const [feedbackItems, setFeedbackItems] = useState([]);
   const [clients, setClients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(null);
-  // Loại bỏ dropdownDirection vì chúng ta sẽ luôn hiển thị lên trên
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [error, setError] = useState("");
-
-  const dropdownRefs = useRef({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchClients = async () => {
     try {
       const response = await fetch(
-        "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users",
+        "https://e8e8-118-69-182-149.ngrok-free.app/api/users",
         {
           headers: {
             "Content-Type": "application/json",
@@ -63,7 +61,7 @@ export default function FeedbackList({ filter, onLoadingChange }) {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      onLoadingChange(true);
+      onLoadingChange(true); // Thông báo trạng thái loading
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Vui lòng đăng nhập để xem phản hồi");
@@ -82,7 +80,7 @@ export default function FeedbackList({ filter, onLoadingChange }) {
         };
 
         const feedbackResponse = await axios.get(
-          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
+          "https://e8e8-118-69-182-149.ngrok-free.app/api/feedbacks",
           { headers }
         );
 
@@ -130,32 +128,12 @@ export default function FeedbackList({ filter, onLoadingChange }) {
         );
       } finally {
         setIsLoading(false);
-        onLoadingChange(false);
+        onLoadingChange(false); // Thông báo trạng thái loading kết thúc
       }
     };
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        !Object.values(dropdownRefs.current).some(
-          (ref) => ref && ref.contains(event.target)
-        )
-      ) {
-        setDropdownOpen(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // Loại bỏ checkDropdownDirection vì chúng ta sẽ cố định hướng lên trên
-  // const checkDropdownDirection = (itemId, buttonRef) => { ... };
 
   const renderStars = (rating) => {
     return Array(5)
@@ -334,33 +312,25 @@ export default function FeedbackList({ filter, onLoadingChange }) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                   {item.date}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <div
-                    className="relative"
-                    ref={(el) => (dropdownRefs.current[item.id] = el)}
-                  >
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="relative">
                     <button
-                      onClick={() => {
-                        console.log(
-                          `Toggling dropdown for feedback: ${item.id}`
-                        );
+                      onClick={() =>
                         setDropdownOpen(
                           dropdownOpen === item.id ? null : item.id
-                        );
-                      }}
-                      className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
+                        )
+                      }
+                      className="text-gray-500 hover:text-[#3D021E] focus:outline-none transition-colors"
                     >
                       <MoreHorizontal className="h-5 w-5" />
                     </button>
                     <AnimatePresence>
                       {dropdownOpen === item.id && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ duration: 0.1 }}
-                          className="absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 overflow-hidden bottom-full mb-2" // Luôn hiển thị lên trên
-                          style={{ maxHeight: "none", overflowY: "hidden" }} // Tắt thanh cuộn
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
                         >
                           <div className="py-1" role="menu">
                             <button
@@ -386,6 +356,7 @@ export default function FeedbackList({ filter, onLoadingChange }) {
         </table>
       </div>
 
+      {/* Card chi tiết hiển thị khi chọn feedback */}
       <AnimatePresence>
         {selectedFeedback && (
           <motion.div

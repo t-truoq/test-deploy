@@ -9,21 +9,15 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [editForm, setEditForm] = useState({
     specialistId: "",
-    serviceIds: [], // Mảng các service ID đã chọn
+    serviceIds: [],
     bookingDate: "",
     startTime: "",
   });
   const [servicesList, setServicesList] = useState([]);
   const [specialistsList, setSpecialistsList] = useState([]);
-
-  const serviceDurationMap = {
-    "Lấy Nhân Mụn Chuẩn Y Khoa": 45,
-    "Exo Booster": 30,
-    "Oil Control & Acne Care, Acne Control Facial": 60,
-    "Premium Hair Cut": 60,
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +30,9 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           );
         }
 
+        // Fetch the list of services
         const servicesResponse = await axios.get(
-          `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/services`,
+          `https://e8e8-118-69-182-149.ngrok-free.app/api/services`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -47,8 +42,9 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         );
         setServicesList(servicesResponse.data);
 
+        // Fetch the booking details
         const bookingResponse = await axios.get(
-          `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/${bookingId}`,
+          `https://e8e8-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -58,26 +54,27 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         );
         const data = bookingResponse.data;
 
+       
+        const services = Array.isArray(data.serviceNames)
+          ? data.serviceNames.map((name, index) => ({
+              id: index + 1,
+              name,
+              duration: data.serviceDurations[name] || 0,
+              price: data.servicePrices[name] || 0,
+            }))
+          : [];
+
         const enhancedBooking = {
           ...data,
-          services: Array.isArray(data.serviceNames)
-            ? data.serviceNames.map((name, index) => ({
-                id: index + 1,
-                name,
-                duration: serviceDurationMap[name] || 0,
-                price: data.totalPrice / (data.serviceNames.length || 1) || 0,
-              }))
-            : [],
+          services,
+          totalDuration: data.totalDuration || services.reduce((sum, service) => sum + (service.duration || 0), 0),
         };
-        const totalDuration = enhancedBooking.services.reduce(
-          (sum, service) => sum + (service.duration || 0),
-          0
-        );
         const status = data.status.toUpperCase();
-        setBooking({ ...enhancedBooking, totalDuration, status });
+        setBooking({ ...enhancedBooking, status });
 
+        // Fetch the list of specialists
         const specialistsResponse = await axios.get(
-          `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users/specialists/active`,
+          `https://e8e8-118-69-182-149.ngrok-free.app/api/users/specialists/active`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -87,11 +84,11 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         );
         setSpecialistsList(specialistsResponse.data);
 
+        // Initialize the edit form
         const initialServiceIds = Array.isArray(data.serviceNames)
           ? data.serviceNames
-              .map(
-                (name) =>
-                  servicesResponse.data.find((s) => s.name === name)?.serviceId
+              .map((name) =>
+                servicesList.find((s) => s.name === name)?.serviceId
               )
               .filter(Boolean)
           : [];
@@ -109,6 +106,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
             error.message ||
             "Failed to fetch data. Please try again later."
         );
+        setIsErrorDialogOpen(true);
       } finally {
         setLoading(false);
       }
@@ -145,7 +143,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app${endpoint}`,
+        url: `https://e8e8-118-69-182-149.ngrok-free.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -172,6 +170,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           error.message ||
           "Failed to update booking status. Please try again later."
       );
+      setIsErrorDialogOpen(true);
     }
   };
 
@@ -193,7 +192,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       };
 
       const response = await axios.put(
-        `https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://e8e8-118-69-182-149.ngrok-free.app/api/bookings/${bookingId}`,
         requestBody,
         {
           headers: {
@@ -207,26 +206,23 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       if (response.status === 200) {
         const updatedData = response.data;
 
+        // Map updated service data
+        const services = Array.isArray(updatedData.serviceNames)
+          ? updatedData.serviceNames.map((name, index) => ({
+              id: index + 1,
+              name,
+              duration: updatedData.serviceDurations[name] || 0,
+              price: updatedData.servicePrices[name] || 0,
+            }))
+          : [];
+
         const enhancedBooking = {
           ...updatedData,
-          services: Array.isArray(updatedData.serviceNames)
-            ? updatedData.serviceNames.map((name, index) => ({
-                id: index + 1,
-                name,
-                duration: serviceDurationMap[name] || 0,
-                price:
-                  updatedData.totalPrice /
-                    (updatedData.serviceNames.length || 1) || 0,
-              }))
-            : [],
+          services,
+          totalDuration: updatedData.totalDuration || services.reduce((sum, service) => sum + (service.duration || 0), 0),
         };
-        const totalDuration = enhancedBooking.services.reduce(
-          (sum, service) => sum + (service.duration || 0),
-          0
-        );
         setBooking({
           ...enhancedBooking,
-          totalDuration,
           status: updatedData.status
             ? updatedData.status.toUpperCase()
             : booking.status,
@@ -234,8 +230,8 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         const updatedServiceIds = Array.isArray(updatedData.serviceNames)
           ? updatedData.serviceNames
-              .map(
-                (name) => servicesList.find((s) => s.name === name)?.serviceId
+              .map((name) =>
+                servicesList.find((s) => s.name === name)?.serviceId
               )
               .filter(Boolean)
           : [];
@@ -260,6 +256,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           error.message ||
           "Failed to update booking. Please try again later."
       );
+      setIsErrorDialogOpen(true);
     }
   };
 
@@ -276,12 +273,12 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const isEditAllowed = () => {
+    return booking?.status !== "IN_PROGRESS" && booking?.status !== "COMPLETED";
+  };
+
   if (loading) {
     return <div className="p-6 text-center text-gray-500">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-center text-red-500">{error}</div>;
   }
 
   if (!booking) {
@@ -294,7 +291,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
     switch (status.toUpperCase()) {
       case "CONFIRMED":
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-500 text-white">
             Confirmed
           </span>
         );
@@ -312,7 +309,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         );
       case "COMPLETED":
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-500 text-white">
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
             Completed
           </span>
         );
@@ -330,6 +327,8 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         );
     }
   };
+  // Find the specialist name from the specialistsList
+  const specialistName = booking.specialistName || "Unknown"; // Use specialistName from API response
 
   return (
     <div className="h-full flex flex-col">
@@ -385,7 +384,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {booking.timeSlot} (Total: {booking.totalDuration || 0} min)
+                {booking.timeSlot}
               </span>
             </div>
           </div>
@@ -393,28 +392,30 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
           <hr className="border-gray-200" />
 
           <div className="space-y-2">
-            {booking.services.map((service, index) => (
-              <div key={index} className="flex justify-between">
-                <span className="text-sm text-gray-500">
-                  Service {index + 1}
-                </span>
-                <span className="font-medium text-gray-800">
-                  {service.name} ({service.duration} min) - $
-                  {service.price.toFixed(2)}
-                </span>
-              </div>
-            ))}
+            {booking.services.length > 0 ? (
+              booking.services.map((service, index) => (
+                <div key={index} className="flex justify-between">
+                  <span className="text-sm text-gray-500">
+                    Service {index + 1}
+                  </span>
+                  <span className="font-medium text-gray-800">
+                    {service.name} ({service.duration} min) - $
+                    {service.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500">No services available</div>
+            )}
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">Total Price</span>
               <span className="font-medium text-gray-800">
-                ${booking.totalPrice || "N/A"}
+                ${booking.totalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Specialist ID</span>
-              <span className="text-gray-800">
-                {booking.specialistId || "Unknown"}
-              </span>
+              <span className="text-sm text-gray-500">Specialist</span>
+              <span className="text-gray-800">{specialistName}</span>
             </div>
           </div>
         </div>
@@ -423,8 +424,13 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       <div className="flex justify-between p-4 border-t">
         <div className="flex gap-2">
           <button
-            className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm font-medium flex items-center"
-            onClick={() => setIsEditDialogOpen(true)}
+            className={`px-3 py-1 text-white rounded-md text-sm font-medium flex items-center ${
+              isEditAllowed()
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+            onClick={() => isEditAllowed() && setIsEditDialogOpen(true)}
+            disabled={!isEditAllowed()}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -468,92 +474,62 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       </div>
 
       {isStatusDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Edit Appointment Status
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Change the status of this appointment.
-            </p>
-            <div className="flex items-center gap-4 p-4 border rounded-md bg-gray-50 mb-6">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-blue-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <div>
-                <p className="font-medium text-gray-800">
-                  {booking.serviceNames.join(", ")}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {format(new Date(booking.bookingDate), "MMMM d, yyyy")} at{" "}
-                  {booking.timeSlot}
-                </p>
-              </div>
-            </div>
-            <div className="grid gap-4 mb-6">
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="status"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Status
-                </label>
-                <div className="grid grid-cols-1 gap-2">
-                  <button
-                    className="px-4 py-2 border border-green-500 text-green-600 rounded-md hover:bg-green-50 flex items-center justify-center"
-                    onClick={() => handleStatusUpdate("CONFIRMED")}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                    Confirm
-                  </button>
-                  <button
-                    className="px-4 py-2 border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 flex items-center justify-center"
-                    onClick={() => handleStatusUpdate("IN_PROGRESS")}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
-                    In Progress
-                  </button>
-                  <button
-                    className="px-4 py-2 border border-purple-500 text-purple-600 rounded-md hover:bg-purple-50 flex items-center justify-center"
-                    onClick={() => handleStatusUpdate("COMPLETED")}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-purple-500 mr-2"></span>
-                    Completed
-                  </button>
-                  <button
-                    className="px-4 py-2 border border-red-500 text-red-600 rounded-md hover:bg-red-50 flex items-center justify-center"
-                    onClick={() => handleStatusUpdate("CANCELLED")}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
-                onClick={() => setIsStatusDialogOpen(false)}
-              >
-                Close
-              </button>
-            </div>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+    {/* ... previous code ... */}
+    <div className="grid gap-4 mb-6">
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor="status"
+          className="text-sm font-medium text-gray-700"
+        >
+          Status
+        </label>
+        <div className="grid grid-cols-1 gap-2">
+          <button
+            className="px-4 py-2 border border-purple-500 text-purple-600 rounded-md hover:bg-purple-50 flex items-center justify-center"
+            onClick={() => handleStatusUpdate("CONFIRMED")}
+          >
+            <span className="h-2 w-2 rounded-full bg-purple-500 mr-2"></span>
+            Confirm
+          </button>
+          <button
+            className="px-4 py-2 border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50 flex items-center justify-center"
+            onClick={() => handleStatusUpdate("IN_PROGRESS")}
+          >
+            <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+            Check In
+          </button>
+          <button
+            className="px-4 py-2 border border-green-500 text-green-600 rounded-md hover:bg-green-50 flex items-center justify-center"
+            onClick={() => handleStatusUpdate("COMPLETED")}
+          >
+            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+            Check Out
+          </button>
+          <button
+            className="px-4 py-2 border border-red-500 text-red-600 rounded-md hover:bg-red-50 flex items-center justify-center"
+            onClick={() => handleStatusUpdate("CANCELLED")}
+          >
+            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+            Cancel
+            </button>
           </div>
         </div>
-      )}
+      </div>
+      <div className="flex justify-end gap-2">
+        <button
+          className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+          onClick={() => setIsStatusDialogOpen(false)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
-      {isEditDialogOpen && (
+      {isEditDialogOpen && isEditAllowed() && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
@@ -708,6 +684,28 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isErrorDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Error
+            </h3>
+            <p className="text-red-500 mb-4">{error}</p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+                onClick={() => {
+                  setIsErrorDialogOpen(false);
+                  setError(null);
+                }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -28,7 +28,7 @@ export default function FeedbackStar() {
         };
 
         const response = await axios.get(
-          "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/feedbacks",
+          "https://e8e8-118-69-182-149.ngrok-free.app/api/feedbacks",
           {
             headers,
           }

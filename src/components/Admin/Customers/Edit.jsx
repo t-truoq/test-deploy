@@ -5,8 +5,7 @@ import PropTypes from "prop-types";
 import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
-const API_URL =
-  "https://0784-2405-4802-811e-11a0-ddab-82fb-3e2a-885d.ngrok-free.app/api/users";
+const API_URL = "https://e8e8-118-69-182-149.ngrok-free.app/api/users";
 
 export function Edit({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);
@@ -17,11 +16,11 @@ export function Edit({ isOpen, onClose, client, onSave }) {
     if (client) {
       setFormData({
         password: "",
-        name: client.name,
-        phone: client.phone,
-        address: client.address,
+        name: client.name || "",
+        phone: client.phone || "",
+        address: client.address || "",
         role: client.role || "CUSTOMER",
-        id: client.id,
+        id: client.id || "",
       });
     }
   }, [client]);
@@ -32,7 +31,10 @@ export function Edit({ isOpen, onClose, client, onSave }) {
   };
 
   const handleAssignRole = async () => {
-    if (!formData?.id || !formData?.role) return;
+    if (!formData?.id || !formData?.role) {
+      setError("Missing user ID or role.");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -50,32 +52,35 @@ export function Edit({ isOpen, onClose, client, onSave }) {
         throw new Error("Unauthorized: Only admins can assign roles.");
       }
 
-      const response = await fetch(
-        `${API_URL}/${formData.id}/assign-role?newRole=${formData.role}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
-      );
+      const url = `${API_URL}/${formData.id}/assign-role?newRole=${formData.role}`;
+      console.log("Sending request to:", url);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+      });
+
+      console.log("Response status:", response.status);
 
       if (!response.ok) {
-        if (response.status === 401)
+        const errorText = await response.text();
+        console.log("Error response:", errorText);
+        if (response.status === 401) {
           throw new Error("Unauthorized: Invalid or expired token.");
-        if (response.status === 403)
+        }
+        if (response.status === 403) {
           throw new Error("Forbidden: Admin privileges required.");
-        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        throw new Error(`HTTP error! status: ${response.status}: ${errorText}`);
       }
 
       const result = await response.json();
       console.log("Role assignment response:", result);
 
-      if (result.code !== 0) {
-        throw new Error(result.msg || "Failed to assign role");
-      }
-
+     
       console.log(`Role updated to ${formData.role} for user ${formData.id}`);
     } catch (err) {
       console.error("Error assigning role:", err);
@@ -87,7 +92,10 @@ export function Edit({ isOpen, onClose, client, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData) return;
+    if (!formData || !formData.id) {
+      setError("No user data available to submit.");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -106,7 +114,7 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       }
 
       const updateData = {
-        password: formData.password,
+        password: formData.password || undefined, // Avoid sending empty string if not set
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
@@ -123,11 +131,15 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       });
 
       if (!response.ok) {
-        if (response.status === 401)
+        const errorText = await response.text();
+        console.log("Error response (Submit):", errorText);
+        if (response.status === 401) {
           throw new Error("Unauthorized: Invalid or expired token.");
-        if (response.status === 403)
+        }
+        if (response.status === 403) {
           throw new Error("Forbidden: Admin privileges required.");
-        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        throw new Error(`HTTP error! status: ${response.status}: ${errorText}`);
       }
 
       onSave({
