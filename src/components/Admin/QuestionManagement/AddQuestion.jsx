@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { XIcon } from "lucide-react";
 
-const BACKEND_URL = "https://f084-118-69-182-149.ngrok-free.app";
+const BACKEND_URL = "https://9c6d-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app";
 
 export default function AddQuestionForm({ onSuccess, onCancel }) {
   const [questionText, setQuestionText] = useState("");
@@ -52,6 +52,7 @@ export default function AddQuestionForm({ onSuccess, onCancel }) {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
           },
         }
       );
