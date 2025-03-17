@@ -17,18 +17,17 @@ export default function SignIn() {
   const BACKEND_URL =
     "https://9c6d-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app";
 
-  useEffect(() => {
-    console.log("Location search:", location.search); // Debug URL
-    const params = new URLSearchParams(location.search);
-    const token = params.get("token");
-    console.log("Token from query:", token); // Debug token
-
-    if (token) {
-      setIsLoading(true); // Hiển thị loading
-      handleGoogleCallback(token);
-    }
-  }, [location]);
-
+    useEffect(() => {
+      console.log("Location search:", location.search); // Debug URL
+      const params = new URLSearchParams(location.search);
+      const token = params.get("token");
+      console.log("Token from query:", token); // Debug token
+    
+      if (token) {
+        setIsLoading(true);
+        handleGoogleCallback(token);
+      }
+    }, [location]);
   const handleGoogleCallback = async (token) => {
     console.log("Handling Google callback with token:", token);
     try {
