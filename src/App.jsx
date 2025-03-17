@@ -1,3 +1,4 @@
+
 import { useLocation } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/home/Header/Navbar";
@@ -10,7 +11,7 @@ import Services from "./pages/Services/Services";
 import ServiceDetail from "./components/service/serviceDetail/SeviceDetail";
 import BlogInfo from "./components/blog/blogDetail/BlogInfor";
 import SignUp from "./components/login/signUp/SignUp";
-import SignIn from "./components/login/SignIn"; // Import đúng SignIn.jsx
+import LoginPage from "./components/login/LoginPage"; // Đảm bảo import đúng
 import ForgetPassword from "./components/login/forgetPass/forgetPass";
 import SidebarProfile from "./components/Profile/SidebarProfile";
 import Wishlist from "./components/Profile/ProfileComponents/Wishlist";
@@ -79,7 +80,8 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/services/:id" element={<ServiceDetail />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<SignIn />} /> {/* Sửa thành SignIn */}
+            <Route path="/login" element={<LoginPage />} />{" "}
+            {/* Đảm bảo route này */}
             <Route path="/forgetpass" element={<ForgetPassword />} />
             <Route path="/profile" element={<SidebarProfile />} />
             <Route path="/wishlist" element={<Wishlist />} />

@@ -36,7 +36,7 @@ export default function SignIn() {
       localStorage.setItem("token", token);
       console.log("Token stored in localStorage");
 
-      // Decode token để lấy thông tin
+      // Decode token để lấy thông tin (không cần introspect nếu tin tưởng backend)
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       console.log("Decoded token:", decodedToken);
 
@@ -51,11 +51,10 @@ export default function SignIn() {
         console.log("User info stored in localStorage");
       }
 
-      // Điều hướng dựa trên role
       redirectBasedOnRole(decodedToken.role);
     } catch (error) {
       console.error("Google callback error:", error);
-      setError("Login Google failed!");
+      setError("Login Google failed !");
       localStorage.removeItem("token");
     } finally {
       setIsLoading(false);
@@ -69,7 +68,7 @@ export default function SignIn() {
 
     try {
       if (!email || !password) {
-        setError("Please enter email and password!");
+        setError("Please enter email and password !");
         return;
       }
 
@@ -95,11 +94,11 @@ export default function SignIn() {
 
         redirectBasedOnRole(decodedToken.role);
       } else {
-        setError("Incorrect email or password!");
+        setError("Incorrect email or password !");
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError(error.response?.data?.message || "Your account isn't exists!");
+      setError(error.response?.data?.message || "Your account isn't exits !");
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +121,7 @@ export default function SignIn() {
         navigate("/");
         break;
       default:
-        setError("Cannot check role!");
+        setError("Cannot check role !");
         navigate("/");
     }
   };
