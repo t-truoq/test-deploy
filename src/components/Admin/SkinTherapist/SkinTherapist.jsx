@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { Edit } from "./Edit";
 
 const API_URL =
-  "https://e8e8-118-69-182-149.ngrok-free.app/api/users";
+  "https://f084-118-69-182-149.ngrok-free.app/api/users";
 
 export function SkinTherapist() {
   const [clients, setClients] = useState([]);

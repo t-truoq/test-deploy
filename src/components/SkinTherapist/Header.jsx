@@ -38,7 +38,7 @@ export function SKHeader() {
       try {
         console.log("Fetching user profile with token:", token);
         const response = await axios.get(
-          "https://e8e8-118-69-182-149.ngrok-free.app/api/users/profile",
+          "https://f084-118-69-182-149.ngrok-free.app/api/users/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -6,7 +6,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL =
-  "https://e8e8-118-69-182-149.ngrok-free.app/api/v1/vnpay";
+  "https://f084-118-69-182-149.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);
