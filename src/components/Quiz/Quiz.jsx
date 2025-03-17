@@ -22,7 +22,7 @@ const Quiz = () => {
           throw new Error("Please login before doing quiz!");
         }
 
-        const response = await axios.get("https://9c6d-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/quiz/questions", {
+        const response = await axios.get("https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/quiz/questions", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -109,7 +109,7 @@ const Quiz = () => {
       });
 
       const response = await axios.post(
-        "https://9c6d-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/quiz/submit",
+        "https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/quiz/submit",
         submissionData,
         {
           headers: {
