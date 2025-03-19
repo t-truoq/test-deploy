@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const BASE_URL = "https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/bookings/specialist";
+const BASE_URL = "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/bookings/specialist";
 
 function Booking() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);

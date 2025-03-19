@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import PropTypes from "prop-types";
-import axios from "axios"; // Dùng axios trực tiếp
+import axios from "axios";
 
 const BASE_URL =
-  "https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/services"; // Base URL với ngrok
+  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/services";
+const IMAGE_BASE_URL =
+  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/images/service";
 
 const EditServiceModal = ({ service, onEditService, onClose }) => {
   const [formData, setFormData] = useState({
@@ -13,11 +15,11 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
     price: service.price,
     duration: service.duration.toString(),
     imageUrl: service.images?.[0]?.url || "",
-    recommendedSkinTypes: service.recommendedSkinTypes || [], // Thêm trường mới
+    recommendedSkinTypes: service.recommendedSkinTypes || [],
   });
   const [error, setError] = useState(null);
 
-  const skinTypeOptions = ["OILY", "COMBINATION", "DRY", "NORMAL", "SENSITIVE"]; // Các tùy chọn loại da
+  const skinTypeOptions = ["OILY", "COMBINATION", "DRY", "NORMAL", "SENSITIVE"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +38,7 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
     });
   };
 
+  // Cập nhật thông tin service (không bao gồm ảnh)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -50,7 +53,6 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
         price: parseFloat(formData.price),
         duration: parseInt(formData.duration, 10),
         recommendedSkinTypes: formData.recommendedSkinTypes,
-        images: formData.imageUrl ? [{ url: formData.imageUrl }] : [],
       };
 
       const response = await axios.put(
@@ -65,9 +67,48 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
       );
 
       onEditService(service.serviceId, response.data);
-      onClose();
+      setError(null);
     } catch (err) {
       setError("Không thể cập nhật dịch vụ. Vui lòng kiểm tra lại.");
+      console.error(err);
+      if (err.response) {
+        console.error("Response error:", err.response.data);
+      }
+    }
+  };
+
+  // Thêm hoặc cập nhật ảnh cho service
+  const handleAddImage = async () => {
+    if (!formData.imageUrl) {
+      setError("Vui lòng nhập URL ảnh.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found. Please login again.");
+      }
+
+      const imagePayload = {
+        url: formData.imageUrl,
+      };
+
+      await axios.post(
+        `${IMAGE_BASE_URL}/${service.serviceId}`,
+        imagePayload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+
+      setError(null);
+      alert("Cập nhật ảnh thành công!");
+    } catch (err) {
+      setError("Không thể cập nhật ảnh. Vui lòng kiểm tra lại.");
       console.error(err);
       if (err.response) {
         console.error("Response error:", err.response.data);
@@ -197,14 +238,23 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
             >
               Image URL
             </label>
-            <input
-              type="text"
-              id="imageUrl"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                id="imageUrl"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
+              />
+              <button
+                type="button"
+                onClick={handleAddImage}
+                className="rounded-md bg-[#4A0404] px-4 py-2 text-sm font-medium text-white hover:bg-[#3A0303]"
+              >
+                Update Image
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2">
@@ -237,7 +287,7 @@ EditServiceModal.propTypes = {
     duration: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       .isRequired,
     images: PropTypes.arrayOf(PropTypes.shape({ url: PropTypes.string })),
-    recommendedSkinTypes: PropTypes.arrayOf(PropTypes.string), // Thêm propTypes cho recommendedSkinTypes
+    recommendedSkinTypes: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   onEditService: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
