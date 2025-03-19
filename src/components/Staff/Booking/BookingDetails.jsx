@@ -32,7 +32,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         // Fetch the list of services
         const servicesResponse = await axios.get(
-          `https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/services`,
+          `https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/services`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         // Fetch the booking details
         const bookingResponse = await axios.get(
-          `https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/bookings/${bookingId}`,
+          `https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
         // Fetch the list of specialists
         const specialistsResponse = await axios.get(
-          `https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/users/specialists/active`,
+          `https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/users/specialists/active`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app${endpoint}`,
+        url: `https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -192,7 +192,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       };
 
       const response = await axios.put(
-        `https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/bookings/${bookingId}`,
+        `https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/bookings/${bookingId}`,
         requestBody,
         {
           headers: {

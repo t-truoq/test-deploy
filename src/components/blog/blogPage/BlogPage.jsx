@@ -29,7 +29,7 @@
 //       try {
 //         setLoading(true);
 //         const response = await axios.get(
-//           "https://1728-2405-4802-811e-11a0-9cec-41b0-ca2f-57a6.ngrok-free.app/api/blogs",
+//           "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/blogs",
 //           {
 //             headers: {
 //               "ngrok-skip-browser-warning": "true",
