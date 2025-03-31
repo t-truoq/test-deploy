@@ -6,7 +6,7 @@ import { MoreHorizontal, XIcon } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import EditQuestionForm from "./EditQuestion";
 
-const BACKEND_URL = "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app";
+const BACKEND_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app";
 
 export default function QuestionDashboard() {
   const [questions, setQuestions] = useState([]);
@@ -27,6 +27,7 @@ export default function QuestionDashboard() {
       { answerText: "", score: 0, skinType: "NORMAL" },
       { answerText: "", score: 0, skinType: "OILY" },
       { answerText: "", score: 0, skinType: "COMBINATION" },
+  
     ],
   });
 
@@ -34,7 +35,7 @@ export default function QuestionDashboard() {
 
   useEffect(() => {
     fetchQuestions();
-  }, []);
+  }, []); // Removed fetchQuestions from dependency array since it's defined inside the component
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -97,9 +98,12 @@ export default function QuestionDashboard() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${BACKEND_URL}/api/quiz/questions/${questionToDelete}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `${BACKEND_URL}/api/quiz/questions/${questionToDelete}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setQuestions(questions.filter((q) => q.id !== questionToDelete));
       setIsDeleteDialogOpen(false);
       setQuestionToDelete(null);
@@ -211,6 +215,7 @@ export default function QuestionDashboard() {
             { answerText: "", score: 0, skinType: "NORMAL" },
             { answerText: "", score: 0, skinType: "OILY" },
             { answerText: "", score: 0, skinType: "COMBINATION" },
+          
           ],
         });
         showToast({
@@ -251,82 +256,120 @@ export default function QuestionDashboard() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Giữ nguyên giao diện loading của bạn
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center bg-white p-6 rounded-xl shadow-lg border"
+        >
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              className="w-full h-full rounded-full border-4 border-[#3D021E] border-t-transparent"
+            />
+          </div>
+          <h3 className="text-lg sm:text-xl text-[#3D021E] font-medium">
+            Loading questions...
+          </h3>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            Please wait while we fetch your data
+          </p>
+        </motion.div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>; // Giữ nguyên giao diện error của bạn
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white p-6 rounded-xl shadow-xl max-w-md w-full text-center border"
+        >
+          <h2 className="text-xl sm:text-2xl font-bold text-[#3D021E] mb-2">
+            Error: {error}
+          </h2>
+          <button
+            onClick={fetchQuestions}
+            className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors mt-4"
+          >
+            Retry
+          </button>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-col space-y-2">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
               Question Dashboard
             </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-xs sm:text-sm text-gray-600">
               Manage your skin type quiz questions
             </p>
           </div>
-          <div className="flex justify-end">
-            <button
-              className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors flex items-center"
-              onClick={() => setIsAddDialogOpen(true)}
-              disabled={isLoading}
+          <button
+            className="flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors text-xs sm:text-sm"
+            onClick={() => setIsAddDialogOpen(true)}
+            disabled={isLoading}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="mr-1 sm:mr-2 h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="mr-2 h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Add Question
-            </button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add Question
+          </button>
         </div>
 
-        <div className="p-6 bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-4 sm:p-6 bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Question Text
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden md:table-cell px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Number of Answers
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-3 py-2 sm:px-6 sm:py-3 text-right text-xs font-semibold uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {questions.map((question) => (
+                {questions.map((question, index) => (
                   <motion.tr key={question.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                       {question.id}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 max-w-[300px] truncate">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm text-gray-600 max-w-[200px] sm:max-w-[300px] truncate">
                       {question.questionText}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="hidden md:table-cell px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600">
                       {question.answers.length}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
                       <div
                         className="relative"
                         ref={(el) => (dropdownRefs.current[question.id] = el)}
@@ -340,22 +383,29 @@ export default function QuestionDashboard() {
                           }
                           className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-full hover:bg-gray-200"
                         >
-                          <MoreHorizontal className="h-5 w-5" />
+                          <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
                         </button>
                         {dropdownOpen[question.id] && (
                           <motion.div
-                            className="absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className={`absolute right-0 w-40 sm:w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10 ${
+                              index === questions.length - 1
+                                ? "bottom-full mb-2" // Last row: dropdown above
+                                : "top-full mt-2" // Other rows: dropdown below
+                            }`}
                           >
                             <div className="py-1">
                               <button
                                 onClick={() => handleEdit(question)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                className="block w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
                               >
                                 Edit Question
                               </button>
                               <button
                                 onClick={() => handleDelete(question.id)}
-                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                className="block w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-red-600 hover:bg-gray-100"
                               >
                                 Delete Question
                               </button>
@@ -373,56 +423,70 @@ export default function QuestionDashboard() {
 
         {/* Add Question Modal */}
         {isAddDialogOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-[#3D021E]">
+          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md sm:max-w-lg p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-[#3D021E]">
                   Add New Question
                 </h3>
                 <button
                   onClick={() => setIsAddDialogOpen(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  <XIcon className="h-6 w-6" />
+                  <XIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                     Question Text
                   </label>
                   <input
                     type="text"
                     value={newQuestion.questionText}
                     onChange={(e) =>
-                      setNewQuestion({ ...newQuestion, questionText: e.target.value })
+                      setNewQuestion({
+                        ...newQuestion,
+                        questionText: e.target.value,
+                      })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+                    className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] text-xs sm:text-sm"
                     placeholder="Enter question text"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                     Answers
                   </label>
                   {newQuestion.answers.map((answer, index) => (
-                    <div key={index} className="flex gap-2 mt-1">
+                    <div
+                      key={index}
+                      className="flex flex-col sm:flex-row gap-2 mt-1"
+                    >
                       <input
                         type="text"
                         value={answer.answerText}
                         onChange={(e) =>
-                          handleAnswerChange(index, "answerText", e.target.value)
+                          handleAnswerChange(
+                            index,
+                            "answerText",
+                            e.target.value
+                          )
                         }
-                        className="w-2/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+                        className="w-full sm:w-2/4 px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] text-xs sm:text-sm"
                         placeholder={`Answer ${index + 1}`}
                       />
                       <input
                         type="number"
                         value={answer.score}
                         onChange={(e) =>
-                          handleAnswerChange(index, "score", parseInt(e.target.value))
+                          handleAnswerChange(
+                            index,
+                            "score",
+                            parseInt(e.target.value)
+                          )
                         }
-                        className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+                        className="w-full sm:w-1/4 px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] text-xs sm:text-sm"
                         placeholder="Score"
                       />
                       <select
@@ -430,27 +494,28 @@ export default function QuestionDashboard() {
                         onChange={(e) =>
                           handleAnswerChange(index, "skinType", e.target.value)
                         }
-                        className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
+                        className="w-full sm:w-1/4 px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] text-xs sm:text-sm"
                       >
                         <option value="SENSITIVE">Sensitive</option>
                         <option value="NORMAL">Normal</option>
                         <option value="OILY">Oily</option>
                         <option value="COMBINATION">Combination</option>
+                        <option value="DRY">DRY</option>
                       </select>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="mt-6 flex justify-end gap-3">
+              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setIsAddDialogOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                  className="px-3 sm:px-4 py-1 sm:py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 text-xs sm:text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddQuestion}
-                  className="px-4 py-2 bg-[#3D021E] text-white rounded-lg hover:bg-[#4A0404]"
+                  className="px-3 sm:px-4 py-1 sm:py-2 bg-[#3D021E] text-white rounded-lg hover:bg-[#4A0404] text-xs sm:text-sm"
                 >
                   {isLoading ? "Adding..." : "Add"}
                 </button>
@@ -470,24 +535,24 @@ export default function QuestionDashboard() {
 
         {/* Delete Confirmation Modal */}
         {isDeleteDialogOpen && (
-          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-              <h3 className="text-lg font-semibold text-[#3D021E] mb-4">
+          <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-[#3D021E] mb-3 sm:mb-4">
                 Confirm Deletion
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-4 sm:mb-6 text-xs sm:text-sm">
                 Are you sure you want to delete this question?
               </p>
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setIsDeleteDialogOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                  className="px-3 sm:px-4 py-1 sm:py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 text-xs sm:text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="px-4 py-2 bg-[#3D021E] text-white rounded-lg hover:bg-[#4A0404]"
+                  className="px-3 sm:px-4 py-1 sm:py-2 bg-[#3D021E] text-white rounded-lg hover:bg-[#4A0404] text-xs sm:text-sm"
                 >
                   {isLoading ? "Deleting..." : "Delete"}
                 </button>
@@ -499,7 +564,7 @@ export default function QuestionDashboard() {
         {/* Toast Notification */}
         {toast && (
           <motion.div
-            className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg max-w-md z-50 border-l-4 ${
+            className={`fixed bottom-4 right-4 p-3 sm:p-4 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md z-50 border-l-4 ${
               toast.type === "success"
                 ? "bg-green-100 border-green-500"
                 : toast.type === "error"
@@ -508,15 +573,19 @@ export default function QuestionDashboard() {
             }`}
           >
             <div className="flex items-start">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-gray-900">{toast.title}</h3>
-                <div className="mt-1 text-sm text-gray-700">{toast.message}</div>
+              <div className="ml-2 sm:ml-3">
+                <h3 className="text-xs sm:text-sm font-medium text-gray-900">
+                  {toast.title}
+                </h3>
+                <div className="mt-1 text-xs sm:text-sm text-gray-700">
+                  {toast.message}
+                </div>
               </div>
               <button
                 onClick={() => setToast(null)}
-                className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-full p-1.5"
+                className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-full p-1 sm:p-1.5"
               >
-                <XIcon className="h-4 w-4" />
+                <XIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
             </div>
           </motion.div>

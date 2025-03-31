@@ -3,8 +3,7 @@ import { X } from "lucide-react";
 import PropTypes from "prop-types";
 import axios from "axios"; // Thay vì import từ api.js, dùng axios trực tiếp
 
-const BASE_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/services"; // Thêm link ngrok trước endpoint
+const BASE_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services"; // Thêm link ngrok trước endpoint
 
 const AddServiceModal = ({ onAddService, onClose }) => {
   const [formData, setFormData] = useState({

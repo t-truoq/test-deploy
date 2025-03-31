@@ -5,8 +5,7 @@ import PropTypes from "prop-types";
 import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
-const API_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/users";
+const API_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users";
 
 export function Edit({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);
@@ -17,11 +16,21 @@ export function Edit({ isOpen, onClose, client, onSave }) {
     if (client) {
       setFormData({
         password: "",
-        name: client.name,
-        phone: client.phone,
-        address: client.address,
+        name: client.name || "Unknown",
+        phone: client.phone || "N/A",
+        address: client.address || "N/A",
         role: client.role || "CUSTOMER",
-        id: client.id,
+        id: client.id || "",
+      });
+    } else {
+      // Fallback if client is null or undefined
+      setFormData({
+        password: "",
+        name: "Unknown",
+        phone: "N/A",
+        address: "N/A",
+        role: "CUSTOMER",
+        id: "",
       });
     }
   }, [client]);
@@ -32,25 +41,25 @@ export function Edit({ isOpen, onClose, client, onSave }) {
   };
 
   const handleAssignRole = async () => {
-    if (!formData?.id || !formData?.role) return;
+    if (!formData?.id || !formData?.role) {
+      setError("Missing user ID or role.");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem("token");
-      console.log("Token from localStorage:", token);
       if (!token) {
         throw new Error("No admin token found. Please log in as an admin.");
       }
 
       const decodedToken = jwtDecode(token);
-      console.log("Decoded token:", decodedToken);
       if (decodedToken.role !== "ADMIN") {
         throw new Error("Unauthorized: Only admins can assign roles.");
       }
 
-      // Sử dụng query parameter thay vì body JSON
       const response = await fetch(
         `${API_URL}/${formData.id}/assign-role?newRole=${formData.role}`,
         {
@@ -63,23 +72,27 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
         if (response.status === 401) {
           throw new Error("Unauthorized: Invalid or expired token.");
         } else if (response.status === 403) {
           throw new Error("Forbidden: Admin privileges required.");
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
       }
 
       const result = await response.json();
-      console.log("Role assignment response:", result);
-
-      // Giả sử API trả về UserResponse với code và dữ liệu user
       if (result.code !== undefined && result.code !== 0) {
         throw new Error(result.msg || "Failed to assign role");
       }
 
-      console.log(`Role updated to ${formData.role} for user ${formData.id}`);
+      // Update the parent component's state immediately after role assignment
+      onSave({
+        ...client,
+        role: formData.role,
+      });
     } catch (err) {
       console.error("Error assigning role:", err);
       setError(err.message);
@@ -90,26 +103,27 @@ export function Edit({ isOpen, onClose, client, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData) return;
+    if (!formData) {
+      setError("No user data available to submit.");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem("token");
-      console.log("Token from localStorage:", token);
       if (!token) {
         throw new Error("No admin token found. Please log in as an admin.");
       }
 
       const decodedToken = jwtDecode(token);
-      console.log("Decoded token:", decodedToken);
       if (decodedToken.role !== "ADMIN") {
         throw new Error("Unauthorized: Only admins can update users.");
       }
 
       const updateData = {
-        password: formData.password,
+        password: formData.password || undefined,
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
@@ -126,12 +140,15 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
         if (response.status === 401) {
           throw new Error("Unauthorized: Invalid or expired token.");
         } else if (response.status === 403) {
           throw new Error("Forbidden: Admin privileges required.");
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
       }
 
       onSave({
@@ -154,7 +171,7 @@ export function Edit({ isOpen, onClose, client, onSave }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800">Edit User</h3>
+          <h3 className="text-xl font-bold text-gray-800">Edit Staff</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"

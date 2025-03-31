@@ -5,8 +5,7 @@ import { Search, MoreHorizontal, XIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Edit } from "./Edit";
 
-const API_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/users";
+const API_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users";
 
 export function SkinTherapist() {
   const [clients, setClients] = useState([]);
@@ -220,13 +219,17 @@ export function SkinTherapist() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Tab Section - Only "All Appointments" */}
-        <div className="flex space-x-4 mb-6">
-          <button className="text-sm font-medium text-gray-600 border-b-2 border-[#6D0F3D] pb-2">
-            All Appointments
-          </button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="max-w-full sm:max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
+              Skin Therapists
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-gray-600">
+              Manage your specialist list
+            </p>
+          </div>
         </div>
 
         <div className="p-6 bg-white rounded-xl shadow-lg overflow-hidden">

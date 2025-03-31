@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight, Star } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState, useEffect, useRef } from "react"
+import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import axios from "axios"
 
 export default function Testimonials() {
@@ -10,221 +10,214 @@ export default function Testimonials() {
   const [testimonials, setTestimonials] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const autoPlayRef = useRef(null)
 
   const fetchTestimonials = async () => {
     try {
-      const response = await axios.get("https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/feedbacks", {
-        headers: {
-          "ngrok-skip-browser-warning": "true",
+      const response = await axios.get(
+        "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/feedbacks",
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
         },
-      });
+      )
 
-      console.log("API Response:", response.data);
+      const data = Array.isArray(response.data) ? response.data : []
 
-      const data = Array.isArray(response.data) ? response.data : [];
-      
       // Filter for 5-star ratings only
       const transformedData = data
-        .filter(feedback => feedback.rating === 5) // Only keep 5-star feedback
-        .map(feedback => ({
+        .filter((feedback) => feedback.rating === 5)
+        .map((feedback) => ({
           id: feedback.feedbackId,
           name: feedback.customerName || "Anonymous",
-          rating: 5, // Since we're filtering for 5 stars, this is always 5
+          rating: 5,
           message: feedback.comment || "No comment provided",
-          image: "/placeholder.svg?height=96&width=96"
         }))
-        .slice(0, 5); // Still limit to 5 testimonials
-
-      console.log("Transformed Data (5-star only):", transformedData);
 
       if (transformedData.length === 0) {
-        setError("No 5-star testimonials found in the database.");
-        setTestimonials([]);
+        setError("No 5-star testimonials found.")
+        setTestimonials([])
       } else {
-        setTestimonials(transformedData);
-        setError(null);
+        setTestimonials(transformedData)
+        setError(null)
       }
-      setLoading(false);
-      console.log("State after update:", { testimonials: transformedData, loading: false, error: null });
+      setLoading(false)
     } catch (error) {
-      console.error("Error fetching testimonials:", error.message || error);
-      if (error.response) {
-        setError(`Server error: ${error.response.status} - ${error.response.statusText}. Please check the backend.`);
-      } else {
-        setError("Failed to connect to the API. Please ensure ngrok is running and the URL is valid.");
-      }
-      setTestimonials([]);
-      setLoading(false);
-      console.log("State after error:", { testimonials: [], loading: false, error });
+      console.error("Error fetching testimonials:", error)
+      setError("Failed to load testimonials.")
+      setTestimonials([])
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    console.log("useEffect triggered on mount or F5");
-    setLoading(true);
-    setError(null);
-    setTestimonials([]);
-    fetchTestimonials();
-  }, []);
+    fetchTestimonials()
+  }, [])
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (testimonials.length > 0) {
+      autoPlayRef.current = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length)
+      }, 2000) // Auto-rotate every 5 seconds
+    }
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current)
+      }
+    }
+  }, [testimonials])
 
   const nextTestimonial = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  };
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current)
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length)
+    resetAutoPlay()
+  }
 
   const prevTestimonial = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length
-    );
-  };
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current)
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length)
+    resetAutoPlay()
+  }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
+  const goToTestimonial = (index) => {
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current)
+    setCurrentIndex(index)
+    resetAutoPlay()
+  }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  console.log("Rendering with state:", { loading, error, testimonials });
+  const resetAutoPlay = () => {
+    autoPlayRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length)
+    }, 5000)
+  }
 
   if (loading) {
     return (
-      <section className="py-16 md:py-24 w-full bg-pink-50">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 text-center">
-          <p>Loading testimonials...</p>
-          <button onClick={fetchTestimonials} className="mt-4 text-blue-500 hover:underline">
-            Refresh
-          </button>
+      <section className="py-20 bg-gradient-to-b from-pink-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="h-8 w-64 bg-gray-200 rounded mb-4"></div>
+              <div className="h-4 w-48 bg-gray-200 rounded"></div>
+            </div>
+          </div>
         </div>
       </section>
-    );
+    )
   }
 
   if (error) {
     return (
-      <section className="py-16 md:py-24 w-full bg-pink-50">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 text-center">
-          <p className="text-red-500">{error}</p>
-          <p className="text-gray-600 mt-2">Current URL: https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/feedbacks</p>
-          <button onClick={fetchTestimonials} className="mt-4 text-blue-500 hover:underline">
-            Try Again
-          </button>
+      <section className="py-20 bg-gradient-to-b from-pink-50 to-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500">{error}</p>
         </div>
       </section>
-    );
+    )
   }
 
-  if (!Array.isArray(testimonials) || testimonials.length === 0) {
+  if (!testimonials.length) {
     return (
-      <section className="py-16 md:py-24 w-full bg-pink-50">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 text-center">
-          <p>No 5-star testimonials available at this time.</p>
+      <section className="py-20 bg-gradient-to-b from-pink-50 to-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500">No testimonials available at this time.</p>
         </div>
       </section>
-    );
+    )
   }
 
   return (
-    <section className="py-16 md:py-24 w-full bg-pink-50">
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          <motion.div variants={itemVariants} className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              What Our Clients Say
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-              Hear from our satisfied clients about their experiences and
-              transformations with our skincare services
-            </p>
-          </motion.div>
-          <motion.div variants={itemVariants} className="relative max-w-5xl mx-auto">
-            <div className="overflow-hidden">
-              <div
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+    <section className="py-20 bg-gradient-to-b from-pink-50 to-white overflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">What Our Clients Say</h2>
+          <div className="w-20 h-1 bg-[#A10550] mx-auto mb-6"></div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Hear from our satisfied clients about their experiences with our skincare services
+          </p>
+        </div>
+
+        <div className="relative max-w-4xl mx-auto">
+          {/* Testimonial Slider */}
+          <div className="relative h-[350px] md:h-[300px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                className="absolute inset-0"
               >
-                {testimonials.map((testimonial) => (
-                  <div
-                    key={testimonial.id}
-                    className="w-full flex-shrink-0 px-4"
-                  >
-                    <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-                      <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
-                        <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
-                          <img
-                            src={testimonial.image}
-                            alt={testimonial.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="text-center md:text-left">
-                          <h3 className="text-xl md:text-2xl font-bold mb-2">
-                            {testimonial.name}
-                          </h3>
-                          <div className="flex justify-center md:justify-start">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className="w-5 h-5 text-yellow-500 fill-yellow-500" // All stars are 5, so always yellow
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <blockquote className="text-lg md:text-xl text-gray-700 italic">
-                        "{testimonial.message}"
-                      </blockquote>
+                <div className="bg-white rounded-xl shadow-lg p-8 md:p-10 h-full flex flex-col justify-between">
+                  <div className="relative">
+                    <Quote className="absolute -top-2 -left-2 w-8 h-8 text-pink-100 rotate-180" />
+                    <div className="pt-6">
+                      <p className="text-gray-700 text-lg leading-relaxed line-clamp-4 overflow-hidden">
+                        {testimonials[currentIndex].message}
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            <button
-              onClick={prevTestimonial}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-colors z-10"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-700" />
-            </button>
-            <button
-              onClick={nextTestimonial}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-colors z-10"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-700" />
-            </button>
+                  <div className="mt-6 flex flex-col items-center md:flex-row md:justify-between md:items-center">
+                    <div className="flex flex-col items-center md:items-start">
+                      <h3 className="font-semibold text-lg text-gray-900">{testimonials[currentIndex].name}</h3>
+                      <div className="flex mt-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
 
-            <div className="flex justify-center mt-8 gap-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentIndex ? "bg-[#A10550]" : "bg-gray-300"
-                  }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
+                    {/* <div className="mt-4 md:mt-0 flex items-center space-x-1">
+                      <span className="text-sm text-gray-500">
+                        {currentIndex + 1} / {testimonials.length}
+                      </span>
+                    </div> */}
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Buttons */}
+          <button
+            onClick={prevTestimonial}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-3 shadow-md hover:bg-gray-50 transition-colors z-10 focus:outline-none focus:ring-2 focus:ring-pink-200"
+            aria-label="Previous testimonial"
+            disabled={testimonials.length <= 1}
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </button>
+
+          <button
+            onClick={nextTestimonial}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white rounded-full p-3 shadow-md hover:bg-gray-50 transition-colors z-10 focus:outline-none focus:ring-2 focus:ring-pink-200"
+            aria-label="Next testimonial"
+            disabled={testimonials.length <= 1}
+          >
+            <ChevronRight className="w-5 h-5 text-gray-700" />
+          </button>
+
+          {/* Indicator Dots */}
+          {/* <div className="flex justify-center mt-8 space-x-2">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToTestimonial(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 focus:outline-none ${
+                  index === currentIndex ? "bg-[#A10550] w-6" : "bg-gray-300 hover:bg-gray-400"
+                }`}
+                aria-label={`Go to testimonial ${index + 1}`}
+              />
+            ))}
+          </div> */}
+        </div>
       </div>
     </section>
-  );
+  )
 }
+

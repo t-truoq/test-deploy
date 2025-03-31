@@ -36,28 +36,44 @@ export function BookingCalendar({
     }
   }, [selectedDate]);
 
-  const filteredAppointments = (appointments || []).filter((appointment) => {
-    if (!(appointment.date instanceof Date) || isNaN(appointment.date)) {
-      return false;
-    }
-    if (view === "day") {
-      return isSameDay(appointment.date, selectedDate);
-    } else {
-      const endDate = addDays(selectedDate, 6);
-      return appointment.date >= selectedDate && appointment.date <= endDate;
-    }
-  });
+  const filteredAppointments = (appointments || [])
+    .filter((appointment) => {
+      if (!(appointment.date instanceof Date) || isNaN(appointment.date)) {
+        return false;
+      }
+      if (view === "day") {
+        return isSameDay(appointment.date, selectedDate);
+      } else {
+        const endDate = addDays(selectedDate, 6);
+        return appointment.date >= selectedDate && appointment.date <= endDate;
+      }
+    })
+    .sort((a, b) => {
+      const statusA = a.status.toUpperCase();
+      const statusB = b.status.toUpperCase();
+
+      // Xếp PENDING lên đầu
+      if (statusA === "PENDING" && statusB !== "PENDING") return -1;
+      if (statusB === "PENDING" && statusA !== "PENDING") return 1;
+
+      // Nếu không phải cả hai đều PENDING, xếp IN_PROGRESS tiếp theo
+      if (statusA === "IN_PROGRESS" && statusB !== "IN_PROGRESS") return -1;
+      if (statusB === "IN_PROGRESS" && statusA !== "IN_PROGRESS") return 1;
+
+      // Giữ nguyên thứ tự cho các status khác
+      return 0;
+    });
 
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {
       case "CONFIRMED":
-        return "bg-purple-500";  // Changed from green to purple
+        return "bg-purple-500"; // Changed from green to purple
       case "PENDING":
         return "bg-yellow-500";
       case "CANCELLED":
         return "bg-red-500";
       case "COMPLETED":
-        return "bg-green-500";   // Changed from purple to green
+        return "bg-green-500"; // Changed from purple to green
       case "IN_PROGRESS":
         return "bg-blue-500";
       default:

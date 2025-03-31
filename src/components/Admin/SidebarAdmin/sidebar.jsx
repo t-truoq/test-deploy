@@ -41,7 +41,7 @@ export default function Sidebar() {
     {
       name: "Skin Therapist Management",
       icon: Contact,
-      path: "/admin/skintherapisttmanagement",
+      path: "/admin/skintherapistmanagement",
     },
     {
       name: "Payment Management",
@@ -118,40 +118,31 @@ export default function Sidebar() {
       </nav>
 
       {/* Pages Section */}
-      <div className={isCollapsed ? "mt-4" : "mt-8"}>
-        <h2
-          className={`px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 ${
-            isCollapsed ? "hidden" : "block"
-          }`}
-        >
-          PAGES
-        </h2>
-        <nav className="flex flex-col gap-1">
-          {pages.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                to={item.path}
-                key={item.name}
-                className={`flex items-center w-full p-2 text-sm rounded-lg transition-all duration-300 ease-in-out hover:bg-pink-100 hover:text-pink-700 hover:scale-105 ${
-                  location.pathname === item.path
-                    ? "bg-pink-50 text-pink-700 font-semibold scale-[1.08] shadow-md shadow-pink-700/15"
-                    : "text-gray-600"
-                }`}
-              >
-                <Icon
-                  className={`w-5 h-5 ${
-                    isCollapsed ? "mx-auto" : "mr-3"
-                  } transition-transform duration-200 ease-in-out hover:rotate-10`}
-                />
-                <span className={isCollapsed ? "hidden" : "block"}>
-                  {item.name}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
+      <nav className="flex flex-col gap-1">
+        {pages.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              to={item.path}
+              key={item.name}
+              className={`flex items-center w-full p-2 text-sm rounded-lg transition-all duration-300 ease-in-out hover:bg-pink-100 hover:text-pink-700 hover:scale-105 ${
+                location.pathname === item.path
+                  ? "bg-pink-50 text-pink-700 font-semibold scale-[1.08] shadow-md shadow-pink-700/15"
+                  : "text-gray-600"
+              }`}
+            >
+              <Icon
+                className={`w-5 h-5 ${
+                  isCollapsed ? "mx-auto" : "mr-3"
+                } transition-transform duration-200 ease-in-out hover:rotate-10`}
+              />
+              <span className={isCollapsed ? "hidden" : "block"}>
+                {item.name}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

@@ -1,33 +1,15 @@
-import { motion } from "framer-motion";
-import { useEffect } from "react"; // Thêm useEffect để tự động đóng
-import { AlertCircle, CheckCircle } from "lucide-react";
+"use client"
 
-const ErrorPopup = ({ notification, setNotification }) => {
-  const fadeIn = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.5 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } },
-  };
+import { motion } from "framer-motion"
+import { AlertCircle } from "lucide-react"
 
-  // Tự động đóng sau 3 giây
-  useEffect(() => {
-    if (notification.show) {
-      const timeout = setTimeout(() => {
-        setNotification((prev) => ({ ...prev, show: false }));
-      }, 3000);
-      return () => clearTimeout(timeout); // Dọn dẹp timeout khi component unmount
-    }
-  }, [notification, setNotification]);
-
-  if (!notification.show) return null;
-
+const ErrorPopup = ({ message, onClose }) => {
   return (
     <motion.div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]"
-      variants={fadeIn}
-      initial="initial"
-      animate="animate"
-      exit="exit"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
     >
       <motion.div
         className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full"
@@ -36,14 +18,10 @@ const ErrorPopup = ({ notification, setNotification }) => {
         exit={{ scale: 0.9, opacity: 0 }}
       >
         <div className="flex flex-col items-center">
-          {notification.isSuccess ? (
-            <CheckCircle className="w-12 h-12 text-emerald-600 mb-4" />
-          ) : (
-            <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-          )}
-          <p className="text-lg font-medium text-gray-800 mb-6 text-center">{notification.message}</p>
+          <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
+          <p className="text-lg font-medium text-gray-800 mb-6 text-center">{message}</p>
           <motion.button
-            onClick={() => setNotification((prev) => ({ ...prev, show: false }))}
+            onClick={onClose}
             className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -53,7 +31,8 @@ const ErrorPopup = ({ notification, setNotification }) => {
         </div>
       </motion.div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default ErrorPopup;
+export default ErrorPopup
+

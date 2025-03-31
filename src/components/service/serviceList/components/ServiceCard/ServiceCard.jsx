@@ -1,25 +1,25 @@
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import PropTypes from "prop-types";
-import { useState, useRef } from "react";
-import { addItem } from "../../../../../store/cartSlice";
-import { Heart, Clock, ChevronRight, Tag } from "lucide-react"; // Loại bỏ DollarSign
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom"
+import { useDispatch } from "react-redux"
+import PropTypes from "prop-types"
+import { useState, useRef } from "react"
+import { addItem } from "../../../../../store/cartSlice"
+import { Heart, Clock, ChevronRight, Tag } from "lucide-react"
+import { motion } from "framer-motion"
 
 // Hàm định dạng giá tiền VND với dấu phân cách hàng nghìn
 const formatVND = (price) => {
-  return price.toLocaleString("vi-VN") + " ₫"; // Định dạng theo kiểu Việt Nam
-};
+  return price.toLocaleString("vi-VN") + " ₫" // Định dạng theo kiểu Việt Nam
+}
 
 export default function ServiceCard({ service, onSelect, isSelected, onAddToWishlist, isInWishlist, variant }) {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef(null);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [isHovered, setIsHovered] = useState(false)
+  const cardRef = useRef(null)
 
   const handleDetailClick = () => {
-    navigate(`/services/${service.serviceId}`);
-  };
+    navigate(`/services/${service.serviceId}`)
+  }
 
   const handleBooking = () => {
     if (!isSelected) {
@@ -33,68 +33,66 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
             service.images && service.images.length > 0
               ? service.images[0].url
               : service.image || "https://picsum.photos/350",
-        })
-      );
+        }),
+      )
     }
-    onSelect(service);
-  };
+    onSelect(service)
+  }
 
   const handleAddToWishlist = (e) => {
-    e.stopPropagation();
-    onAddToWishlist(service);
-  };
+    e.stopPropagation()
+    onAddToWishlist(service)
+  }
 
   // Logic lấy ảnh giống BlogPage
   const serviceImage =
     service.images && service.images.length > 0
       ? service.images[0].url
-      : service.image || "https://via.placeholder.com/350";
+      : service.image || "https://via.placeholder.com/350"
 
   // Format duration to hours and minutes
   const formatDuration = (minutes) => {
-    if (!minutes) return "N/A";
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours === 0) return `${mins} min`;
-    if (mins === 0) return `${hours} hr`;
-    return `${hours} hr ${mins} min`;
-  };
+    if (!minutes) return "N/A"
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    if (hours === 0) return `${mins} min`
+    if (mins === 0) return `${hours} hr`
+    return `${hours} hr ${mins} min`
+  }
 
   return (
-    <motion.div 
-      className="w-full mb-8"
+    <motion.div
+      className="w-full max-w-lg mx-auto mb-8" // Tăng từ max-w-md lên max-w-lg
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       ref={cardRef}
+      style={{ width: "min(100%, 32rem)" }} // Tăng từ 28rem lên 32rem
     >
       <motion.div
         className={`bg-white rounded-xl shadow-lg border overflow-hidden ${
           isSelected ? "border-[#A10550]" : "border-gray-200"
         } transition-all duration-300`}
-        whileHover={{ 
-          scale: 1.02, 
+        whileHover={{
+          scale: 1.02,
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-          borderColor: "#A10550" 
+          borderColor: "#A10550",
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="flex flex-col md:flex-row">
-          {/* Left side - Image */}
-          <div className="relative md:w-2/5 overflow-hidden">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.5 }}
-              className="h-full"
-            >
+        <div className="flex flex-col">
+          {/* Top - Image */}
+          <div className="relative w-full overflow-hidden">
+            <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.5 }} className="h-full">
               <img
                 src={serviceImage || "/placeholder.svg"}
-                className="w-full h-[300px] lg:h-[400px] object-cover"
+                className="w-full h-[320px] object-cover" // Tăng từ h-[280px] lên h-[320px]
                 alt={service.name}
+                style={{ height: "auto", maxHeight: "320px" }} // Linh hoạt chiều cao
               />
             </motion.div>
-            
+
             {/* Recommended badge */}
             {variant === "recommended" && (
               <div className="absolute top-4 left-0 bg-[#A10550] text-white py-1 px-4 rounded-r-full shadow-md flex items-center">
@@ -118,39 +116,34 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
               <Heart
                 size={24}
                 className={`transition-colors duration-300 ${
-                  isInWishlist
-                    ? "text-[#A10550] fill-[#A10550]"
-                    : isHovered
-                    ? "text-[#A10550]"
-                    : "text-white"
+                  isInWishlist ? "text-[#A10550] fill-[#A10550]" : isHovered ? "text-[#A10550]" : "text-white"
                 }`}
               />
             </motion.button>
           </div>
 
-          {/* Right side - Content */}
-          <div className="md:w-3/5 p-6 lg:p-8 flex flex-col justify-between">
+          {/* Bottom - Content */}
+          <div className="p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center mb-2">
                 <Clock className="w-4 h-4 text-gray-500 mr-1" />
                 <span className="text-gray-500 text-sm">{formatDuration(service.duration)}</span>
               </div>
-              
-              <h5 className="text-[#A10550] font-serif font-bold text-2xl lg:text-3xl mb-3 hover:text-[#800440] transition-colors">
+
+              <h5 className="text-[#A10550] font-serif font-bold text-xl mb-2 hover:text-[#800440] transition-colors">
                 {service.name}
               </h5>
-              
-              <div className="flex items-center mb-4">
-                {/* Thay DollarSign bằng ký hiệu ₫ trong span */}
-                <span className="font-bold text-xl lg:text-2xl text-gray-800">{formatVND(service.price)}</span>
+
+              <div className="flex items-center mb-3">
+                <span className="font-bold text-lg text-gray-800">{formatVND(service.price)}</span>
               </div>
-              
-              <p className="text-gray-600 mb-6 line-clamp-3">{service.description}</p>
+
+              <p className="text-gray-600 mb-4 line-clamp-2 text-sm">{service.description}</p>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3 mt-2">
               <motion.button
-                className={`flex-1 py-3 px-6 rounded-lg font-medium text-base transition-all duration-300 ${
+                className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all duration-300 ${
                   isSelected
                     ? "bg-[#A10550] text-white shadow-lg shadow-[#A10550]/30"
                     : "bg-gray-100 text-black hover:bg-[#A10550] hover:text-white hover:shadow-lg hover:shadow-[#A10550]/30"
@@ -161,21 +154,21 @@ export default function ServiceCard({ service, onSelect, isSelected, onAddToWish
               >
                 {isSelected ? "Selected" : "Book Now"}
               </motion.button>
-              
+
               <motion.button
                 onClick={handleDetailClick}
-                className="flex items-center justify-center py-3 px-6 rounded-lg font-medium text-base border-2 border-gray-300 transition-all duration-300 hover:border-gray-800 hover:bg-gray-800 hover:text-white"
+                className="flex items-center justify-center py-2 px-4 rounded-lg font-medium text-sm border-2 border-gray-300 transition-all duration-300 hover:border-gray-800 hover:bg-gray-800 hover:text-white"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
-                Details <ChevronRight size={16} className="ml-1" />
+                Details <ChevronRight size={14} className="ml-1" />
               </motion.button>
             </div>
           </div>
         </div>
       </motion.div>
     </motion.div>
-  );
+  )
 }
 
 ServiceCard.propTypes = {
@@ -189,7 +182,7 @@ ServiceCard.propTypes = {
     images: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string.isRequired,
-      })
+      }),
     ),
   }).isRequired,
   onSelect: PropTypes.func.isRequired,
@@ -197,4 +190,4 @@ ServiceCard.propTypes = {
   onAddToWishlist: PropTypes.func.isRequired,
   isInWishlist: PropTypes.bool.isRequired,
   variant: PropTypes.string,
-};
+}

@@ -15,19 +15,20 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
 
   const BACKEND_URL =
-    "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app";
+    "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app";
 
-    useEffect(() => {
-      console.log("Location search:", location.search); // Debug URL
-      const params = new URLSearchParams(location.search);
-      const token = params.get("token");
-      console.log("Token from query:", token); // Debug token
-    
-      if (token) {
-        setIsLoading(true);
-        handleGoogleCallback(token);
-      }
-    }, [location]);
+  useEffect(() => {
+    console.log("Location search:", location.search); // Debug URL
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    console.log("Token from query:", token); // Debug token
+
+    if (token) {
+      setIsLoading(true); // Hiển thị loading
+      handleGoogleCallback(token);
+    }
+  }, [location]);
+
   const handleGoogleCallback = async (token) => {
     console.log("Handling Google callback with token:", token);
     try {

@@ -6,7 +6,7 @@ function ProfilePage() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="sticky top-0 h-screen w-64 bg-white shadow">
+      <div className="sticky top-0 h-screen">
         <SKsidebar />
       </div>
 

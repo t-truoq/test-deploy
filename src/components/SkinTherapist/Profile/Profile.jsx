@@ -12,9 +12,10 @@ import {
   X,
 } from "lucide-react";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const BASE_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/users/profile";
+  "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users/profile";
 
 // Dữ liệu mặc định cho các trường không có trong API
 const defaultProfessionalInfo = {
@@ -177,11 +178,26 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#4A0404] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-600">Loading profile...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center bg-white border-gray-100 p-6 sm:p-8 rounded-xl shadow-lg border backdrop-blur-sm"
+        >
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              className="w-full h-full rounded-full border-4 border-[#3D021E] border-t-transparent"
+            />
+          </div>
+          <h3 className="text-lg sm:text-xl text-[#3D021E] font-medium">
+            Loading profile...
+          </h3>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            Please wait while we fetch your data
+          </p>
+        </motion.div>
       </div>
     );
   }
@@ -199,7 +215,9 @@ function Profile() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Profile</h1>
+        <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
+          My Profile
+        </h2>
         {isEditing ? (
           <div className="flex space-x-2">
             <button
