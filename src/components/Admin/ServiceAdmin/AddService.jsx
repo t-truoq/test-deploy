@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import PropTypes from "prop-types";
-import axios from "axios"; // Thay vì import từ api.js, dùng axios trực tiếp
+import axios from "axios";
 
-const BASE_URL = "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services"; // Thêm link ngrok trước endpoint
+const BASE_URL = "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services";
 
 const AddServiceModal = ({ onAddService, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
-    duration: "30",
+    duration: "", // Khởi tạo rỗng để người dùng nhập
     imageUrl: "",
     recommendedSkinTypes: [],
   });
@@ -20,17 +20,33 @@ const AddServiceModal = ({ onAddService, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Reset lỗi trước khi gửi
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found. Please login again.");
       }
 
+      // Kiểm tra duration hợp lệ
+      const duration = parseInt(formData.duration, 10);
+      if (isNaN(duration) || duration <= 0) {
+        setError("Thời gian phải là một số dương lớn hơn 0.");
+        return;
+      }
+
+      // Kiểm tra price hợp lệ
+      const price = parseFloat(formData.price);
+      if (isNaN(price) || price <= 0) {
+        setError("Giá phải là một số dương lớn hơn 0.");
+        return;
+      }
+
       const payload = {
         name: formData.name,
         description: formData.description,
-        price: parseFloat(formData.price),
-        duration: parseInt(formData.duration, 10),
+        price: price,
+        duration: duration,
         recommendedSkinTypes: formData.recommendedSkinTypes,
         images: formData.imageUrl ? [{ url: formData.imageUrl }] : [],
       };
@@ -45,11 +61,17 @@ const AddServiceModal = ({ onAddService, onClose }) => {
       onAddService(response.data);
       onClose();
     } catch (err) {
-      setError("Không thể thêm dịch vụ. Vui lòng kiểm tra lại.");
-      console.error(err);
+      // Xử lý lỗi chi tiết từ API
       if (err.response) {
+        const errorMessage = err.response.data?.message || "Không thể thêm dịch vụ. Vui lòng kiểm tra lại.";
+        setError(errorMessage);
         console.error("Response error:", err.response.data);
+      } else if (err.request) {
+        setError("Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối.");
+      } else {
+        setError(err.message || "Đã xảy ra lỗi không xác định.");
       }
+      console.error("Error:", err);
     }
   };
 
@@ -138,6 +160,7 @@ const AddServiceModal = ({ onAddService, onClose }) => {
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
               required
               step="0.01"
+              min="0.01" // Đảm bảo giá trị không âm
             />
           </div>
 
@@ -146,24 +169,21 @@ const AddServiceModal = ({ onAddService, onClose }) => {
               htmlFor="duration"
               className="mb-1 block text-sm font-medium text-gray-700"
             >
-              Duration
+              Duration (minutes)
             </label>
-            <div className="flex space-x-4">
-              {["30", "45", "60"].map((dur) => (
-                <label key={dur} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="duration"
-                    value={dur}
-                    checked={formData.duration === dur}
-                    onChange={handleChange}
-                    className="mr-2 focus:ring-[#4A0404]"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {dur === "60" ? "1 hour" : `${dur} min`}
-                  </span>
-                </label>
-              ))}
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="duration"
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                className="w-24 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
+                required
+                min="1" // Đảm bảo giá trị không âm
+                step="1" // Chỉ cho phép nhập số nguyên
+              />
+              <span className="text-sm text-gray-700">minutes</span>
             </div>
           </div>
 
