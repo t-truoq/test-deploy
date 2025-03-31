@@ -12,16 +12,17 @@ import {
   RefreshCw,
   Search,
   XCircle,
+  X as XIcon, // Add XIcon for toast close button
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Hàm parse booking date
+// Function to parse booking date
 const parseBookingDate = (dateString) => {
   if (!dateString || dateString === "N/A") return "N/A";
   return new Date(dateString).toLocaleDateString();
 };
 
-// Updated API URL to fetch all bookings (not just confirmed)
+// API URLs
 const BOOKING_API_URL =
   "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/confirmed";
 const CASH_PAYMENT_API_URL =
@@ -37,6 +38,7 @@ export default function BookingStaff() {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [toast, setToast] = useState(null); // State for toast notification
 
   useEffect(() => {
     if (hasFetched) return;
@@ -116,7 +118,13 @@ export default function BookingStaff() {
     fetchBookings();
   }, [hasFetched]);
 
-  // Hàm xử lý thanh toán bằng tiền mặt
+  // Function to show toast notification
+  const showToast = (toastData) => {
+    setToast(toastData);
+    setTimeout(() => setToast(null), 3000); // Hide toast after 3 seconds
+  };
+
+  // Function to handle cash payment
   const handleCashPayment = async (bookingId, amount) => {
     try {
       const token = localStorage.getItem("token");
@@ -144,15 +152,21 @@ export default function BookingStaff() {
               : booking
           )
         );
-        alert(`Payment successful for Booking ID: ${bookingId}`);
+        showToast({
+          title: "Payment Successful",
+          message: `Payment for Booking ID: ${bookingId} was successful.`,
+          type: "success",
+        });
       }
     } catch (error) {
       console.error("Cash Payment Error:", error);
-      alert(
-        `Failed to process payment: ${
+      showToast({
+        title: "Payment Failed",
+        message: `Failed to process payment: ${
           error.response?.data?.message || error.message
-        }`
-      );
+        }`,
+        type: "error",
+      });
     }
   };
 
@@ -735,6 +749,32 @@ export default function BookingStaff() {
             </div>
           </div>
         </motion.div>
+
+        {/* Toast Notification */}
+        {toast && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg max-w-md z-50 border-l-4 ${
+              toast.type === "success"
+                ? "bg-green-100 border-green-500"
+                : "bg-red-100 border-red-500"
+            }`}
+          >
+            <div className="flex items-start">
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-gray-900">
+                  {toast.title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-700">{toast.message}</p>
+              </div>
+              <button
+                onClick={() => setToast(null)}
+                className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-full p-1.5"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
