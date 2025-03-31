@@ -51,7 +51,7 @@ export default function Newsletter() {
 
     try {
       const response = await axios.post(
-        "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/contact",
+        "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/contact",
         formData,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );

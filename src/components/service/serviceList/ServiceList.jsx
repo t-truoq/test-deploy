@@ -344,7 +344,7 @@ const ServiceList = () => {
         const token = localStorage.getItem("token")
         if (!token) throw new Error("Please login before doing quiz !.")
 
-        const response = await axios.get("https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/quiz/recommended-services", {
+        const response = await axios.get("https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/quiz/recommended-services", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -380,7 +380,7 @@ const ServiceList = () => {
 
     const fetchAllServices = async () => {
       try {
-        const response = await axios.get("https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services", {
+        const response = await axios.get("https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services", {
           headers: {
             "ngrok-skip-browser-warning": "true",
           },
@@ -423,7 +423,7 @@ const ServiceList = () => {
         const token = localStorage.getItem("token")
         if (!token) throw new Error("No token found. Please login again.")
 
-        const response = await axios.get("https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/quiz/recommended-services", {
+        const response = await axios.get("https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/quiz/recommended-services", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",

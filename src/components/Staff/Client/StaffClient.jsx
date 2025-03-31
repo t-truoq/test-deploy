@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EditClientModal } from "./EditClientModal";
 
-const API_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users";
+const API_URL = "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users";
 
 export function StaffClients() {
   const [clients, setClients] = useState([]);
