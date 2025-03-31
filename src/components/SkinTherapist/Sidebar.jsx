@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 export default function SKsidebar() {
   const location = useLocation();
   const pathname = location.pathname;
-  const [isCollapsed, setIsCollapsed] = useState(false); // State to manage sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false); // State cho desktop
 
   const isStaffRoute = pathname.startsWith("/skintherapist");
 
@@ -31,12 +31,7 @@ export default function SKsidebar() {
     : [];
 
   const toggleSidebar = () => {
-    console.log("Toggle button clicked. isCollapsed:", isCollapsed); // Debug log
-    setIsCollapsed((prev) => {
-      const newState = !prev;
-      console.log("New isCollapsed state:", newState); // Debug log
-      return newState;
-    });
+    setIsCollapsed(!isCollapsed);
   };
 
   return (
@@ -66,7 +61,6 @@ export default function SKsidebar() {
         <button
           onClick={toggleSidebar}
           className="p-2 rounded-lg hover:bg-pink-100 focus:outline-none transition-colors duration-200"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} // Accessibility
         >
           {isCollapsed ? (
             <Menu className="w-6 h-6 text-pink-700" />

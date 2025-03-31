@@ -63,8 +63,17 @@ function BookingDialog({
 }) {
   if (!isOpen || !appointment) return null;
 
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      onClick={handleOverlayClick}
+    >
       <div className="bg-white rounded-lg max-w-md w-full overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium">Appointment Details</h3>
@@ -112,12 +121,12 @@ function BookingDialog({
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-2">
           {appointment.status === "pending" ? (
             <>
               <button
                 onClick={onClose}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium mr-2"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100"
               >
                 Cancel
               </button>
@@ -131,7 +140,7 @@ function BookingDialog({
           ) : (
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100"
             >
               Close
             </button>
@@ -150,7 +159,13 @@ BookingDialog.propTypes = {
     date: PropTypes.string.isRequired,
     time: PropTypes.string.isRequired,
     duration: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(["pending", "confirmed"]).isRequired,
+    status: PropTypes.oneOf([
+      "pending",
+      "confirmed",
+      "in_progress",
+      "completed",
+      "cancelled",
+    ]).isRequired, // Mở rộng danh sách status
   }),
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,

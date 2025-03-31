@@ -5,22 +5,20 @@ import Sidebar from "../../../components/Admin/SidebarAdmin/sidebar";
 function HomeAdmin() {
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
       <div className="sticky top-0 h-screen">
         <Sidebar />
       </div>
-
-      <div className="flex-1 overflow-auto">
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto transition-all duration-300 ease-in-out">
+        {/* Header */}
         <div className="flex border-b border-gray-200">
           <div className="flex-1">
             <Header />
           </div>
         </div>
 
-        <main className="p-7">
-          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
-            Dash Board
-          </h2>
+        {/* Main Section */}
+        <main className="p-4 sm:p-6 md:p-7">
           <Dashboard />
         </main>
       </div>

@@ -2,19 +2,16 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { motion } from "framer-motion"; // Added for loading animation consistency
-import { XIcon } from "lucide-react"; // Added for consistent icon usage
+import { motion } from "framer-motion";
+import { XIcon } from "lucide-react";
 
-const BASE_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/bookings"; // Replace with valid ngrok URL
+const BASE_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings";
 
 export default function OrderlistAdmin() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // State for filters
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [therapistFilter, setTherapistFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
@@ -23,9 +20,7 @@ export default function OrderlistAdmin() {
     const fetchAllBookings = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("No token found. Please login again.");
-        }
+        if (!token) throw new Error("No token found. Please login again.");
 
         const response = await axios.get(BASE_URL, {
           headers: {
@@ -33,10 +28,8 @@ export default function OrderlistAdmin() {
             "ngrok-skip-browser-warning": "true",
           },
           maxRedirects: 5,
-          timeout: 10000, // Add timeout to avoid hanging requests
+          timeout: 10000,
         });
-
-        console.log("API Response:", response.data);
 
         if (Array.isArray(response.data)) {
           const formattedData = response.data.map((booking) => ({
@@ -55,7 +48,6 @@ export default function OrderlistAdmin() {
           }));
           setOrders(formattedData);
           setFilteredOrders(formattedData);
-          console.log("Formatted Orders:", formattedData);
         } else {
           throw new Error("Bookings data is not an array");
         }
@@ -80,28 +72,23 @@ export default function OrderlistAdmin() {
     };
 
     fetchAllBookings();
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
-  // Filter data based on filters
   useEffect(() => {
     let result = [...orders];
-
     if (statusFilter && statusFilter !== "All Status") {
       result = result.filter(
         (order) => order.status.toLowerCase() === statusFilter.toLowerCase()
       );
     }
-
     if (therapistFilter) {
       result = result.filter((order) =>
         order.therapist.toLowerCase().includes(therapistFilter.toLowerCase())
       );
     }
-
     if (dateFilter) {
       result = result.filter((order) => order.date.includes(dateFilter));
     }
-
     setFilteredOrders(result);
   }, [statusFilter, therapistFilter, dateFilter, orders]);
 
@@ -110,7 +97,7 @@ export default function OrderlistAdmin() {
       Pending: "bg-yellow-100 border border-yellow-500 text-yellow-900",
       Confirm: "bg-green-100 border border-green-500 text-green-900",
       "In Progress": "bg-blue-100 border border-blue-500 text-blue-900",
-      Completed: "bg-green-100 border border-green-500 text-green-900", // Changed to green
+      Completed: "bg-green-100 border border-green-500 text-green-900",
       Cancelled: "bg-red-100 border border-red-500 text-red-900",
     };
     return colors[status] || "bg-gray-100 border border-gray-300 text-gray-800";
@@ -129,23 +116,19 @@ export default function OrderlistAdmin() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center bg-white border-gray-100 p-8 rounded-xl shadow-lg border backdrop-blur-sm"
+          className="text-center bg-white p-6 rounded-xl shadow-lg border"
         >
-          <div className="relative w-20 h-20 mx-auto mb-6">
+          <div className="relative w-16 h-16 mx-auto mb-4">
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="w-20 h-20 rounded-full border-4 border-[#3D021E] border-t-transparent"
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              className="w-16 h-16 rounded-full border-4 border-[#3D021E] border-t-transparent"
             />
           </div>
-          <h3 className="text-xl text-[#3D021E] font-medium">
+          <h3 className="text-lg text-[#3D021E] font-medium">
             Loading bookings...
           </h3>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
             Please wait while we fetch your data
           </p>
         </motion.div>
@@ -159,24 +142,9 @@ export default function OrderlistAdmin() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white border-gray-200 p-6 rounded-xl shadow-xl max-w-md w-full text-center border"
+          className="bg-white p-6 rounded-xl shadow-xl max-w-md w-full text-center border"
         >
-          <div className="w-20 h-20 mx-auto mb-6 text-[#3D021E]">
-            <svg
-              className="h-20 w-20"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-[#3D021E] mb-2">{error}</h2>
+          <h2 className="text-xl font-bold text-[#3D021E] mb-2">{error}</h2>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors mt-4"
@@ -189,23 +157,19 @@ export default function OrderlistAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col space-y-2">
-          <div>
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
-              Order List
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage your booking orders
-            </p>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#3D021E] to-[#6D0F3D]">
+            Order List
+          </h2>
+          <p className="text-sm text-gray-600">Manage your booking orders</p>
         </div>
 
-        <div className="p-6 bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-4 sm:p-6 bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Filters */}
           <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 flex-wrap">
               <button className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white rounded-lg hover:from-[#4A0404] hover:to-[#7D1F4D] transition-colors">
                 <svg
                   className="w-4 h-4"
@@ -219,11 +183,10 @@ export default function OrderlistAdmin() {
                 Filter By
               </button>
 
-              {/* Status Filter */}
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
+                className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
               >
                 <option value="All Status">All Status</option>
                 <option value="Pending">Pending</option>
@@ -233,26 +196,24 @@ export default function OrderlistAdmin() {
                 <option value="Cancelled">Cancelled</option>
               </select>
 
-              {/* Therapist Filter */}
               <input
                 type="text"
                 placeholder="Filter by Skin Therapist"
                 value={therapistFilter}
                 onChange={(e) => setTherapistFilter(e.target.value)}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
+                className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
               />
 
-              {/* Date Filter */}
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E] transition-all duration-300"
+                className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3D021E]"
               />
 
               <button
                 onClick={resetFilters}
-                className="px-4 py-2 text-sm text-[#3D021E] hover:text-[#4A0404] transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-sm text-[#3D021E] hover:text-[#4A0404] transition-colors"
               >
                 Reset Filter
               </button>
@@ -264,22 +225,22 @@ export default function OrderlistAdmin() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gradient-to-r from-[#3D021E] to-[#6D0F3D] text-white">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden sm:table-cell px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Skin Therapist
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden md:table-cell px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Detail
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
@@ -290,22 +251,22 @@ export default function OrderlistAdmin() {
                     key={order.id}
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.id}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600">
                       {order.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="hidden sm:table-cell px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600">
                       {order.therapist}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-600">
                       {order.date}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="hidden md:table-cell px-4 py-3 sm:px-6 sm:py-4 whitespace-normal text-sm text-gray-600 max-w-[150px]">
                       {order.detail}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
                           order.status
@@ -321,7 +282,7 @@ export default function OrderlistAdmin() {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-end px-6 py-3 border-t border-gray-200">
+          <div className="flex items-center justify-end px-4 py-3 sm:px-6 border-t border-gray-200">
             <div className="flex gap-2">
               <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                 <svg

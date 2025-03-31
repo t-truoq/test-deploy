@@ -1,4 +1,3 @@
-
 import { useLocation } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/home/Header/Navbar";
@@ -49,7 +48,7 @@ function App() {
     "/admin/calendar",
     "/admin/customersmanagement",
     "/admin/staffsmanagement",
-    "/admin/skintherapisttmanagement",
+    "/admin/skintherapistmanagement",
     "/admin/paymentmanagement",
     "/admin/feedback",
     "/admin/questions",
@@ -102,7 +101,7 @@ function App() {
               element={<StaffsManagement />}
             />
             <Route
-              path="/admin/skintherapisttmanagement"
+              path="/admin/skintherapistmanagement"
               element={<SkinTherapistsManagement />}
             />
             <Route

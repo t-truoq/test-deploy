@@ -1,7 +1,7 @@
-"use client"; // Đánh dấu đây là Client Component
+"use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Thêm useNavigate
+import { useNavigate } from "react-router-dom";
 import {
   Bell,
   ChevronDown,
@@ -15,7 +15,7 @@ import {
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const navigate = useNavigate(); // Hook để điều hướng
+  const navigate = useNavigate();
 
   // Xử lý click ngoài để đóng dropdown
   useEffect(() => {
@@ -31,17 +31,14 @@ export default function Header() {
 
   // Hàm xử lý logout
   const handleLogout = () => {
-    // Xóa token và thông tin người dùng khỏi localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // Điều hướng về trang đăng nhập (giả sử là "/signin")
     navigate("/");
   };
 
   return (
     <header
-      className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-2"
+      className="flex items-center justify-end border-b border-gray-200 bg-white px-4 sm:px-6 md:px-8 py-2"
       onClick={(e) => {
         if (!e.target.closest(".dropdown-toggle")) {
           setIsDropdownOpen(false);
@@ -49,7 +46,7 @@ export default function Header() {
         }
       }}
     >
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         <div className="relative">
           <button
             className="dropdown-toggle rounded-md p-2 hover:bg-gray-100"
@@ -59,13 +56,15 @@ export default function Header() {
               setIsDropdownOpen(false);
             }}
           >
-            <Bell className="h-5 w-5 text-gray-600" />
+            <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
           </button>
 
           {isNotificationOpen && (
-            <div className="absolute right-0 top-full z-10 mt-2 w-80 rounded-lg border border-gray-200 bg-white py-2 shadow-lg">
+            <div className="absolute right-0 top-full z-10 mt-2 w-72 sm:w-80 rounded-lg border border-gray-200 bg-white py-2 shadow-lg">
               <div className="px-4 py-2">
-                <h3 className="font-medium text-gray-900">Notification</h3>
+                <h3 className="font-medium text-gray-900 text-sm sm:text-base">
+                  Notification
+                </h3>
               </div>
 
               <div className="mt-2 space-y-1">
@@ -74,7 +73,9 @@ export default function Header() {
                     <Settings className="h-4 w-4 text-blue-600" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">Settings</span>
+                    <span className="text-xs sm:text-sm text-gray-700">
+                      Settings
+                    </span>
                     <span className="text-xs text-gray-500">
                       Update Dashboard
                     </span>
@@ -86,7 +87,9 @@ export default function Header() {
                     <Calendar className="h-4 w-4 text-pink-600" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">Event Update</span>
+                    <span className="text-xs sm:text-sm text-gray-700">
+                      Event Update
+                    </span>
                     <span className="text-xs text-gray-500">
                       An event date update again
                     </span>
@@ -98,7 +101,9 @@ export default function Header() {
                     <UserCircle className="h-4 w-4 text-purple-600" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">Profile</span>
+                    <span className="text-xs sm:text-sm text-gray-700">
+                      Profile
+                    </span>
                     <span className="text-xs text-gray-500">
                       Update your profile
                     </span>
@@ -110,7 +115,7 @@ export default function Header() {
                     <AlertCircle className="h-4 w-4 text-red-600" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm text-gray-700">
+                    <span className="text-xs sm:text-sm text-gray-700">
                       Application Error
                     </span>
                     <span className="text-xs text-gray-500">
@@ -121,7 +126,7 @@ export default function Header() {
               </div>
 
               <div className="border-t border-gray-100 px-4 py-2 mt-2">
-                <button className="text-sm text-blue-600 hover:text-blue-700">
+                <button className="text-xs sm:text-sm text-blue-600 hover:text-blue-700">
                   See all notification
                 </button>
               </div>
@@ -139,7 +144,7 @@ export default function Header() {
             }}
           >
             <div className="flex flex-col items-end">
-              <span className="text-sm font-medium text-gray-900">
+              <span className="text-xs sm:text-sm font-medium text-gray-900">
                 Moni Roy
               </span>
               <span className="text-xs text-gray-500">Admin</span>
@@ -148,10 +153,10 @@ export default function Header() {
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 top-full z-10 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+            <div className="absolute right-0 top-full z-10 mt-2 w-48 sm:w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
               <button
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={handleLogout} // Gọi hàm handleLogout khi nhấn nút Log out
+                className="flex w-full items-center gap-2 px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
+                onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4 text-blue-500" />
                 Log out

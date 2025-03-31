@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
-const API_URL = "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/users";
+const API_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users";
 
 export function Edit({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);
@@ -13,14 +13,27 @@ export function Edit({ isOpen, onClose, client, onSave }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("Edit component received client:", client);
     if (client) {
-      setFormData({
+      const newFormData = {
         password: "",
-        name: client.name || "",
-        phone: client.phone || "",
-        address: client.address || "",
+        name: client.name || "Unknown",
+        phone: client.phone || "N/A",
+        address: client.address || "N/A",
         role: client.role || "CUSTOMER",
         id: client.id || "",
+      };
+      console.log("Setting formData:", newFormData);
+      setFormData(newFormData);
+    } else {
+      console.log("Client is null/undefined, setting fallback formData");
+      setFormData({
+        password: "",
+        name: "Unknown",
+        phone: "N/A",
+        address: "N/A",
+        role: "CUSTOMER",
+        id: "",
       });
     }
   }, [client]);
@@ -80,7 +93,12 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       const result = await response.json();
       console.log("Role assignment response:", result);
 
-     
+      // Update the client data in the parent component
+      onSave({
+        ...client,
+        role: formData.role,
+      });
+
       console.log(`Role updated to ${formData.role} for user ${formData.id}`);
     } catch (err) {
       console.error("Error assigning role:", err);
@@ -94,6 +112,7 @@ export function Edit({ isOpen, onClose, client, onSave }) {
     e.preventDefault();
     if (!formData || !formData.id) {
       setError("No user data available to submit.");
+      console.log("Form submission failed: No user data available");
       return;
     }
 
@@ -114,11 +133,12 @@ export function Edit({ isOpen, onClose, client, onSave }) {
       }
 
       const updateData = {
-        password: formData.password || undefined, // Avoid sending empty string if not set
+        password: formData.password || undefined,
         name: formData.name,
         phone: formData.phone,
         address: formData.address,
       };
+      console.log("Submitting update data:", updateData);
 
       const response = await fetch(`${API_URL}/${formData.id}`, {
         method: "PUT",
@@ -130,6 +150,7 @@ export function Edit({ isOpen, onClose, client, onSave }) {
         body: JSON.stringify(updateData),
       });
 
+      console.log("Response status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
         console.log("Error response (Submit):", errorText);
@@ -141,6 +162,9 @@ export function Edit({ isOpen, onClose, client, onSave }) {
         }
         throw new Error(`HTTP error! status: ${response.status}: ${errorText}`);
       }
+
+      const result = await response.json();
+      console.log("Update response:", result);
 
       onSave({
         ...client,
@@ -156,13 +180,21 @@ export function Edit({ isOpen, onClose, client, onSave }) {
     }
   };
 
-  if (!isOpen || !formData) return null;
+  if (!isOpen || !formData) {
+    console.log(
+      "Edit component not rendering: isOpen =",
+      isOpen,
+      "formData =",
+      formData
+    );
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800">Edit User</h3>
+          <h3 className="text-xl font-bold text-gray-800">Edit Customer</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"

@@ -3,17 +3,15 @@ import { X } from "lucide-react";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-const BASE_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/services";
-const IMAGE_BASE_URL =
-  "https://b5a8-2405-4802-811e-11a0-602d-4a96-8004-ab8a.ngrok-free.app/api/images/service";
+const BASE_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services";
+const IMAGE_BASE_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/images/service";
 
 const EditServiceModal = ({ service, onEditService, onClose }) => {
   const [formData, setFormData] = useState({
     name: service.name,
     description: service.description || "",
     price: service.price,
-    duration: service.duration.toString(),
+    duration: service.duration.toString(), // Đảm bảo duration là chuỗi để hiển thị trong input
     imageUrl: service.images?.[0]?.url || "",
     recommendedSkinTypes: service.recommendedSkinTypes || [],
   });
@@ -47,11 +45,18 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
         throw new Error("No token found. Please login again.");
       }
 
+      // Kiểm tra duration hợp lệ
+      const duration = parseInt(formData.duration, 10);
+      if (isNaN(duration) || duration <= 0) {
+        setError("Thời gian phải là một số dương lớn hơn 0.");
+        return;
+      }
+
       const payload = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
-        duration: parseInt(formData.duration, 10),
+        duration: duration, // Gửi duration dưới dạng số
         recommendedSkinTypes: formData.recommendedSkinTypes,
       };
 
@@ -190,24 +195,21 @@ const EditServiceModal = ({ service, onEditService, onClose }) => {
               htmlFor="duration"
               className="mb-1 block text-sm font-medium text-gray-700"
             >
-              Duration
+              Duration (minutes)
             </label>
-            <div className="flex space-x-4">
-              {["30", "45", "60"].map((dur) => (
-                <label key={dur} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="duration"
-                    value={dur}
-                    checked={formData.duration === dur}
-                    onChange={handleChange}
-                    className="mr-2 focus:ring-[#4A0404]"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {dur === "60" ? "1 hour" : `${dur} min`}
-                  </span>
-                </label>
-              ))}
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="duration"
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                className="w-24 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#4A0404] focus:outline-none focus:ring-1 focus:ring-[#4A0404]"
+                required
+                min="1" // Đảm bảo giá trị không âm
+                step="1" // Chỉ cho phép nhập số nguyên
+              />
+              <span className="text-sm text-gray-700">minutes</span>
             </div>
           </div>
 
