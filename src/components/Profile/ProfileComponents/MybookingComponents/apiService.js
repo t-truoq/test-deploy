@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const API_BASE_URL = "https://62dd-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app"
+const API_BASE_URL = "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app"
 
 export const fetchBookings = async (token) => {
   try {
