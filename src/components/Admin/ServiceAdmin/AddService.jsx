@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-const BASE_URL = "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services";
+const BASE_URL = "http://localhost:8080/api/services";
 
 const AddServiceModal = ({ onAddService, onClose }) => {
   const [formData, setFormData] = useState({

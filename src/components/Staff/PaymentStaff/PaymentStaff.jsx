@@ -24,9 +24,9 @@ const parseBookingDate = (dateString) => {
 
 // API URLs
 const BOOKING_API_URL =
-  "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/confirmed";
+  "http://localhost:8080/api/bookings/confirmed";
 const CASH_PAYMENT_API_URL =
-  "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/v1/vnpay/cash-payment";
+  "http://localhost:8080/api/v1/vnpay/cash-payment";
 
 export default function BookingStaff() {
   const [bookings, setBookings] = useState([]);

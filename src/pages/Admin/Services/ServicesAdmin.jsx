@@ -10,7 +10,7 @@ import AddServiceModal from "../../../components/Admin/ServiceAdmin/AddService";
 import EditServiceModal from "../../../components/Admin/ServiceAdmin/EditService";
 import { motion } from "framer-motion";
 
-const BASE_URL = "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services";
+const BASE_URL = "http://localhost:8080/api/services";
 
 const ServicesAdmin = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

@@ -32,13 +32,13 @@ export function StaffSchedule() {
       try {
         const [schedulesResponse, servicesResponse] = await Promise.all([
           axios.get(
-            `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/schedules/busy`,
+            `http://localhost:8080/api/schedules/busy`,
             {
               headers: { "ngrok-skip-browser-warning": "true" },
             }
           ),
           axios.get(
-            `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services`,
+            `http://localhost:8080/api/services`,
             {
               headers: { "ngrok-skip-browser-warning": "true" },
             }
@@ -147,7 +147,7 @@ export function StaffSchedule() {
 
     try {
       const response = await axios.post(
-        `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/guest`,
+        `http://localhost:8080/api/bookings/guest`,
         bookingRequest,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );

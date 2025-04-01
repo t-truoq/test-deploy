@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 
 const BASE_URL =
-  "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/specialist";
+  "http://localhost:8080/api/bookings/specialist";
 
 function Booking() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);

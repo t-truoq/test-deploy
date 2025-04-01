@@ -122,7 +122,7 @@ const Dashboard = () => {
           [usersResponse, ordersResponse, salesResponse] = await Promise.all([
             axios
               .get(
-                "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users",
+                "http://localhost:8080/api/users",
                 config
               )
               .catch((err) => {
@@ -134,7 +134,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings",
+                "http://localhost:8080/api/bookings",
                 config
               )
               .catch((err) => {
@@ -146,7 +146,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/v1/vnpay",
+                "http://localhost:8080/api/v1/vnpay",
                 config
               )
               .catch((err) => {
@@ -168,7 +168,7 @@ const Dashboard = () => {
           applyFilters(salesResponse.data || []);
         } else if (userRole === "SPECIALIST") {
           ordersResponse = await axios.get(
-            "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings",
+            "http://localhost:8080/api/bookings",
             config
           );
           const totalOrders =
@@ -177,7 +177,7 @@ const Dashboard = () => {
           setStats((prev) => ({ ...prev, totalOrders }));
         } else if (userRole === "CUSTOMER") {
           ordersResponse = await axios.get(
-            "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings",
+            "http://localhost:8080/api/bookings",
             {
               ...config,
               params: { userId: decodedToken.sub },

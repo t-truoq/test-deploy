@@ -43,7 +43,7 @@
 //         };
 
 //         const response = await axios.get(
-//           `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/blogs/${id}`,
+//           `http://localhost:8080/api/blogs/${id}`,
 //           { headers }
 //         );
 
@@ -123,7 +123,7 @@
 //         };
 
 //         const response = await axios.get(
-//           "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/blogs",
+//           "http://localhost:8080/api/blogs",
 //           { headers }
 //         );
 

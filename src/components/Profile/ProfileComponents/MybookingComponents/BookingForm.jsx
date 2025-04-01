@@ -56,7 +56,7 @@ const BookingForm = ({
 
       if (specialistId) {
         const response = await axios.get(
-          `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/schedules/${specialistId}/busy`,
+          `http://localhost:8080/api/schedules/${specialistId}/busy`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ const BookingForm = ({
         for (const specialist of specialists) {
           try {
             const response = await axios.get(
-              `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/schedules/${specialist.userId}/busy`,
+              `http://localhost:8080/api/schedules/${specialist.userId}/busy`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -257,7 +257,7 @@ const BookingForm = ({
 
     try {
       const response = await axios.post(
-        "https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings",
+        "http://localhost:8080/api/bookings",
         bookingData,
         {
           headers: {

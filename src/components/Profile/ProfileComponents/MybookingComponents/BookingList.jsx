@@ -66,7 +66,7 @@ const BookingList = ({
       setIsCancelling((prev) => ({ ...prev, [bookingId]: true }))
 
       const response = await fetch(
-        `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/${bookingId}/cancel`,
+        `http://localhost:8080/api/bookings/${bookingId}/cancel`,
         {
           method: "POST",
           headers: {
@@ -101,7 +101,7 @@ const BookingList = ({
       }
 
       const response = await fetch(
-        `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/${booking.bookingId}`,
+        `http://localhost:8080/api/bookings/${booking.bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

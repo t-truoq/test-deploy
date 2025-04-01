@@ -31,7 +31,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         }
 
         const servicesResponse = await axios.get(
-          `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/services`,
+          `http://localhost:8080/api/services`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         setServicesList(servicesResponse.data);
 
         const bookingResponse = await axios.get(
-          `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/${bookingId}`,
+          `http://localhost:8080/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -72,7 +72,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         setBooking({ ...enhancedBooking, status });
 
         const specialistsResponse = await axios.get(
-          `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/users/specialists/active`,
+          `http://localhost:8080/api/users/specialists/active`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -140,7 +140,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app${endpoint}`,
+        url: `http://localhost:8080${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -189,7 +189,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       };
 
       const response = await axios.put(
-        `https://2134-2402-800-78d0-a832-503e-9ecd-54a8-3bb0.ngrok-free.app/api/bookings/${bookingId}`,
+        `http://localhost:8080/api/bookings/${bookingId}`,
         requestBody,
         {
           headers: {
