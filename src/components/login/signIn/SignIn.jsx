@@ -14,8 +14,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const BACKEND_URL =
-    "http://localhost:8080";
+  const BACKEND_URL = "http://localhost:8080";
 
   useEffect(() => {
     console.log("Location search:", location.search); // Debug URL
@@ -24,7 +23,7 @@ export default function SignIn() {
     console.log("Token from query:", token); // Debug token
 
     if (token) {
-      setIsLoading(true); // Hiển thị loading
+      setIsLoading(true);
       handleGoogleCallback(token);
     }
   }, [location]);
@@ -32,30 +31,33 @@ export default function SignIn() {
   const handleGoogleCallback = async (token) => {
     console.log("Handling Google callback with token:", token);
     try {
-      // Lưu token ngay lập tức
       localStorage.setItem("token", token);
       console.log("Token stored in localStorage");
 
-      // Decode token để lấy thông tin (không cần introspect nếu tin tưởng backend)
+      // Decode token để lấy thông tin
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       console.log("Decoded token:", decodedToken);
+
+      // Lưu role vào localStorage để App.js sử dụng
+      localStorage.setItem("userRole", decodedToken.role.toUpperCase());
 
       if (rememberMe) {
         localStorage.setItem(
           "user",
           JSON.stringify({
             email: decodedToken.sub,
-            role: decodedToken.role,
+            role: decodedToken.role.toUpperCase(),
           })
         );
         console.log("User info stored in localStorage");
       }
 
-      redirectBasedOnRole(decodedToken.role);
+      redirectBasedOnRole(decodedToken.role.toUpperCase());
     } catch (error) {
       console.error("Google callback error:", error);
-      setError("Login Google failed !");
+      setError("Google login failed!");
       localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +70,8 @@ export default function SignIn() {
 
     try {
       if (!email || !password) {
-        setError("Please enter email and password !");
+        setError("Please enter email and password!");
+        setIsLoading(false);
         return;
       }
 
@@ -85,20 +88,26 @@ export default function SignIn() {
         const decodedToken = JSON.parse(atob(token.split(".")[1]));
         console.log("Decoded token:", decodedToken);
 
+        // Lưu role vào localStorage để App.js sử dụng
+        localStorage.setItem("userRole", decodedToken.role.toUpperCase());
+
         if (rememberMe) {
           localStorage.setItem(
             "user",
-            JSON.stringify({ email: decodedToken.sub, role: decodedToken.role })
+            JSON.stringify({
+              email: decodedToken.sub,
+              role: decodedToken.role.toUpperCase(),
+            })
           );
         }
 
-        redirectBasedOnRole(decodedToken.role);
+        redirectBasedOnRole(decodedToken.role.toUpperCase());
       } else {
-        setError("Incorrect email or password !");
+        setError("Incorrect email or password!");
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError(error.response?.data?.message || "Your account isn't exits !");
+      setError(error.response?.data?.message || "Your account doesn't exist!");
     } finally {
       setIsLoading(false);
     }
@@ -106,23 +115,22 @@ export default function SignIn() {
 
   const redirectBasedOnRole = (role) => {
     console.log("Redirecting based on role:", role);
-    const userRole = role?.toUpperCase();
-    switch (userRole) {
+    switch (role) {
       case "ADMIN":
         navigate("/admin/home");
         break;
       case "STAFF":
         navigate("/staff/home");
         break;
-      case "SPECIALIST":
+      case "SPECIALIST": // Đảm bảo role từ backend trả về khớp với "SPECIALIST"
         navigate("/skintherapist/home");
         break;
       case "CUSTOMER":
         navigate("/");
         break;
       default:
-        setError("Cannot check role !");
-        navigate("/");
+        setError("Unknown role!");
+        navigate("/"); // Mặc định về trang khách hàng nếu role không xác định
     }
   };
 
