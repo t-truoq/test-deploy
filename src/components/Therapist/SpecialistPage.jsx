@@ -129,24 +129,26 @@ const fillMissingData = (specialist) => {
 };
 
 // Component SpecialistCard
+// Trong file chứa SpecialistPage và SpecialistCard
+
 const SpecialistCard = ({ specialist, onClick }) => {
   const filledSpecialist = fillMissingData(specialist);
   return (
     <div
-      className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform transition-transform hover:scale-105 hover:shadow-lg"
+      className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group" // Thêm hover effect giống SpecialistShowcase
       onClick={() => onClick(filledSpecialist)}
     >
-      <div className="relative">
+      <div className="aspect-[3/4] w-full overflow-hidden relative"> {/* Tỷ lệ 3/4 giống SpecialistShowcase */}
         <img
-          src={filledSpecialist.image || "/placeholder.svg"}
+          src={filledSpecialist.image || "/placeholder.svg?height=400&width=300"} // Placeholder giống SpecialistShowcase
           alt={filledSpecialist.name}
-          className="w-full h-auto object-cover aspect-[4/3]"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" // Hiệu ứng phóng to khi hover
         />
         <div className="absolute top-0 right-0 m-2 p-1 bg-white rounded-full shadow">
-          <Heart className="h-5 w-5 text-pink-500" />
+          <Heart className="h-5 w-5 text-pink-500" /> {/* Giữ biểu tượng Heart */}
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-4"> {/* Phần nội dung giữ nguyên hoặc điều chỉnh theo ý bạn */}
         <h3 className="text-lg font-semibold text-gray-800">
           {filledSpecialist.name}
         </h3>
