@@ -24,9 +24,9 @@ const parseBookingDate = (dateString) => {
 
 // API URLs
 const BOOKING_API_URL =
-  "http://localhost:8080/api/bookings/confirmed";
+  "https://enhanced-perfectly-dog.ngrok-free.app/api/bookings/confirmed";
 const CASH_PAYMENT_API_URL =
-  "http://localhost:8080/api/v1/vnpay/cash-payment";
+  "https://enhanced-perfectly-dog.ngrok-free.app/api/v1/vnpay/cash-payment";
 
 export default function BookingStaff() {
   const [bookings, setBookings] = useState([]);

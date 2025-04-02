@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -14,50 +13,60 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const BACKEND_URL = "http://localhost:8080";
+  const BACKEND_URL = "https://enhanced-perfectly-dog.ngrok-free.app";
 
   useEffect(() => {
-    console.log("Location search:", location.search); // Debug URL
+    console.log("useEffect triggered with search:", location.search);
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
-    console.log("Token from query:", token); // Debug token
+    console.log("Token from query:", token);
 
     if (token) {
       setIsLoading(true);
       handleGoogleCallback(token);
     }
-  }, [location]);
+  }, [location.search]);
 
   const handleGoogleCallback = async (token) => {
-    console.log("Handling Google callback with token:", token);
     try {
-      localStorage.setItem("token", token);
-      console.log("Token stored in localStorage");
+      // Xóa token và user cũ để tránh xung đột
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-      // Decode token để lấy thông tin
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      // Lưu token mới
+      localStorage.setItem("token", token);
+      console.log("New token stored in localStorage:", token);
+
+      // Giải mã token và kiểm tra thời gian hết hạn
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        throw new Error("Invalid token format");
+      }
+      const decodedToken = JSON.parse(atob(parts[1]));
       console.log("Decoded token:", decodedToken);
 
-      // Lưu role vào localStorage để App.js sử dụng
-      localStorage.setItem("userRole", decodedToken.role.toUpperCase());
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (decodedToken.exp < currentTime) {
+        throw new Error("Token has expired");
+      }
 
+      // Lưu thông tin user nếu chọn "Remember me"
       if (rememberMe) {
         localStorage.setItem(
           "user",
           JSON.stringify({
             email: decodedToken.sub,
-            role: decodedToken.role.toUpperCase(),
+            role: decodedToken.role,
           })
         );
         console.log("User info stored in localStorage");
       }
 
-      redirectBasedOnRole(decodedToken.role.toUpperCase());
+      redirectBasedOnRole(decodedToken.role);
     } catch (error) {
-      console.error("Google callback error:", error);
-      setError("Google login failed!");
+      console.error("Google callback error:", error.message);
+      setError(`Login Google failed: ${error.message}`);
       localStorage.removeItem("token");
-      localStorage.removeItem("userRole");
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +80,6 @@ export default function SignIn() {
     try {
       if (!email || !password) {
         setError("Please enter email and password!");
-        setIsLoading(false);
         return;
       }
 
@@ -88,20 +96,14 @@ export default function SignIn() {
         const decodedToken = JSON.parse(atob(token.split(".")[1]));
         console.log("Decoded token:", decodedToken);
 
-        // Lưu role vào localStorage để App.js sử dụng
-        localStorage.setItem("userRole", decodedToken.role.toUpperCase());
-
         if (rememberMe) {
           localStorage.setItem(
             "user",
-            JSON.stringify({
-              email: decodedToken.sub,
-              role: decodedToken.role.toUpperCase(),
-            })
+            JSON.stringify({ email: decodedToken.sub, role: decodedToken.role })
           );
         }
 
-        redirectBasedOnRole(decodedToken.role.toUpperCase());
+        redirectBasedOnRole(decodedToken.role);
       } else {
         setError("Incorrect email or password!");
       }
@@ -115,28 +117,30 @@ export default function SignIn() {
 
   const redirectBasedOnRole = (role) => {
     console.log("Redirecting based on role:", role);
-    switch (role) {
+    const userRole = role?.toUpperCase();
+    switch (userRole) {
       case "ADMIN":
         navigate("/admin/home");
         break;
       case "STAFF":
         navigate("/staff/home");
         break;
-      case "SPECIALIST": // Đảm bảo role từ backend trả về khớp với "SPECIALIST"
+      case "SPECIALIST":
         navigate("/skintherapist/home");
         break;
       case "CUSTOMER":
         navigate("/");
         break;
       default:
-        setError("Unknown role!");
-        navigate("/"); // Mặc định về trang khách hàng nếu role không xác định
+        setError("Cannot determine role!");
+        navigate("/");
     }
   };
 
   const handleGoogleLogin = () => {
     console.log("Initiating Google login");
-    window.location.href = `${BACKEND_URL}/oauth2/authorization/google`;
+    // Thêm prompt=login để buộc Google yêu cầu đăng nhập lại
+    window.location.href = `${BACKEND_URL}/oauth2/authorization/google?prompt=login`;
   };
 
   return (
@@ -247,7 +251,7 @@ export default function SignIn() {
         </div>
 
         <p className="text-center text-sm text-gray-600">
-          Don't have account?{" "}
+          Don't have an account?{" "}
           <Link to="/signup" className="text-orange-500 hover:text-orange-600">
             Sign up now
           </Link>

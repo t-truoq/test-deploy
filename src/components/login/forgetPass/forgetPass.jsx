@@ -188,7 +188,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/forgotPassword/verifyMail/${email}`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/forgotPassword/verifyMail/${email}`,
 
         {}, // Backend có thể không yêu cầu body, gửi body rỗng
         {
@@ -250,7 +250,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/forgotPassword/verifyOtp/${otp}/${email}`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/forgotPassword/verifyOtp/${otp}/${email}`,
 
         {},
         {
@@ -327,7 +327,7 @@ export default function ForgetPassword() {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/forgotPassword/changePassword/${email}`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/forgotPassword/changePassword/${email}`,
 
         {
           password: newPassword,

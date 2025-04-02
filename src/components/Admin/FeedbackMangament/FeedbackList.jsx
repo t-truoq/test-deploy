@@ -21,7 +21,7 @@ export default function FeedbackList({ filter }) {
   const fetchClients = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/users",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/users",
         {
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function FeedbackList({ filter }) {
         };
 
         const feedbackResponse = await axios.get(
-          "http://localhost:8080/api/feedbacks",
+          "https://enhanced-perfectly-dog.ngrok-free.app/api/feedbacks",
           { headers }
         );
 

@@ -32,13 +32,13 @@ export function StaffSchedule() {
       try {
         const [schedulesResponse, servicesResponse] = await Promise.all([
           axios.get(
-            `http://localhost:8080/api/schedules/busy`,
+            `https://enhanced-perfectly-dog.ngrok-free.app/api/schedules/busy`,
             {
               headers: { "ngrok-skip-browser-warning": "true" },
             }
           ),
           axios.get(
-            `http://localhost:8080/api/services`,
+            `https://enhanced-perfectly-dog.ngrok-free.app/api/services`,
             {
               headers: { "ngrok-skip-browser-warning": "true" },
             }
@@ -147,7 +147,7 @@ export function StaffSchedule() {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/bookings/guest`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/api/bookings/guest`,
         bookingRequest,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );

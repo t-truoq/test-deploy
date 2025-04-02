@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EditClientModal } from "./EditClientModal";
 
-const API_URL = "http://localhost:8080/api/users";
+const API_URL = "https://enhanced-perfectly-dog.ngrok-free.app/api/users";
 
 export function StaffClients() {
   const [clients, setClients] = useState([]);

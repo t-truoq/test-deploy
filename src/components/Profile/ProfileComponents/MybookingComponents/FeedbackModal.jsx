@@ -56,7 +56,7 @@ const FeedbackModal = ({ booking, onClose, onSubmit, setFeedbackNotification }) 
       }
 
       const response = await axios.post(
-        "http://localhost:8080/api/feedbacks",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/feedbacks",
         feedbackData,
         {
           headers: {

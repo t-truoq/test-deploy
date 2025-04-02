@@ -344,7 +344,7 @@ const ServiceList = () => {
         const token = localStorage.getItem("token")
         if (!token) throw new Error("Please login before doing quiz !.")
 
-        const response = await axios.get("http://localhost:8080/api/quiz/recommended-services", {
+        const response = await axios.get("https://enhanced-perfectly-dog.ngrok-free.app/api/quiz/recommended-services", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -380,7 +380,7 @@ const ServiceList = () => {
 
     const fetchAllServices = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/services", {
+        const response = await axios.get("https://enhanced-perfectly-dog.ngrok-free.app/api/services", {
           headers: {
             "ngrok-skip-browser-warning": "true",
           },
@@ -423,7 +423,7 @@ const ServiceList = () => {
         const token = localStorage.getItem("token")
         if (!token) throw new Error("No token found. Please login again.")
 
-        const response = await axios.get("http://localhost:8080/api/quiz/recommended-services", {
+        const response = await axios.get("https://enhanced-perfectly-dog.ngrok-free.app/api/quiz/recommended-services", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",

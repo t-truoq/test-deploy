@@ -26,9 +26,9 @@ export const StaffMemberPropType = PropTypes.shape({
 });
 
 const API_URL =
-  "http://localhost:8080/api/users/specialists";
+  "https://enhanced-perfectly-dog.ngrok-free.app/api/users/specialists";
 const STATUS_API_URL =
-  "http://localhost:8080/api/users/specialists";
+  "https://enhanced-perfectly-dog.ngrok-free.app/api/users/specialists";
 
 export function StaffList() {
   const [staff, setStaff] = useState([]);

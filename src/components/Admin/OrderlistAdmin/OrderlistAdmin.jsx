@@ -5,7 +5,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { XIcon } from "lucide-react";
 
-const BASE_URL = "http://localhost:8080/api/bookings";
+const BASE_URL = "https://enhanced-perfectly-dog.ngrok-free.app/api/bookings";
 
 export default function OrderlistAdmin() {
   const [orders, setOrders] = useState([]);

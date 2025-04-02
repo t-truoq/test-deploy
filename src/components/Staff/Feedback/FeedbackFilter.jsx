@@ -31,7 +31,7 @@ export default function FeedbackFilterStats({ currentFilter, onFilterChange }) {
         };
 
         const response = await axios.get(
-          "http://localhost:8080/api/feedbacks",
+          "https://enhanced-perfectly-dog.ngrok-free.app/api/feedbacks",
           { headers }
         );
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { XIcon } from "lucide-react";
 
-const BACKEND_URL = "http://localhost:8080";
+const BACKEND_URL = "https://enhanced-perfectly-dog.ngrok-free.app";
 
 export default function AddQuestionForm({ onSuccess, onCancel }) {
   const [questionText, setQuestionText] = useState("");

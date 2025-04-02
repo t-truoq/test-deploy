@@ -72,7 +72,7 @@ const Navbar = () => {
   const [googleTranslateReady, setGoogleTranslateReady] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
   const baseUrl =
-    "http://localhost:8080";
+    "https://enhanced-perfectly-dog.ngrok-free.app";
 
   const handleBlogPage = () => {
     navigate(`/blog`);

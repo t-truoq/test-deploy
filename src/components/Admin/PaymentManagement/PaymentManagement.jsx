@@ -5,7 +5,7 @@ import { Filter, ChevronDown, AlertCircle, RefreshCw } from "lucide-react";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 
-const BASE_URL = "http://localhost:8080/api/v1/vnpay";
+const BASE_URL = "https://enhanced-perfectly-dog.ngrok-free.app/api/v1/vnpay";
 
 export default function PaymentStaff() {
   const [payments, setPayments] = useState([]);

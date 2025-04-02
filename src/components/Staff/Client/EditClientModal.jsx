@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
-const API_URL = "http://localhost:8080/api/users";
+const API_URL = "https://enhanced-perfectly-dog.ngrok-free.app/api/users";
 
 export function EditClientModal({ isOpen, onClose, client, onSave }) {
   const [formData, setFormData] = useState(null);

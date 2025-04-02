@@ -44,7 +44,7 @@ export default function SignUp() {
 
       // Gửi yêu cầu POST tới API để đăng ký
       const response = await axios.post(
-        "http://localhost:8080/api/users",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/users",
         signupData,
         {
           headers: {

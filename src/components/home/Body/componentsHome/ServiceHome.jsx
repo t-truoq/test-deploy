@@ -14,7 +14,7 @@ export default function ServiceHome() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/services",
+          "https://enhanced-perfectly-dog.ngrok-free.app/api/services",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",

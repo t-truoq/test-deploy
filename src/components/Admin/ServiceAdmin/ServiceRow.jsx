@@ -7,7 +7,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { XIcon } from "lucide-react";
 
-const BASE_URL = "http://localhost:8080/api/services";
+const BASE_URL = "https://enhanced-perfectly-dog.ngrok-free.app/api/services";
 
 const ServiceRow = ({ service, onEditService, onDeleteService }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

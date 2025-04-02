@@ -51,7 +51,7 @@ const BookingDetailsModal = ({
       const paymentData = { amount, orderInfo }
 
       const response = await fetch(
-        "http://localhost:8080/api/v1/vnpay/create-payment",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/v1/vnpay/create-payment",
         {
           method: "POST",
           headers: {

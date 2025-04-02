@@ -122,7 +122,7 @@ const Dashboard = () => {
           [usersResponse, ordersResponse, salesResponse] = await Promise.all([
             axios
               .get(
-                "http://localhost:8080/api/users",
+                "https://enhanced-perfectly-dog.ngrok-free.app/api/users",
                 config
               )
               .catch((err) => {
@@ -134,7 +134,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "http://localhost:8080/api/bookings",
+                "https://enhanced-perfectly-dog.ngrok-free.app/api/bookings",
                 config
               )
               .catch((err) => {
@@ -146,7 +146,7 @@ const Dashboard = () => {
               }),
             axios
               .get(
-                "http://localhost:8080/api/v1/vnpay",
+                "https://enhanced-perfectly-dog.ngrok-free.app/api/v1/vnpay",
                 config
               )
               .catch((err) => {
@@ -168,7 +168,7 @@ const Dashboard = () => {
           applyFilters(salesResponse.data || []);
         } else if (userRole === "SPECIALIST") {
           ordersResponse = await axios.get(
-            "http://localhost:8080/api/bookings",
+            "https://enhanced-perfectly-dog.ngrok-free.app/api/bookings",
             config
           );
           const totalOrders =
@@ -177,7 +177,7 @@ const Dashboard = () => {
           setStats((prev) => ({ ...prev, totalOrders }));
         } else if (userRole === "CUSTOMER") {
           ordersResponse = await axios.get(
-            "http://localhost:8080/api/bookings",
+            "https://enhanced-perfectly-dog.ngrok-free.app/api/bookings",
             {
               ...config,
               params: { userId: decodedToken.sub },

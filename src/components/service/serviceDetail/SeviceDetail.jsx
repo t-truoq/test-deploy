@@ -37,7 +37,7 @@ export default function ServiceDetail() {
 
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/services/${id}`,
+          `https://enhanced-perfectly-dog.ngrok-free.app/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

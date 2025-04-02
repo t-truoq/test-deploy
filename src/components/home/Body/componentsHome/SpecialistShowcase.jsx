@@ -85,7 +85,7 @@ export default function SpecialistShowcase() {
   const [error, setError] = useState(null);
   const [selectedSpecialist, setSelectedSpecialist] = useState(null);
   const baseUrl =
-    "http://localhost:8080";
+    "https://enhanced-perfectly-dog.ngrok-free.app";
 
   useEffect(() => {
     const fetchSpecialists = async () => {

@@ -35,7 +35,7 @@ export default function FeedbackList({ filter }) {
         };
 
         const feedbackResponse = await axios.get(
-          "http://localhost:8080/api/feedbacks/specialist/feedbacks",
+          "https://enhanced-perfectly-dog.ngrok-free.app/api/feedbacks/specialist/feedbacks",
           { headers }
         );
 

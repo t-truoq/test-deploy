@@ -15,7 +15,7 @@ export default function Testimonials() {
   const fetchTestimonials = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/feedbacks",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/feedbacks",
         {
           headers: {
             "ngrok-skip-browser-warning": "true",

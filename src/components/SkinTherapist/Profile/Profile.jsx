@@ -15,7 +15,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 
 const BASE_URL =
-  "http://localhost:8080/api/users/profile";
+  "https://enhanced-perfectly-dog.ngrok-free.app/api/users/profile";
 
 // Dữ liệu mặc định cho các trường không có trong API
 const defaultProfessionalInfo = {

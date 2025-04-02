@@ -51,7 +51,7 @@ export default function Newsletter() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/contact",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/contact",
         formData,
         { headers: { "ngrok-skip-browser-warning": "true" } }
       );

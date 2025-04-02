@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL:
-    "http://localhost:8080/api",
+    "https://enhanced-perfectly-dog.ngrok-free.app/api",
 
   timeout: 10000,
   headers: {

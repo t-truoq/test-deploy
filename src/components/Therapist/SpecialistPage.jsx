@@ -315,7 +315,7 @@ const SpecialistPage = () => {
     const fetchSpecialists = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/users/specialists/active",
+          "https://enhanced-perfectly-dog.ngrok-free.app/api/users/specialists/active",
           {
             headers: {
               "ngrok-skip-browser-warning": "true",

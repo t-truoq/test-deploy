@@ -56,7 +56,7 @@ const BookingForm = ({
 
       if (specialistId) {
         const response = await axios.get(
-          `http://localhost:8080/api/schedules/${specialistId}/busy`,
+          `https://enhanced-perfectly-dog.ngrok-free.app/api/schedules/${specialistId}/busy`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ const BookingForm = ({
         for (const specialist of specialists) {
           try {
             const response = await axios.get(
-              `http://localhost:8080/api/schedules/${specialist.userId}/busy`,
+              `https://enhanced-perfectly-dog.ngrok-free.app/api/schedules/${specialist.userId}/busy`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -257,7 +257,7 @@ const BookingForm = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/bookings",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/bookings",
         bookingData,
         {
           headers: {

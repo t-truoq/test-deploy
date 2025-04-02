@@ -43,7 +43,7 @@
 //         };
 
 //         const response = await axios.get(
-//           `http://localhost:8080/api/blogs/${id}`,
+//           `https://enhanced-perfectly-dog.ngrok-free.app/api/blogs/${id}`,
 //           { headers }
 //         );
 
@@ -123,7 +123,7 @@
 //         };
 
 //         const response = await axios.get(
-//           "http://localhost:8080/api/blogs",
+//           "https://enhanced-perfectly-dog.ngrok-free.app/api/blogs",
 //           { headers }
 //         );
 

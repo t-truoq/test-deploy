@@ -5,7 +5,7 @@ import { Search, MoreHorizontal, XIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Edit } from "./Edit";
 
-const API_URL = "http://localhost:8080/api/users";
+const API_URL = "https://enhanced-perfectly-dog.ngrok-free.app/api/users";
 
 export function SkinTherapist() {
   const [clients, setClients] = useState([]);

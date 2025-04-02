@@ -42,7 +42,7 @@ export function ContactDashboard() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/contact",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/contact",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -88,7 +88,7 @@ export function ContactDashboard() {
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/contact/${id}/status?status=${status}`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/api/contact/${id}/status?status=${status}`,
         null,
         {
           headers: {

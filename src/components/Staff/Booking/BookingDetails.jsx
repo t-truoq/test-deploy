@@ -31,7 +31,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         }
 
         const servicesResponse = await axios.get(
-          `http://localhost:8080/api/services`,
+          `https://enhanced-perfectly-dog.ngrok-free.app/api/services`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         setServicesList(servicesResponse.data);
 
         const bookingResponse = await axios.get(
-          `http://localhost:8080/api/bookings/${bookingId}`,
+          `https://enhanced-perfectly-dog.ngrok-free.app/api/bookings/${bookingId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -72,7 +72,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
         setBooking({ ...enhancedBooking, status });
 
         const specialistsResponse = await axios.get(
-          `http://localhost:8080/api/users/specialists/active`,
+          `https://enhanced-perfectly-dog.ngrok-free.app/api/users/specialists/active`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -140,7 +140,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
 
       const response = await axios({
         method: "POST",
-        url: `http://localhost:8080${endpoint}`,
+        url: `https://enhanced-perfectly-dog.ngrok-free.app${endpoint}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -189,7 +189,7 @@ export function BookingDetails({ bookingId, onStatusUpdate }) {
       };
 
       const response = await axios.put(
-        `http://localhost:8080/api/bookings/${bookingId}`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/api/bookings/${bookingId}`,
         requestBody,
         {
           headers: {

@@ -66,7 +66,7 @@ const BookingList = ({
       setIsCancelling((prev) => ({ ...prev, [bookingId]: true }))
 
       const response = await fetch(
-        `http://localhost:8080/api/bookings/${bookingId}/cancel`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/api/bookings/${bookingId}/cancel`,
         {
           method: "POST",
           headers: {
@@ -101,7 +101,7 @@ const BookingList = ({
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/bookings/${booking.bookingId}`,
+        `https://enhanced-perfectly-dog.ngrok-free.app/api/bookings/${booking.bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

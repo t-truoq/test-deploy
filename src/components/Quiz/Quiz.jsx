@@ -22,7 +22,7 @@ const Quiz = () => {
           throw new Error("Please login before doing quiz!");
         }
 
-        const response = await axios.get("http://localhost:8080/api/quiz/questions", {
+        const response = await axios.get("https://enhanced-perfectly-dog.ngrok-free.app/api/quiz/questions", {
           headers: {
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true",
@@ -109,7 +109,7 @@ const Quiz = () => {
       });
 
       const response = await axios.post(
-        "http://localhost:8080/api/quiz/submit",
+        "https://enhanced-perfectly-dog.ngrok-free.app/api/quiz/submit",
         submissionData,
         {
           headers: {
